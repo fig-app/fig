@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:internal-tauri": "pnpm --filter @fig/app dev"
+    "dev:internal-tauri": "pnpm --filter @fig/app dev",
+    "build:internal-tauri": "pnpm --filter @fig/app build"
   },
   "keywords": [],
   "author": "",
