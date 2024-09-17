@@ -1,0 +1,12 @@
+{
+  "name": "fig",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:internal-tauri": "pnpm --filter @fig/app dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
