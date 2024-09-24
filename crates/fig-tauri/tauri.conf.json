@@ -1,8 +1,8 @@
 {
   "build": {
-    "beforeBuildCommand": "",
+    "beforeBuildCommand": "pnpm build:internal-tauri",
     "beforeDevCommand": "pnpm dev:internal-tauri",
-    "devPath": "http://localhost:5174",
+    "devPath": "http://localhost:1042",
     "distDir": "tauri.conf.json"
   },
   "package": {

@@ -2,3 +2,18 @@
 resolver = "2"
 members = ["crates/*"]
 
+[workspace.dependencies]
+fig-file = { path = "crates/fig-file" }
+fig-types ={ path = "crates/fig-types"}
+
+[workspace.package]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/fig-app/fig"
+
+[profile.release]
+panic = "abort" # Strip expensive panic clean-up logic
+codegen-units = 1 # Compile crates one after another so the compiler can optimize better
+lto = true # Enables link to optimizations
+opt-level = "s" # Optimize for binary size
+strip = true # Remove debug symbols
+

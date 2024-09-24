@@ -3,10 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "packageManager": "pnpm@9.9.0",
   "scripts": {
-    "dev:internal-tauri": "pnpm --filter @fig/app dev"
+    "dev:ui": "pnpm --filter @fig/ui storybook",
+    "dev:app": "pnpm tauri dev",
+    "dev:internal-tauri": "turbo watch --filter @fig/app dev",
+    "build:internal-tauri": "pnpm --filter @fig/app build"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.6.2",
+    "turbo": "^2.1.2"
+  }
 }

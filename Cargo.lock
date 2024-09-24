@@ -692,6 +692,8 @@ dependencies = [
 name = "fig-app"
 version = "0.1.0"
 dependencies = [
+ "fig-file",
+ "fig-types",
  "serde",
  "serde_json",
  "tauri",

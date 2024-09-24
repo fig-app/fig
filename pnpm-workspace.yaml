@@ -1,0 +1,13 @@
+packages:
+  - 'app'
+  - 'packages/*'
+
+catalog:
+  vite: '^5.0.3'
+catalogs:
+  svelte:
+    svelte: '^4.2.7'
+    '@sveltejs/kit': '^2.0.0'
+    svelte-check: '^4.0.0'
+    '@sveltejs/vite-plugin-svelte': '^3.0.0'
+    '@sveltejs/adapter-static': '^3.0.5'
