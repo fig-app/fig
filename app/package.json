@@ -10,19 +10,22 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"dependencies": {
-		"@tauri-apps/api": "^1.6.0",
 		"@fig/canvas": "workspace:*",
-		"@fig/ui": "workspace:*"
+		"@fig/ui": "workspace:*",
+		"@tauri-apps/api": "^1.6.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "catalog:svelte",
 		"@sveltejs/kit": "catalog:svelte",
 		"@sveltejs/vite-plugin-svelte": "catalog:svelte",
+		"@types/node": "^22.3.0",
+		"autoprefixer": "^10.4.20",
+		"postcss": "^8.4.47",
 		"svelte": "catalog:svelte",
 		"svelte-check": "catalog:svelte",
-		"vite": "catalog:",
+		"tailwindcss": "^3.4.9",
 		"typescript": "^5.0.0",
-		"@types/node": "^22.3.0"
+		"vite": "catalog:"
 	},
 	"type": "module"
 }
