@@ -1,7 +1,10 @@
-<script>
-    import Button from "@fig/ui/button/button.svelte";
+<script lang="ts">
+    import { Button, Switch, Label } from "@fig/ui";
 </script>
 
-<Button>
-    Salut !
-</Button>
+<Button>Coucou</Button>
+
+<div class="flex items-center space-x-2 mt-2">
+    <Switch id="switch" />
+    <Label for="switch">Switch</Label>
+</div>
