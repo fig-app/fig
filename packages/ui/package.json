@@ -1,38 +1,40 @@
 {
-  "name": "@fig/ui",
-  "version": "0.0.1",
-  "type": "module",
-  "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite preview",
-    "package": "svelte-kit sync && svelte-package",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
-  },
-  "devDependencies": {
-    "@sveltejs/adapter-static": "catalog:svelte",
+	"name": "@fig/ui",
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"package": "svelte-kit sync && svelte-package",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"storybook": "storybook dev -p 6006",
+		"build-storybook": "storybook build"
+	},
+	"devDependencies": {
+		"@chromatic-com/storybook": "^1.9.0",
+		"@storybook/addon-essentials": "^8.3.1",
+		"@storybook/addon-interactions": "^8.3.1",
+		"@storybook/addon-links": "^8.3.1",
+		"@storybook/addon-svelte-csf": "^4.1.7",
+		"@storybook/blocks": "^8.3.1",
+		"@storybook/svelte": "^8.3.1",
+		"@storybook/sveltekit": "^8.3.1",
+		"@storybook/test": "^8.3.1",
+		"@sveltejs/adapter-static": "catalog:svelte",
 		"@sveltejs/kit": "catalog:svelte",
+		"@sveltejs/package": "^2.3.2",
 		"@sveltejs/vite-plugin-svelte": "catalog:svelte",
-    "@sveltejs/package": "^2.3.2",
+		"autoprefixer": "^10.4.20",
+		"storybook": "^8.3.1",
 		"svelte": "catalog:svelte",
 		"svelte-check": "catalog:svelte",
-		"vite": "catalog:",
-    "@chromatic-com/storybook": "^1.9.0",
-    "@storybook/addon-essentials": "^8.3.1",
-    "@storybook/addon-interactions": "^8.3.1",
-    "@storybook/addon-links": "^8.3.1",
-    "@storybook/addon-svelte-csf": "^4.1.7",
-    "@storybook/blocks": "^8.3.1",
-    "@storybook/svelte": "^8.3.1",
-    "@storybook/sveltekit": "^8.3.1",
-    "@storybook/test": "^8.3.1",
-    "storybook": "^8.3.1",
-    "typescript": "^5.0.0"
-  },
-  "exports": {
+		"tailwindcss": "^3.4.9",
+		"typescript": "^5.0.0",
+		"vite": "catalog:"
+	},
+	"exports": {
 		"./*.svelte": {
 			"svelte": "./dist/*.svelte",
 			"types": "./dist/*.svelte.d.ts"
@@ -58,5 +60,12 @@
 		"!./dist/*.test.*",
 		"./dist/*.css",
 		"./dist/*.woff2"
-	]
+	],
+	"dependencies": {
+		"bits-ui": "^0.21.15",
+		"clsx": "^2.1.1",
+		"lucide-svelte": "^0.446.0",
+		"tailwind-merge": "^2.5.2",
+		"tailwind-variants": "^0.2.1"
+	}
 }
