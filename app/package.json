@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@fig/canvas": "workspace:*",
 		"@fig/ui": "workspace:*",
+		"@fig/types": "workspace:*",
 		"@tauri-apps/api": "^1.6.0"
 	},
 	"devDependencies": {

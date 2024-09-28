@@ -42,6 +42,9 @@ importers:
       '@fig/canvas':
         specifier: workspace:*
         version: link:../packages/canvas
+      '@fig/types':
+        specifier: workspace:*
+        version: link:../packages/types
       '@fig/ui':
         specifier: workspace:*
         version: link:../packages/ui
@@ -109,6 +112,15 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 5.4.6(@types/node@22.5.5)
+
+  packages/types:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.3.0
+        version: 22.5.5
+      typescript:
+        specifier: ^5.0.0
+        version: 5.6.2
 
   packages/ui:
     dependencies:
