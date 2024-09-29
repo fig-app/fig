@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[allow(dead_code)]
 
 use serde::{Deserialize, Serialize};
@@ -185,41 +187,40 @@ pub struct FlowStartingPoint {
 pub struct LayoutConstraint {
     /// Vertical constraint as an enum
     vertical: LayoutConstraintVertical,
-    /// TOP: Node is laid out relative to top of the containing frame
-    /// BOTTOM: Node is laid out relative to bottom of the containing frame
-    /// CENTER: Node is vertically centered relative to containing frame
-    /// TOP_BOTTOM: Both top and bottom of node are constrained relative to containing frame (node stretches with frame)
-    /// SCALE: Node scales vertically with containing frame
-
     /// Horizontal constraint as an enum
     horizontal: LayoutConstraintHorizontal,
-    /// LEFT: Node is laid out relative to left of the containing frame
-    /// RIGHT: Node is laid out relative to right of the containing frame
-    /// CENTER: Node is horizontally centered relative to containing frame
-    /// LEFT_RIGHT: Both left and right of node are constrained relative to containing frame (node stretches with frame)
-    /// SCALE: Node scales horizontally with containing frame
 }
 
 /// Enum describing vertical layout constraint
 #[derive(Serialize, Deserialize, TS)]
 #[ts(export)]
 pub enum LayoutConstraintVertical {
-    Top, /// Node is laid out relative to top of the containing frame
-    Bottom, /// Node is laid out relative to bottom of the containing frame
-    Center, /// Node is vertically centered relative to containing frame
-    TopBottom, /// Both top and bottom of node are constrained relative to containing frame (node stretches with frame)
-    Scale, /// Node scales vertically with containing frame
+    /// Node is laid out relative to top of the containing frame
+    Top, 
+    /// Node is laid out relative to bottom of the containing frame
+    Bottom, 
+    /// Node is vertically centered relative to containing frame
+    Center, 
+    /// Both top and bottom of node are constrained relative to containing frame (node stretches with frame)
+    TopBottom, 
+    /// Node scales vertically with containing frame
+    Scale, 
 }
 
 /// Enum describing horizontal layout constraint
 #[derive(Serialize, Deserialize, TS)]
 #[ts(export)]
 pub enum LayoutConstraintHorizontal {
-    Left, /// Node is laid out relative to left of the containing frame
-    Right, /// Node is laid out relative to right of the containing frame
-    Center, /// Node is horizontally centered relative to containing frame
-    LeftRight, /// Both left and right of node are constrained relative to containing frame (node stretches with frame)
-    Scale, /// Node scales horizontally with containing frame
+    /// Node is laid out relative to left of the containing frame
+    Left,
+    /// Node is laid out relative to right of the containing frame
+    Right,
+    /// Node is horizontally centered relative to containing frame
+    Center,
+    /// Both left and right of node are constrained relative to containing frame (node stretches with frame)
+    LeftRight,
+    /// Node scales horizontally with containing frame
+    Scale,
 }
 
 /// Guides to align and place objects within a frame
@@ -253,25 +254,31 @@ pub struct LayoutGrid {
     /// Number of columns or rows
     count: i32,
     /// A mapping of field to the VariableAlias of the bound variable
-    bound_variables: Map<String, VariableAlias>,
+    bound_variables: HashMap<String, VariableAlias>,
 }
 
 /// Enum describing pattern of LayoutGrid
 #[derive(Serialize, Deserialize, TS)]
 #[ts(export)]
 pub enum LayoutGridPattern {
-    Columns, /// Vertical grid
-    Rows, /// Horizontal grid
-    Grid, /// Square grid
+    /// Vertical grid
+    Columns,
+    /// Horizontal grid
+    Rows,
+    /// Square grid
+    Grid, 
 }
 
 /// Enum describing alignment of LayoutGrid
 #[derive(Serialize, Deserialize, TS)]
 #[ts(export)]
 pub enum LayoutGridAlignment {
-    Min, /// Grid starts at the left or top of the frame
-    Stretch, /// Grid is stretched to fit the frame
-    Center, /// Grid is center aligned
+    /// Grid starts at the left or top of the frame
+    Min,
+    /// Grid is stretched to fit the frame
+    Stretch,
+    /// Grid is center aligned
+    Center,
 }
 
 /// A visual effect such as a shadow or blur
@@ -299,7 +306,7 @@ pub struct Effect {
     /// Whether to show the shadow behind translucent or transparent pixels (applies only to drop shadows)
     show_shadow_behind_node: bool,
     /// A mapping of field to the VariableAlias of the bound variable.
-    bound_variables: Map<String, VariableAlias>,
+    bound_variables: HashMap<String, VariableAlias>,
 }
 
 /// Enum describing the type of an effect
@@ -388,7 +395,7 @@ pub struct Paint {
     /// Affine transform applied to the image, only present if scaleMode is STRETCH
     image_transform: Transform,
     /// Amount image is scaled by in tiling, only present if scaleMode is TILE
-    scaling_factor: Number,
+    scaling_factor: i32,
     /// Image rotation, in degrees.
     rotation: i32,
     /// A reference to an image embedded in this node. To download the image using this reference, use the GET file images endpoint to retrieve the mapping from image references to image URLs
@@ -398,7 +405,7 @@ pub struct Paint {
     /// A reference to the GIF embedded in this node, if the image is a GIF. To download the image using this reference, use the GET file images endpoint to retrieve the mapping from image references to image URLs
     gif_ref: String,
     /// A mapping of field to the VariableAlias of the bound variable.
-    bound_variables: Map<String, VariableAlias>,
+    bound_variables: HashMap<String, VariableAlias>,
 }
 
 /// Enum describing the scale mode of a paint
@@ -472,13 +479,20 @@ pub struct Transform {
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct ImageFilters {
-    exposure_number: i32, /// default: 0
-    contrast_number: i32, /// default: 0
-    saturation_number: i32, /// default: 0
-    temperature_number: i32, /// default: 0
-    tint_number: i32, /// default: 0
-    highlights_number: i32, /// default: 0
-    shadows_number: i32, /// default: 0
+    /// default: 0
+    exposure_number: i32,
+    /// default: 0
+    contrast_number: i32,
+    /// default: 0
+    saturation_number: i32,
+    /// default: 0
+    temperature_number: i32,
+    /// default: 0
+    tint_number: i32,
+    /// default: 0
+    highlights_number: i32,
+    /// default: 0
+    shadows_number: i32,
 }
 
 /// A stop in a gradient paint that contains information about the stop position, color, and bound variables
@@ -491,7 +505,7 @@ pub struct ColorStop {
     /// Color attached to corresponding position
     color: Color,
     /// Color variable that is attached to the stop if any
-    bound_variables: Map<String, VariableAlias>,
+    bound_variables: HashMap<String, VariableAlias>,
 }
 
 /// Paint metadata to override default paints
@@ -515,11 +529,14 @@ pub struct TypeStyle {
     /// PostScript font name
     font_post_script_name: String,
     /// Space between paragraphs in px, 0 if not present
-    paragraph_spacing: i32, /// default: 0
+    /// default: 0
+    paragraph_spacing: i32, 
     /// Paragraph indentation in px, 0 if not present
-    paragraph_indent: i32, /// default: 0
+    /// default: 0
+    paragraph_indent: i32, 
     /// Space between list items in px, 0 if not present
-    list_spacing: i32, /// default: 0
+    /// default: 0
+    list_spacing: i32, 
     /// Whether or not text is italicized
     italic: bool,
     /// Numeric font weight
@@ -564,9 +581,9 @@ pub struct TypeStyle {
     /// Paints applied to characters
     fills: Vec<Paint>,
     /// Link to a URL or frame
-    hyperlink: Hyperlink,
+    hyperlink: HyperLink,
     /// A map of OpenType feature flags to 1 or 0, 1 if it is enabled and 0 if it is disabled. Note that some flags aren't reflected here. For example, SMCP (small caps) is still represented by the textCase field.
-    opentype_flags: Map<String, i32>, /// default: {}
+    opentype_flags: HashMap<String, i32>, /// default: {}
     /// Line height in px
     line_height_px: i32,
     /// Line height as a percentage of normal line height. This is deprecated; in a future version of the API only lineHeightPx and lineHeightPercentFontSize will be returned.
@@ -623,7 +640,8 @@ pub enum TypeStyleTextTruncation {
 pub enum TypeStyleTextAutoResize {
     Height,
     WdithAndHeight,
-    Truncate, /// [DEPRECATED]
+    /// [DEPRECATED]
+    Truncate, 
 }
 
 /// Enum describing the text decoration of TypeStyle
@@ -784,8 +802,6 @@ pub struct ConnectorEndpoint {
     /// Canvas location as x & y coordinate.
     /// ConnectorEndpoint with endpointNodeId and magnet only:
     position: Vector,
-    /// Node ID this endpoint attaches to.
-    endpoint_node_id: String,
     /// The magnet type is a string enum
     /// AUTO
     /// TOP
@@ -820,10 +836,11 @@ pub enum ConnectorLineType {
 #[ts(export)]
 pub struct ConnectorTextBackground {
     /// Radius of each corner of the rectangle if a single radius is set for all corners
-    corner_radius: CornerRadius,
+    corner_radius: f32,
     /// An array of fill paints applied to the node
     fills: Vec<Paint>,
 }
+
 
 /// Component property definition
 #[derive(Serialize, Deserialize, TS)]
@@ -840,6 +857,8 @@ pub struct ComponentPropertyDefinition {
     preferred_values: Vec<InstanceSwapPreferredValue>
 }
 
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum ComponentPropertyDefinitionDefaultValue {
     Bool(bool),
     String(String),
@@ -857,9 +876,11 @@ pub struct ComponentProperty {
     /// List of user-defined preferred values for this property. Only exists on INSTANCE_SWAP properties
     preferred_values: Vec<InstanceSwapPreferredValue>,
     /// A mapping of field to the VariableAlias of the bound variable.
-    bound_variables: Map<String, VariableAlias>,
+    bound_variables: HashMap<String, VariableAlias>,
 }
 
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum ComponentPropertyValue {
     Bool(bool),
     String(String),
@@ -1150,10 +1171,11 @@ pub enum TriggerType {
     OnKeyDown,
     OnKeyUp,
     OnMediaHit,
-    OnMediaEnd,
 }
 
 /// An action that is performed when a trigger is activated.
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum Action {
     /// An action can be one of the following types:
     BackAction,
@@ -1167,6 +1189,9 @@ pub enum Action {
 }
 
 /// An action that opens a URL.
+#[derive(Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
 pub struct OpenURLAction {
     open_url_action_type: String, // always 'URL'
     url: String,
@@ -1362,7 +1387,7 @@ pub struct EasingFunctionSpring {
 #[ts(export)]
 pub struct SetVariableAction {
     set_variable_action_type: String, // always 'SET_VARIABLE'
-    variable_id: Oprtion<String>,
+    variable_id: Option<String>,
     variable_value: VariableData,
 }
 
@@ -1458,7 +1483,6 @@ pub enum ExpressionFunction {
     Or,
     VarModeLookup,
     Negate,
-    Not,
 }
 
 /// Either the if or else conditional blocks. The if block contains a condition to check. If that condition is met then it will run those list of actions, else it will run the actions in the else block.

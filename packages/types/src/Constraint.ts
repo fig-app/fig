@@ -11,7 +11,7 @@ export type Constraint = {
  * WIDTH: Scale proportionally and set width to value
  * HEIGHT: Scale proportionally and set height to value
  */
-ctype: ConstraintType, 
+constraint_type: ConstraintType, 
 /**
  * See ctype property for effect of this field 
  */
