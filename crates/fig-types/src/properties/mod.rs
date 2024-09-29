@@ -1,6 +1,12 @@
 #[allow(dead_code)]
 
+use serde::{Deserialize, Serialize};
+use ts_rs::TS;
+
+
 /// An RGBA color
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct Color {
     /// Red channel value, between 0 and 1
     r: f32,
@@ -13,6 +19,8 @@ pub struct Color {
 }
 
 /// An RBG Color
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct RGBColor {
     /// Red channel value, between 0 and 1
     r: f32,
@@ -23,6 +31,8 @@ pub struct RGBColor {
 }
 
 /// Format and size to export an asset at
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct ExportSetting {
     /// File suffix to append to all filenames
     suffix: String,
@@ -33,6 +43,8 @@ pub struct ExportSetting {
 }
 
 /// Enum describing format type
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum FormatType {
     JPG,
     PNG,
@@ -40,6 +52,8 @@ pub enum FormatType {
 }
 
 /// Sizing constraint for exports
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct Constraint {
     /// Type of constraint to apply; string enum with potential values below
     /// SCALE: Scale by value
@@ -51,13 +65,20 @@ pub struct Constraint {
 }
 
 /// Enum describing type of constraint
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum ConstraintType {
-    SCALE, /// Scale by value
-    WIDTH, /// Scale proportionally and set width to value
-    HEIGHT, /// Scale proportionally and set height to value
+    /// Scale by value
+    Scale,
+    /// Scale proportionally and set width to value
+    Width,
+    /// Scale proportionally and set height to value
+    Height,
 }
 
 /// A rectangle that expresses a bounding box in absolute coordinates
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct Rectangle {
     /// X coordinate of top left corner of the rectangle
     x: i32,
@@ -70,96 +91,139 @@ pub struct Rectangle {
 }
 
 /// Information about the arc properties of an ellipse. 0° is the x axis and increasing angles rotate clockwise
+#[derive(Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
 pub struct ArcData {
     /// Start of the sweep in radians
-    startingAngleNumber: i32,
+    starting_angle_number: i32,
     /// End of the sweep in radians
-    endingAngle: i32,
+    ending_angle: i32,
     /// Inner radius value between 0 and 1
-    innerRadius: f32,
+    inner_radius: f32,
 }
 
 /// Enum describing how layer blends with layers below
+/// This type is a string enum with the following possible values
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum BlendMode {
-    /// This type is a string enum with the following possible values
     /// Normal blends:
-    PASS_THROUGH, /// (only applicable to objects with children)
-    NORMAL,
+    /// (only applicable to objects with children)
+    PassThrough,
+    Normal,
 
     /// Darken:
-    DARKEN,
-    MULTIPLY,
-    LINEAR_BURN, /// ("Plus darker" in Figma)
-    COLOR_BURN,
+    Darken,
+    Multiply,
+    LinearBurn, /// ("Plus darker" in Figma)
+    ColorBurn,
 
     /// Lighten:
-    LIGHTEN,
-    SCREEN,
-    LINEAR_DODGE, /// ("Plus lighter" in Figma)
-    COLOR_DODGE,
+    Lighten,
+    Screen,
+    LinearDodge, /// ("Plus lighter" in Figma)
+    ColorDodge,
 
     /// Contrast:
-    OVERLAY,
-    SOFT_LIGHT,
-    HARD_LIGHT,
+    Overlay,
+    SoftLight,
+    HardLight,
 
     /// Inversion:
-    DIFFERENCE,
-    EXCLUSION,
+    Difference,
+    Exclusion,
 
     /// Component:
-    HUE,
-    SATURATION,
-    COLOR,
-    LUMINOSITY,
+    Hue,
+    Saturation,
+    Color,
+    Luminosity,
 }
 
 /// Enum describing how mask layer operates on the pixels of the layers it masks.
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum MaskType {
-    /// This type is a string enum with the following possible values:
-    ALPHA, /// The mask node's alpha channel will be used to determine the opacity of each pixel in the masked result.
-    VECTOR, /// If the mask node has visible fill paints, every pixel inside the node's fill regions will be fully visible in the masked result. If the mask has visible stroke paints, every pixel inside the node's stroke regions will be fully visible in the masked result.
-    LUMINANCE, /// The luminance value of each pixel of the mask node will be used to determine the opacity of that pixel in the masked result.
+    /// The mask node's alpha channel will be used to determine the opacity of each pixel in the masked result.
+    Alpha,
+    /// If the mask node has visible fill paints, every pixel inside the node's fill regions will be fully visible in the masked result. If the mask has visible stroke paints, every pixel inside the node's stroke regions will be fully visible in the masked result.
+    Vector,
+    /// The luminance value of each pixel of the mask node will be used to determine the opacity of that pixel in the masked result.
+    Luminance,
 }
 
 /// Enum describing animation easing curves
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum EasingType {
-    /// This type is a string enum with the following possible values
-    EASE_IN, /// Ease in with an animation curve similar to CSS ease-in.
-    EASE_OUT, /// Ease out with an animation curve similar to CSS ease-out.
-    EASE_IN_AND_OUT, /// Ease in and then out with an animation curve similar to CSS ease-in-out.
-    LINEAR, /// No easing, similar to CSS linear.
-    GENTLE_SPRING, /// Gentle spring animation similar to react-spring.
+    /// Ease in with an animation curve similar to CSS ease-in.
+    EaseIn,
+    /// Ease out with an animation curve similar to CSS ease-out.
+    EaseOut,
+    /// Ease in and then out with an animation curve similar to CSS ease-in-out.
+    EaseInAndOut,
+    /// No easing, similar to CSS linear.
+    Linear,
+    /// Gentle spring animation similar to react-spring.
+    GentleSpring,
 }
 
 /// A flow starting point used when launching a prototype to enter Presentation view.
+#[derive(Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
 pub struct FlowStartingPoint {
     /// Unique identifier specifying the frame
-    nodeId: String,
+    node_id: String,
     /// Name of flow
     name: String,
 }
 
 /// Layout constraint relative to containing Frame
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct LayoutConstraint {
     /// Vertical constraint as an enum
-    vertical: String,
-    /// TOP: Node is laid out relative to top of the containing frame
-    /// BOTTOM: Node is laid out relative to bottom of the containing frame
-    /// CENTER: Node is vertically centered relative to containing frame
-    /// TOP_BOTTOM: Both top and bottom of node are constrained relative to containing frame (node stretches with frame)
-    /// SCALE: Node scales vertically with containing frame
+    vertical: LayoutVerticalConstraint,
 
     /// Horizontal constraint as an enum
-    horizontal: String,
-    /// LEFT: Node is laid out relative to left of the containing frame
-    /// RIGHT: Node is laid out relative to right of the containing frame
-    /// CENTER: Node is horizontally centered relative to containing frame
-    /// LEFT_RIGHT: Both left and right of node are constrained relative to containing frame (node stretches with frame)
-    /// SCALE: Node scales horizontally with containing frame
+    horizontal: LayoutHorizontalConstraint,
+}
+
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
+pub enum LayoutVerticalConstraint {
+    /// Node is laid out relative to top of the containing frame
+    Top,
+    /// Node is laid out relative to bottom of the containing frame
+    Bottom,
+    /// Node is vertically centered relative to containing frame
+    Center,
+    /// Both top and bottom of node are constrained relative to containing frame (node stretches with frame)
+    TopBottom,
+    /// Node scales vertically with containing frame
+    Scale
+}
+
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
+pub enum LayoutHorizontalConstraint {
+    /// Node is laid out relative to left of the containing frame
+    Left,
+    /// Node is laid out relative to right of the containing frame
+    Right,
+    /// Node is horizontally centered relative to containing frame
+    Center,
+    /// Both left and right of node are constrained relative to containing frame (node stretches with frame)
+    LeftRight,
+    /// Node scales horizontally with containing frame
+    Scale
 }
 
 ///
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum LayoutConstraintVertical {
     
 }
