@@ -7,12 +7,12 @@ export type ArcData = {
 /**
  * Start of the sweep in radians
  */
-starting_angle_number: number, 
+startingAngleNumber: number, 
 /**
  * End of the sweep in radians
  */
-ending_angle: number, 
+endingAngle: number, 
 /**
  * Inner radius value between 0 and 1
  */
-inner_radius: number, };
+innerRadius: number, };

@@ -17,7 +17,7 @@ visible: boolean,
 /**
  * The type of the node.
  */
-ntype: NodeType, 
+nodeType: NodeType, 
 /**
  * The rotation of the node, if not 0.
  */

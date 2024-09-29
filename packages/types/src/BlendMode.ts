@@ -2,5 +2,6 @@
 
 /**
  * Enum describing how layer blends with layers below
+ * This type is a string enum with the following possible values
  */
 export type BlendMode = "PassThrough" | "Normal" | "Darken" | "Multiply" | "LinearBurn" | "ColorBurn" | "Lighten" | "Screen" | "LinearDodge" | "ColorDodge" | "Overlay" | "SoftLight" | "HardLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity";

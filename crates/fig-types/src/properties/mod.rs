@@ -92,6 +92,7 @@ pub struct Rectangle {
 
 /// Information about the arc properties of an ellipse. 0° is the x axis and increasing angles rotate clockwise
 #[derive(Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct ArcData {
     /// Start of the sweep in radians
@@ -170,6 +171,7 @@ pub enum EasingType {
 
 /// A flow starting point used when launching a prototype to enter Presentation view.
 #[derive(Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct FlowStartingPoint {
     /// Unique identifier specifying the frame

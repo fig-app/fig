@@ -7,7 +7,7 @@ export type FlowStartingPoint = {
 /**
  * Unique identifier specifying the frame
  */
-node_id: string, 
+nodeId: string, 
 /**
  * Name of flow
  */
