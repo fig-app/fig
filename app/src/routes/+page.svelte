@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Button, Switch, Label } from "@fig/ui";
+    import type {Node} from "@fig/types/Node"
 </script>
 
 <Button>Coucou</Button>

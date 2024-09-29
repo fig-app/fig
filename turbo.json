@@ -9,7 +9,8 @@
         "dev": {
             "dependsOn": [
                 "@fig/ui#package",
-                "@fig/canvas#package"
+                "@fig/canvas#package",
+                "@fig/types#package"
             ],
             "cache": false,
             "persistent": true

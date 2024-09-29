@@ -18,7 +18,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc"
+    "package": "tsc"
   },
   "devDependencies": {
     "@types/node": "^22.3.0",

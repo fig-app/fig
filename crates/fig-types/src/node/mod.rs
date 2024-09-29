@@ -1,5 +1,10 @@
 #![allow(dead_code)]
 
+use serde::{Deserialize, Serialize};
+use ts_rs::TS;
+
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct Node {
     /// A string uniquely identifying this node within the document.
     id: String,
@@ -13,17 +18,23 @@ pub struct Node {
     rotation: i32
 }
 
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum NodeType {
     Document(DocumentNode),
     Canvas(CanvasNode),
     Vector(VectorNode)
 }
 
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct DocumentNode {
     /// An array of canvases attached to the document.
     children: Vec<Node>
 }
 
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct CanvasNode {
     /// An array of top level layers on the canvas
     children: Vec<Node>,
@@ -33,6 +44,8 @@ pub struct CanvasNode {
     // export_settings: Vec<ExportSetting>
 }
 
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct VectorNode {
     /// If true, layer is locked and cannot be edited.
     locked: bool,
