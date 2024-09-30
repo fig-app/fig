@@ -6,16 +6,15 @@
     import type { CanvasContext } from "$lib/types/CanvasContext";
 
     export let node: Node;
-    // VectorNode<RectangleNode>
 
-    let _node: CanvasNode = {
+    let canvasNode: CanvasNode = {
         draw,
         node: node
     }
 
     let context = getContext<CanvasContext>("canvas");
 
-    context.register(_node);
+    context.register(canvasNode);
 
     function draw(ctx: CanvasRenderingContext2D) {
         if (node.node.type === "rectangle") {

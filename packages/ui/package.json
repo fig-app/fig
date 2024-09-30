@@ -4,6 +4,7 @@
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"prettier": "@fig/tools/prettier.config.js",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -11,8 +12,19 @@
 		"package": "svelte-kit sync && svelte-package",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"format": "prettier --write ./src",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build"
+	},
+	"peerDependencies": {
+		"svelte": "catalog:svelte"
+	},
+	"dependencies": {
+		"bits-ui": "^0.21.15",
+		"clsx": "^2.1.1",
+		"lucide-svelte": "^0.446.0",
+		"tailwind-merge": "^2.5.2",
+		"tailwind-variants": "^0.2.1"
 	},
 	"devDependencies": {
 		"@chromatic-com/storybook": "^1.9.0",
@@ -34,7 +46,9 @@
 		"svelte-check": "catalog:svelte",
 		"tailwindcss": "^3.4.9",
 		"typescript": "^5.0.0",
-		"vite": "catalog:"
+		"vite": "catalog:",
+		"prettier": "^3.3.3",
+		"@fig/tools": "workspace:*"
 	},
 	"exports": {
 		".": {
@@ -66,12 +80,5 @@
 		"!./dist/*.test.*",
 		"./dist/*.css",
 		"./dist/*.woff2"
-	],
-	"dependencies": {
-		"bits-ui": "^0.21.15",
-		"clsx": "^2.1.1",
-		"lucide-svelte": "^0.446.0",
-		"tailwind-merge": "^2.5.2",
-		"tailwind-variants": "^0.2.1"
-	}
+	]
 }

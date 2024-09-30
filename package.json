@@ -8,6 +8,7 @@
     "dev:ui": "pnpm --filter @fig/ui storybook",
     "dev:app": "pnpm tauri dev",
     "dev:internal-tauri": "turbo watch --filter @fig/app dev",
+    "format": "turbo format",
     "build:internal-tauri": "pnpm --filter @fig/app build"
   },
   "keywords": [],
