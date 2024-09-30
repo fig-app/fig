@@ -1,13 +1,11 @@
 use std::collections::HashMap;
 
 #[allow(dead_code)]
-
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 /// An RGBA color
-#[derive(Debug, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "properties/color/")]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Color {
     /// Red channel value, between 0 and 1
     r: f32,
@@ -20,8 +18,7 @@ pub struct Color {
 }
 
 /// An RBG Color
-#[derive(Debug, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "properties/color/")]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RGBColor {
     /// Red channel value, between 0 and 1
     r: f32,
@@ -61,7 +58,7 @@ pub struct Constraint {
     /// WIDTH: Scale proportionally and set width to value
     /// HEIGHT: Scale proportionally and set height to value
     constraint_type: ConstraintType,
-    /// See ctype property for effect of this field 
+    /// See ctype property for effect of this field
     value: f32,
 }
 
@@ -91,7 +88,8 @@ pub struct Rectangle {
     height: i32,
 }
 
-/// Information about the arc properties of an ellipse. 0° is the x axis and increasing angles rotate clockwise
+/// Information about the arc properties of an ellipse. 0° is the x axis and increasing angles
+/// rotate clockwise
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "properties/")]
@@ -117,13 +115,15 @@ pub enum BlendMode {
     /// Darken:
     Darken,
     Multiply,
-    LinearBurn, /// ("Plus darker" in Figma)
+    LinearBurn,
+    /// ("Plus darker" in Figma)
     ColorBurn,
 
     /// Lighten:
     Lighten,
     Screen,
-    LinearDodge, /// ("Plus lighter" in Figma)
+    LinearDodge,
+    /// ("Plus lighter" in Figma)
     ColorDodge,
 
     /// Contrast:
@@ -146,11 +146,15 @@ pub enum BlendMode {
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "properties/")]
 pub enum MaskType {
-    /// The mask node's alpha channel will be used to determine the opacity of each pixel in the masked result.
+    /// The mask node's alpha channel will be used to determine the opacity of each pixel in the
+    /// masked result.
     Alpha,
-    /// If the mask node has visible fill paints, every pixel inside the node's fill regions will be fully visible in the masked result. If the mask has visible stroke paints, every pixel inside the node's stroke regions will be fully visible in the masked result.
+    /// If the mask node has visible fill paints, every pixel inside the node's fill regions will
+    /// be fully visible in the masked result. If the mask has visible stroke paints, every pixel
+    /// inside the node's stroke regions will be fully visible in the masked result.
     Vector,
-    /// The luminance value of each pixel of the mask node will be used to determine the opacity of that pixel in the masked result.
+    /// The luminance value of each pixel of the mask node will be used to determine the opacity of
+    /// that pixel in the masked result.
     Luminance,
 }
 
@@ -196,15 +200,16 @@ pub struct LayoutConstraint {
 #[ts(export, export_to = "properties/layout/")]
 pub enum LayoutConstraintVertical {
     /// Node is laid out relative to top of the containing frame
-    Top, 
+    Top,
     /// Node is laid out relative to bottom of the containing frame
-    Bottom, 
+    Bottom,
     /// Node is vertically centered relative to containing frame
-    Center, 
-    /// Both top and bottom of node are constrained relative to containing frame (node stretches with frame)
-    TopBottom, 
+    Center,
+    /// Both top and bottom of node are constrained relative to containing frame (node stretches
+    /// with frame)
+    TopBottom,
     /// Node scales vertically with containing frame
-    Scale, 
+    Scale,
 }
 
 /// Enum describing horizontal layout constraint
@@ -217,7 +222,8 @@ pub enum LayoutConstraintHorizontal {
     Right,
     /// Node is horizontally centered relative to containing frame
     Center,
-    /// Both left and right of node are constrained relative to containing frame (node stretches with frame)
+    /// Both left and right of node are constrained relative to containing frame (node stretches
+    /// with frame)
     LeftRight,
     /// Node scales horizontally with containing frame
     Scale,
@@ -266,7 +272,7 @@ pub enum LayoutGridPattern {
     /// Horizontal grid
     Rows,
     /// Square grid
-    Grid, 
+    Grid,
 }
 
 /// Enum describing alignment of LayoutGrid
@@ -281,7 +287,8 @@ pub enum LayoutGridAlignment {
     Center,
 }
 
-/// Determines if the layer should stretch along the parent’s counter axis. This property is only provided for direct children of auto-layout frames.
+/// Determines if the layer should stretch along the parent’s counter axis. This property is only
+/// provided for direct children of auto-layout frames.
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "properties/layout/")]
 pub enum LayoutAlign {
@@ -305,7 +312,7 @@ pub struct Effect {
     radius: i32,
 
     /// The following properties are for shadows only:
-    
+
     /// The color of the shadow
     color: Color,
     /// Blend mode of the shadow
@@ -313,8 +320,10 @@ pub struct Effect {
     /// How far the shadow is projected in the x and y directions
     offset: Vector,
     /// How far the shadow spreads
-    spread: i32, /// default : 0
-    /// Whether to show the shadow behind translucent or transparent pixels (applies only to drop shadows)
+    spread: i32,
+    /// default : 0
+    /// Whether to show the shadow behind translucent or transparent pixels (applies only to drop
+    /// shadows)
     show_shadow_behind_node: bool,
     /// A mapping of field to the VariableAlias of the bound variable.
     bound_variables: HashMap<String, VariableAlias>,
@@ -377,26 +386,36 @@ pub struct Paint {
     /// VIDEO
     paint_type: PaintType,
     /// Is the paint enabled?
-    visible: bool, /// default : true
-    /// Overall opacity of paint (colors within the paint can also have opacity values which would blend with this)
-    opacity: f32, /// default : true
+    visible: bool,
+    /// default : true
+    /// Overall opacity of paint (colors within the paint can also have opacity values which would
+    /// blend with this)
+    opacity: f32,
+    /// default : true
 
     /// For solid paints :
-    
+
     /// Solid color of the paint
     color: Color,
 
     /// For gradient paints :
 
-    /// How this node blends with nodes behind it in the scene (see blend mode section for more details)
+    /// How this node blends with nodes behind it in the scene (see blend mode section for more
+    /// details)
     blend_mode: BlendMode,
-    /// This field contains three vectors, each of which are a position in normalized object space (normalized object space is if the top left corner of the bounding box of the object is (0, 0) and the bottom right is (1,1)). The first position corresponds to the start of the gradient (value 0 for the purposes of calculating gradient stops), the second position is the end of the gradient (value 1), and the third handle position determines the width of the gradient. See image examples below :
+    /// This field contains three vectors, each of which are a position in normalized object space
+    /// (normalized object space is if the top left corner of the bounding box of the object is (0,
+    /// 0) and the bottom right is (1,1)). The first position corresponds to the start of the
+    /// gradient (value 0 for the purposes of calculating gradient stops), the second position is
+    /// the end of the gradient (value 1), and the third handle position determines the width of
+    /// the gradient. See image examples below :
     gradient_handle_positions: Vec<Vector>, // 3 vecs only
-    /// Positions of key points along the gradient axis with the colors anchored there. Colors along the gradient are interpolated smoothly between neighboring gradient stops.
+    /// Positions of key points along the gradient axis with the colors anchored there. Colors
+    /// along the gradient are interpolated smoothly between neighboring gradient stops.
     gradient_stops: Vec<ColorStop>,
 
     /// For image paints :
-    
+
     /// Image scaling mode
     /// FILL
     /// FIT
@@ -409,11 +428,17 @@ pub struct Paint {
     scaling_factor: i32,
     /// Image rotation, in degrees.
     rotation: i32,
-    /// A reference to an image embedded in this node. To download the image using this reference, use the GET file images endpoint to retrieve the mapping from image references to image URLs
+    /// A reference to an image embedded in this node. To download the image using this reference,
+    /// use the GET file images endpoint to retrieve the mapping from image references to image
+    /// URLs
     image_ref: String,
-    /// Defines what image filters have been applied to this paint, if any. If this property is not defined, no filters have been applied.
-    filters: ImageFilters, /// default : {}
-    /// A reference to the GIF embedded in this node, if the image is a GIF. To download the image using this reference, use the GET file images endpoint to retrieve the mapping from image references to image URLs
+    /// Defines what image filters have been applied to this paint, if any. If this property is not
+    /// defined, no filters have been applied.
+    filters: ImageFilters,
+    /// default : {}
+    /// A reference to the GIF embedded in this node, if the image is a GIF. To download the image
+    /// using this reference, use the GET file images endpoint to retrieve the mapping from image
+    /// references to image URLs
     gif_ref: String,
     /// A mapping of field to the VariableAlias of the bound variable.
     bound_variables: HashMap<String, VariableAlias>,
@@ -450,7 +475,8 @@ pub enum PaintType {
 pub struct Path {
     /// A series of path commands that encodes how to draw the path.
     path: String,
-    /// The winding rule for the path (same as in SVGs). This determines whether a given point in space is inside or outside the path.
+    /// The winding rule for the path (same as in SVGs). This determines whether a given point in
+    /// space is inside or outside the path.
     winding_rule: String,
     /// If there is a per-region fill, this refers to an ID in the fillOverrideTable.
     override_id: i32,
@@ -473,15 +499,17 @@ pub struct Size {
     /// the width of a size
     width: i32,
     /// the height of a size
-    height: i32, 
+    height: i32,
 }
 
 /// A 2x3 affine transformation matrix
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "properties/")]
 pub struct Transform {
-    /// A 2D affine transformation matrix that can be used to calculate the affine transforms applied to a layer, including scaling, rotation, shearing, and translation.
-    /// The form of the matrix is given as an array of 2 arrays of 3 numbers each. E.g. the identity matrix would be    [[1, 0, 0],
+    /// A 2D affine transformation matrix that can be used to calculate the affine transforms
+    /// applied to a layer, including scaling, rotation, shearing, and translation. The form of
+    /// the matrix is given as an array of 2 arrays of 3 numbers each. E.g. the identity matrix
+    /// would be    [[1, 0, 0],
     matrix: Vec<Vec<i32>>, // 2 vecs containing each a vec of 3 i32 number
 }
 
@@ -506,7 +534,8 @@ pub struct ImageFilters {
     shadows_number: i32,
 }
 
-/// A stop in a gradient paint that contains information about the stop position, color, and bound variables
+/// A stop in a gradient paint that contains information about the stop position, color, and bound
+/// variables
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "properties/")]
@@ -541,13 +570,13 @@ pub struct TypeStyle {
     font_post_script_name: String,
     /// Space between paragraphs in px, 0 if not present
     /// default: 0
-    paragraph_spacing: i32, 
+    paragraph_spacing: i32,
     /// Paragraph indentation in px, 0 if not present
     /// default: 0
-    paragraph_indent: i32, 
+    paragraph_indent: i32,
     /// Space between list items in px, 0 if not present
     /// default: 0
-    list_spacing: i32, 
+    list_spacing: i32,
     /// Whether or not text is italicized
     italic: bool,
     /// Numeric font weight
@@ -560,22 +589,31 @@ pub struct TypeStyle {
     /// TITLE
     /// SMALL_CAPS
     /// SMALL_CAPS_FORCED
-    text_case: TypeStyleTextCase, /// default: ORIGINAL
+    text_case: TypeStyleTextCase,
+    /// default: ORIGINAL
     /// Text decoration applied to the node, default is none
     /// STRIKETHROUGH
     /// UNDERLINE
-    text_decoration: TypeStyleTextDecoration, /// default: NONE
-    /// Dimensions along which text will auto resize, default is that the text does not auto-resize. TRUNCATE means that the text will be shortened and trailing text will be replaced with "…" if the text contents is larger than the bounds. TRUNCATE as a return value is deprecated and will be removed in a future version. Read fromtextTruncation instead.
-    /// HEIGHT
+    text_decoration: TypeStyleTextDecoration,
+    /// default: NONE
+    /// Dimensions along which text will auto resize, default is that the text does not
+    /// auto-resize. TRUNCATE means that the text will be shortened and trailing text will be
+    /// replaced with "…" if the text contents is larger than the bounds. TRUNCATE as a return
+    /// value is deprecated and will be removed in a future version. Read fromtextTruncation
+    /// instead. HEIGHT
     /// WIDTH_AND_HEIGHT
     /// [DEPRECATED] TRUNCATE
-    text_auto_resize: TypeStyleTextAutoResize, /// default: NONE
-    /// Whether this text node will truncate with an ellipsis when the text contents is larger than the text node.
-    /// DISABLED
+    text_auto_resize: TypeStyleTextAutoResize,
+    /// default: NONE
+    /// Whether this text node will truncate with an ellipsis when the text contents is larger than
+    /// the text node. DISABLED
     /// ENDING
-    text_truncation: TypeStyleTextTruncation, /// default: DISABLED
-    /// When textTruncation: "ENDING" is set, maxLinesdetermines how many lines a text node can grow to before it truncates
-    max_lines: i32, /// default: null
+    text_truncation: TypeStyleTextTruncation,
+    /// default: DISABLED
+    /// When textTruncation: "ENDING" is set, maxLinesdetermines how many lines a text node can
+    /// grow to before it truncates
+    max_lines: i32,
+    /// default: null
     /// Horizontal text alignment as string enum
     /// LEFT
     /// RIGHT
@@ -593,20 +631,28 @@ pub struct TypeStyle {
     fills: Vec<Paint>,
     /// Link to a URL or frame
     hyperlink: HyperLink,
-    /// A map of OpenType feature flags to 1 or 0, 1 if it is enabled and 0 if it is disabled. Note that some flags aren't reflected here. For example, SMCP (small caps) is still represented by the textCase field.
-    opentype_flags: HashMap<String, i32>, /// default: {}
+    /// A map of OpenType feature flags to 1 or 0, 1 if it is enabled and 0 if it is disabled. Note
+    /// that some flags aren't reflected here. For example, SMCP (small caps) is still represented
+    /// by the textCase field.
+    opentype_flags: HashMap<String, i32>,
+    /// default: {}
     /// Line height in px
     line_height_px: i32,
-    /// Line height as a percentage of normal line height. This is deprecated; in a future version of the API only lineHeightPx and lineHeightPercentFontSize will be returned.
-    line_height_percent: i32, /// default: 100
-    /// Line height as a percentage of the font size. Only returned when lineHeightPercent is not 100.
+    /// Line height as a percentage of normal line height. This is deprecated; in a future version
+    /// of the API only lineHeightPx and lineHeightPercentFontSize will be returned.
+    line_height_percent: i32,
+    /// default: 100
+    /// Line height as a percentage of the font size. Only returned when lineHeightPercent is not
+    /// 100.
     line_height_percent_font_size: i32,
     /// The unit of the line height value specified by the user.
     /// PIXELS
     /// FONT_SIZE_%
     /// INTRINSIC_%
     line_height_unit: TypeStyleLineHeightUnit,
-    /// Whether or not there are overrides over a text style. The possible fields to override are semanticWeight, semanticItalic, hyperlink, and textDecoration. If this is true, then those fields are overrides if present.
+    /// Whether or not there are overrides over a text style. The possible fields to override are
+    /// semanticWeight, semanticItalic, hyperlink, and textDecoration. If this is true, then those
+    /// fields are overrides if present.
     is_override_over_text_style: bool,
     /// Indicates how the font weight was overridden when there is a text style override.
     /// BOLD
@@ -652,7 +698,7 @@ pub enum TypeStyleTextAutoResize {
     Height,
     WdithAndHeight,
     /// [DEPRECATED]
-    Truncate, 
+    Truncate,
 }
 
 /// Enum describing the text decoration of TypeStyle
@@ -735,7 +781,8 @@ pub struct ComponentSet {
     remote: bool,
 }
 
-/// A set of properties that can be applied to nodes and published. Styles for a property can be created in the corresponding property's panel while editing a file
+/// A set of properties that can be applied to nodes and published. Styles for a property can be
+/// created in the corresponding property's panel while editing a file
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "properties/")]
@@ -766,7 +813,9 @@ pub enum StyleType {
     Grid,
 }
 
-/// Geometric shape type. Most shape types have the same name as their tooltip but there are a few exceptions. ENG_DATABASE: Cylinder, ENG_QUEUE: Horizontal cylinder, ENG_FILE: File, ENG_FOLDER: Folder.
+/// Geometric shape type. Most shape types have the same name as their tooltip but there are a few
+/// exceptions. ENG_DATABASE: Cylinder, ENG_QUEUE: Horizontal cylinder, ENG_FILE: File, ENG_FOLDER:
+/// Folder.
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "properties/")]
 pub enum ShapeType {
@@ -807,7 +856,7 @@ pub enum ShapeType {
 #[ts(export, export_to = "properties/")]
 pub struct ConnectorEndpoint {
     /// ConnectorEndpoint with endpointNodeId and position only:
-    
+
     /// Node ID this endpoint attaches to.
     endpoint_node_id: String,
     /// Canvas location as x & y coordinate.
@@ -852,7 +901,6 @@ pub struct ConnectorTextBackground {
     fills: Vec<Paint>,
 }
 
-
 /// Component property definition
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -864,8 +912,9 @@ pub struct ComponentPropertyDefinition {
     default_value: ComponentPropertyDefinitionDefaultValue, // enum boolString, traits, generics ?
     /// All possible values for this property. Only exists on VARIANT properties
     variant_options: Vec<String>,
-    /// List of user-defined preferred values for this property. Only exists on INSTANCE_SWAP properties
-    preferred_values: Vec<InstanceSwapPreferredValue>
+    /// List of user-defined preferred values for this property. Only exists on INSTANCE_SWAP
+    /// properties
+    preferred_values: Vec<InstanceSwapPreferredValue>,
 }
 
 #[derive(Debug, Serialize, Deserialize, TS)]
@@ -883,8 +932,9 @@ pub struct ComponentProperty {
     /// Type of this component property
     component_property_type: ComponentPropertyType,
     /// Value of this property set on this instance
-    value: ComponentPropertyValue, 
-    /// List of user-defined preferred values for this property. Only exists on INSTANCE_SWAP properties
+    value: ComponentPropertyValue,
+    /// List of user-defined preferred values for this property. Only exists on INSTANCE_SWAP
+    /// properties
     preferred_values: Vec<InstanceSwapPreferredValue>,
     /// A mapping of field to the VariableAlias of the bound variable.
     bound_variables: HashMap<String, VariableAlias>,
@@ -1083,7 +1133,7 @@ pub enum StrokeAlign {
     /// Stroke drawn outside the shape boundary
     Outside,
     /// Stroke drawn centered along the shape boundary
-    Center
+    Center,
 }
 
 /// A string enum with values describing the end caps of vector paths.
@@ -1132,7 +1182,9 @@ pub struct Overrides {
 #[ts(export, export_to = "properties/")]
 pub struct VariableAlias {
     variable_alias_type: String, // always 'VARIABLE_ALIAS'
-    /// The id of the variable that the current variable is aliased to. This variable can be a local or remote variable, and both can be retrieved via the GET /v1/files/:file_key/variables/local endpoint.
+    /// The id of the variable that the current variable is aliased to. This variable can be a
+    /// local or remote variable, and both can be retrieved via the GET
+    /// /v1/files/:file_key/variables/local endpoint.
     id: String,
 }
 
@@ -1142,7 +1194,8 @@ pub struct VariableAlias {
 #[ts(export, export_to = "properties/")]
 pub struct DevStatus {
     dev_status_type: DevStatusType,
-    /// An optional field where the designer can add more information about the design and what has changed.
+    /// An optional field where the designer can add more information about the design and what has
+    /// changed.
     description: String,
 }
 
@@ -1165,32 +1218,32 @@ pub struct Interaction {
 }
 
 /// A prototyping Trigger describes the user input needed to cause an interaction to happen.
-/// The "ON_HOVER" and "ON_PRESS" trigger types revert the navigation when the trigger is finished (the result is temporary).
-/// "MOUSE_ENTER", "MOUSE_LEAVE", "MOUSE_UP" and "MOUSE_DOWN" are permanent, one-way navigation. The delay parameter requires the trigger to be held for a certain duration of time before the action occurs. Both timeout and delay values are in milliseconds.
-/// The "ON_MEDIA_HIT" and "ON_MEDIA_END" trigger types can only trigger from a video. They fire when a video reaches a certain time or ends. The timestamp value is in seconds.'
+/// The "ON_HOVER" and "ON_PRESS" trigger types revert the navigation when the trigger is finished
+/// (the result is temporary). "MOUSE_ENTER", "MOUSE_LEAVE", "MOUSE_UP" and "MOUSE_DOWN" are
+/// permanent, one-way navigation. The delay parameter requires the trigger to be held for a certain
+/// duration of time before the action occurs. Both timeout and delay values are in milliseconds.
+/// The "ON_MEDIA_HIT" and "ON_MEDIA_END" trigger types can only trigger from a video. They fire
+/// when a video reaches a certain time or ends. The timestamp value is in seconds.'
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "properties/interaction/")]
 pub struct Trigger {
     trigger_type: TriggerType,
-    
+
     /// For "AFTER_TIMEOUT" events:
-    
     timeout: i32,
-    
+
     /// For "MOUSE_ENTER", "MOUSE_LEAVE", "MOUSE_UP", and "MOUSE_DOWN" events:
-    
     delay: i32,
-    /// Whether this is a deprecated version of the trigger that was left unchanged for backwards compatibility. If not present, the trigger is the latest version.
+    /// Whether this is a deprecated version of the trigger that was left unchanged for backwards
+    /// compatibility. If not present, the trigger is the latest version.
     deprecated_version: bool,
 
     /// For "ON_KEY_DOWN" events:
-
     device: TriggerDevice,
     key_codes: Vec<i32>,
 
     /// For "ON_MEDIA_HIT" events:
-
     media_hit_time: i32,
 }
 
@@ -1255,18 +1308,19 @@ pub struct OpenURLAction {
 #[ts(export, export_to = "properties/interaction/")]
 pub struct UpdateMediaRuntimeAction {
     update_media_runtime_type: String, // always 'UPDATE_MEDIA_RUNTIME'
-    /// The node ID of the media node to update. If destinationId is null, the action will update the media node that contains the action.
+    /// The node ID of the media node to update. If destinationId is null, the action will update
+    /// the media node that contains the action.
     destination_id: Option<String>,
     /// The action to perform on the media node.
     media_action: UpdateMediaRuntimeActionMediaAction,
-    
+
     /// For "SKIP_FORWARD" and "SKIP_BACKWARDS" actions:
-    
+
     /// The amount of time to skip in seconds.
     amount_to_skip: i32,
-    
+
     /// For SKIP_TO actions:
-    
+
     /// The new time to skip to in seconds.
     new_timestamp: i32,
 }
@@ -1295,15 +1349,24 @@ pub struct NodeAction {
     destination_id: Option<String>,
     navigation: Navigation,
     transition: NodeActionTransition,
-    /// Whether the scroll offsets of any scrollable elements in the current screen or overlay are preserved when navigating to the destination. This is applicable only if the layout of both the current frame and its destination are the same.
+    /// Whether the scroll offsets of any scrollable elements in the current screen or overlay are
+    /// preserved when navigating to the destination. This is applicable only if the layout of both
+    /// the current frame and its destination are the same.
     preserve_scroll_position: bool,
-    /// Applicable only when navigation is "OVERLAY" and the destination is a frame with overlayPosition equal to "MANUAL". This value represents the offset by which the overlay is opened relative to this node.
+    /// Applicable only when navigation is "OVERLAY" and the destination is a frame with
+    /// overlayPosition equal to "MANUAL". This value represents the offset by which the overlay is
+    /// opened relative to this node.
     overlay_relative_position: Vector,
-    /// When true, all videos within the destination frame will reset their memorized playback position to 00:00 before starting to play.
+    /// When true, all videos within the destination frame will reset their memorized playback
+    /// position to 00:00 before starting to play.
     reset_video_position: bool,
-    /// Whether the scroll offsets of any scrollable elements in the current screen or overlay reset when navigating to the destination. This is applicable only if the layout of both the current frame and its destination are the same.
+    /// Whether the scroll offsets of any scrollable elements in the current screen or overlay
+    /// reset when navigating to the destination. This is applicable only if the layout of both the
+    /// current frame and its destination are the same.
     reset_scroll_position: bool,
-    /// Whether the state of any interactive components in the current screen or overlay reset when navigating to the destination. This is applicable if there are interactive components in the destination frame.
+    /// Whether the state of any interactive components in the current screen or overlay reset when
+    /// navigating to the destination. This is applicable if there are interactive components in
+    /// the destination frame.
     reset_interactive_components: bool,
 }
 
@@ -1317,11 +1380,13 @@ pub enum NodeActionTransition {
 }
 
 /// The method of navigation. The possible values are:
-///- "NAVIGATE": Replaces the current screen with the destination, also closing all overlays.
-///- "OVERLAY": Opens the destination as an overlay on the current screen.
-///- "SWAP": On an overlay, replaces the current (topmost) overlay with the destination. On a top-level frame, behaves the same as "NAVIGATE" except that no entry is added to the navigation history.
-///- "SCROLL_TO": Scrolls to the destination on the current screen.
-///- "CHANGE_TO": Changes the closest ancestor instance of source node to the specified variant.'
+/// - "NAVIGATE": Replaces the current screen with the destination, also closing all overlays.
+/// - "OVERLAY": Opens the destination as an overlay on the current screen.
+/// - "SWAP": On an overlay, replaces the current (topmost) overlay with the destination. On a
+///   top-level frame, behaves the same as "NAVIGATE" except that no entry is added to the
+///   navigation history.
+/// - "SCROLL_TO": Scrolls to the destination on the current screen.
+/// - "CHANGE_TO": Changes the closest ancestor instance of source node to the specified variant.'
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "properties/")]
@@ -1372,7 +1437,9 @@ pub struct DirectionalTransition {
     duration: i32,
     /// The easing curve of the transition.
     easing: Easing,
-    /// When the transition type is "SMART_ANIMATE" or when matchLayers is true, then the transition will be performed using smart animate, which attempts to match corresponding layers and interpolate other properties during the animation.
+    /// When the transition type is "SMART_ANIMATE" or when matchLayers is true, then the
+    /// transition will be performed using smart animate, which attempts to match corresponding
+    /// layers and interpolate other properties during the animation.
     match_layers: bool,
 }
 
@@ -1453,7 +1520,8 @@ pub struct SetVariableModeAction {
     variable_mode_id: Option<String>,
 }
 
-/// An action that checks if a condition is met before performing certain actions by using an if/else conditional statement.
+/// An action that checks if a condition is met before performing certain actions by using an
+/// if/else conditional statement.
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "properties/")]
@@ -1508,7 +1576,8 @@ pub enum VariableResolvedDataType {
     Color,
 }
 
-/// Defines the Expression object, which contains a list of VariableData objects strung together by operators (VariableData).
+/// Defines the Expression object, which contains a list of VariableData objects strung together by
+/// operators (VariableData).
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "properties/")]
@@ -1537,7 +1606,9 @@ pub enum ExpressionFunction {
     Negate,
 }
 
-/// Either the if or else conditional blocks. The if block contains a condition to check. If that condition is met then it will run those list of actions, else it will run the actions in the else block.
+/// Either the if or else conditional blocks. The if block contains a condition to check. If that
+/// condition is met then it will run those list of actions, else it will run the actions in the
+/// else block.
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "properties/")]

@@ -3,6 +3,7 @@
     import type { CanvasContext } from "./types/CanvasContext";
     import type { CanvasNode } from "./types/CanvasNode";
     import { fillRect } from "$lib/primitive/rect";
+    import { line } from "./primitive/line";
 
     // Exports
     export let width = 100;
@@ -52,7 +53,8 @@
     function draw() {
         if (ctx) {
             ctx.clearRect(0, 0, width, height);
-            fillRect({ctx, x: width / 2, y: height / 2, width, height, color: backgroundColor})
+            fillRect({ctx, x: width / 2, y: height / 2, width, height, color: backgroundColor});
+            line({ctx, start: {x: 20, y: 40}, end: {x: 80, y: 100}, width: 20});
 
             for (const node of pipeline) {
                 node.draw(ctx);
