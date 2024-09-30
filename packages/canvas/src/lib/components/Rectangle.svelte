@@ -22,22 +22,18 @@
     context.register(_node);
 
     function draw(ctx: CanvasRenderingContext2D) {
-        if ("Rectangle" in node.nodeType) {
-            console.log("coucou");
-            
-            let data = node.nodeType.Rectangle;
+        if (node.node.type === "rectangle") {
+            let data = node.node.data;
+
             if (data.absoluteRenderBounds) {
-                console.log("coucouaze");
-                
                 let x = data.absoluteRenderBounds.x;
                 let y = data.absoluteRenderBounds.y;
                 let width = data.absoluteRenderBounds.width;
                 let height = data.absoluteRenderBounds.height;
-                let background = colorToString(data.fills[0].color);
-                let stroke = colorToString(data.strokes[0].color);
+                let background = data.fills.length > 0 ? colorToString(data.fills[0].color) : null;
+                let stroke = data.strokes.length > 0 ? colorToString(data.strokes[0].color) : null;
                 let radius = data.addidionalData.cornerRadius;
                 let strokeWidth = data.strokeWeight;
-                console.log(x, y, width, height, background, stroke);
 
                 rect({ctx, x, y, colors: {background, stroke}, height, width, radius, strokeWidth});
             }

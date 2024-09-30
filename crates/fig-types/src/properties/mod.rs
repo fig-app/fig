@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 /// An RGBA color
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/color/")]
 pub struct Color {
     /// Red channel value, between 0 and 1
     r: f32,
@@ -20,8 +20,8 @@ pub struct Color {
 }
 
 /// An RBG Color
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/color/")]
 pub struct RGBColor {
     /// Red channel value, between 0 and 1
     r: f32,
@@ -32,8 +32,8 @@ pub struct RGBColor {
 }
 
 /// Format and size to export an asset at
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/export/")]
 pub struct ExportSetting {
     /// File suffix to append to all filenames
     suffix: String,
@@ -44,8 +44,8 @@ pub struct ExportSetting {
 }
 
 /// Enum describing format type
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/export/")]
 pub enum FormatType {
     JPG,
     PNG,
@@ -53,8 +53,8 @@ pub enum FormatType {
 }
 
 /// Sizing constraint for exports
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/constraint/")]
 pub struct Constraint {
     /// Type of constraint to apply; string enum with potential values below
     /// SCALE: Scale by value
@@ -66,8 +66,8 @@ pub struct Constraint {
 }
 
 /// Enum describing type of constraint
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/constraint/")]
 pub enum ConstraintType {
     /// Scale by value
     Scale,
@@ -78,8 +78,8 @@ pub enum ConstraintType {
 }
 
 /// A rectangle that expresses a bounding box in absolute coordinates
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub struct Rectangle {
     /// X coordinate of top left corner of the rectangle
     x: i32,
@@ -92,9 +92,9 @@ pub struct Rectangle {
 }
 
 /// Information about the arc properties of an ellipse. 0° is the x axis and increasing angles rotate clockwise
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct ArcData {
     /// Start of the sweep in radians
     starting_angle_number: i32,
@@ -106,8 +106,8 @@ pub struct ArcData {
 
 /// Enum describing how layer blends with layers below
 /// This type is a string enum with the following possible values
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum BlendMode {
     /// Normal blends:
     /// (only applicable to objects with children)
@@ -143,8 +143,8 @@ pub enum BlendMode {
 }
 
 /// Enum describing how mask layer operates on the pixels of the layers it masks.
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum MaskType {
     /// The mask node's alpha channel will be used to determine the opacity of each pixel in the masked result.
     Alpha,
@@ -155,8 +155,8 @@ pub enum MaskType {
 }
 
 /// Enum describing animation easing curves
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/easing/")]
 pub enum EasingType {
     /// Ease in with an animation curve similar to CSS ease-in.
     EaseIn,
@@ -171,9 +171,9 @@ pub enum EasingType {
 }
 
 /// A flow starting point used when launching a prototype to enter Presentation view.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct FlowStartingPoint {
     /// Unique identifier specifying the frame
     node_id: String,
@@ -182,8 +182,8 @@ pub struct FlowStartingPoint {
 }
 
 /// Layout constraint relative to containing Frame
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/layout/")]
 pub struct LayoutConstraint {
     /// Vertical constraint as an enum
     vertical: LayoutConstraintVertical,
@@ -192,8 +192,8 @@ pub struct LayoutConstraint {
 }
 
 /// Enum describing vertical layout constraint
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/layout/")]
 pub enum LayoutConstraintVertical {
     /// Node is laid out relative to top of the containing frame
     Top, 
@@ -208,8 +208,8 @@ pub enum LayoutConstraintVertical {
 }
 
 /// Enum describing horizontal layout constraint
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/layout/")]
 pub enum LayoutConstraintHorizontal {
     /// Node is laid out relative to left of the containing frame
     Left,
@@ -224,9 +224,9 @@ pub enum LayoutConstraintHorizontal {
 }
 
 /// Guides to align and place objects within a frame
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/layout/")]
 pub struct LayoutGrid {
     /// Orientation of the grid as a string enum
     /// COLUMNS: Vertical grid
@@ -258,8 +258,8 @@ pub struct LayoutGrid {
 }
 
 /// Enum describing pattern of LayoutGrid
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/layout/")]
 pub enum LayoutGridPattern {
     /// Vertical grid
     Columns,
@@ -270,8 +270,8 @@ pub enum LayoutGridPattern {
 }
 
 /// Enum describing alignment of LayoutGrid
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/layout/")]
 pub enum LayoutGridAlignment {
     /// Grid starts at the left or top of the frame
     Min,
@@ -281,10 +281,21 @@ pub enum LayoutGridAlignment {
     Center,
 }
 
+/// Determines if the layer should stretch along the parent’s counter axis. This property is only provided for direct children of auto-layout frames.
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/layout/")]
+pub enum LayoutAlign {
+    Inherit,
+    Stretch,
+    Min,
+    Center,
+    Max,
+}
+
 /// A visual effect such as a shadow or blur
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct Effect {
     /// Type of effect as a string enum
     effect_type: EffectType,
@@ -310,8 +321,8 @@ pub struct Effect {
 }
 
 /// Enum describing the type of an effect
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum EffectType {
     InnerShadow,
     DropShadow,
@@ -320,9 +331,9 @@ pub enum EffectType {
 }
 
 /// A link to either a URL or another frame (node) in the document
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct HyperLink {
     /// Type of hyperlink
     /// URL
@@ -335,25 +346,25 @@ pub struct HyperLink {
 }
 
 /// Enum describing the typed of an hyper link
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum HyperLinkType {
     Url,
     Node,
 }
 
 /// Represents a link to documentation for a component.
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub struct DocumentationLink {
     /// Should be a valid URI (e.g. https://www.figma.com).
     uri: String,
 }
 
 /// A solid color, gradient, or image texture that can be applied as fills or strokes
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/paint/")]
 pub struct Paint {
     /// Type of paint as a string enum
     /// SOLID
@@ -409,8 +420,8 @@ pub struct Paint {
 }
 
 /// Enum describing the scale mode of a paint
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/paint/")]
 pub enum PaintScaleMode {
     Fill,
     Fit,
@@ -419,8 +430,8 @@ pub enum PaintScaleMode {
 }
 
 /// Enum describing the type of a paint
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/paint/")]
 pub enum PaintType {
     Solid,
     GradientLienear,
@@ -433,9 +444,9 @@ pub enum PaintType {
 }
 
 /// Defines a single path
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct Path {
     /// A series of path commands that encodes how to draw the path.
     path: String,
@@ -446,8 +457,8 @@ pub struct Path {
 }
 
 /// A 2d vector
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub struct Vector {
     /// X coordinate of the vector
     x: i32,
@@ -456,8 +467,8 @@ pub struct Vector {
 }
 
 /// A width and a height
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub struct Size {
     /// the width of a size
     width: i32,
@@ -466,8 +477,8 @@ pub struct Size {
 }
 
 /// A 2x3 affine transformation matrix
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub struct Transform {
     /// A 2D affine transformation matrix that can be used to calculate the affine transforms applied to a layer, including scaling, rotation, shearing, and translation.
     /// The form of the matrix is given as an array of 2 arrays of 3 numbers each. E.g. the identity matrix would be    [[1, 0, 0],
@@ -475,9 +486,9 @@ pub struct Transform {
 }
 
 /// Defines the image filters applied to an image paint. All values are from -1 to 1.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct ImageFilters {
     /// default: 0
     exposure_number: i32,
@@ -496,9 +507,9 @@ pub struct ImageFilters {
 }
 
 /// A stop in a gradient paint that contains information about the stop position, color, and bound variables
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct ColorStop {
     /// Value between 0 and 1 representing position along gradient axis
     position: i32,
@@ -509,9 +520,9 @@ pub struct ColorStop {
 }
 
 /// Paint metadata to override default paints
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/paint/")]
 pub struct PaintOverride {
     /// Paints applied to characters
     fills: Vec<Paint>,
@@ -520,9 +531,9 @@ pub struct PaintOverride {
 }
 
 /// Metadata for character formatting
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub struct TypeStyle {
     /// Font family of text (standard name)
     font_family: String,
@@ -608,8 +619,8 @@ pub struct TypeStyle {
 }
 
 /// Enum describing the text vertical align of TypeStyle
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub enum TypeStyleTextAlignVertical {
     Top,
     Center,
@@ -617,8 +628,8 @@ pub enum TypeStyleTextAlignVertical {
 }
 
 /// Enum describing the text horizontal align of TypeStyle
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub enum TypeStyleTextAlignHorizontal {
     Left,
     Right,
@@ -627,16 +638,16 @@ pub enum TypeStyleTextAlignHorizontal {
 }
 
 /// Enum describing the text truncation of TypeStyle
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub enum TypeStyleTextTruncation {
     Disabled,
     Ending,
 }
 
 /// Enum describing the text auto resize of TypeStyle
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub enum TypeStyleTextAutoResize {
     Height,
     WdithAndHeight,
@@ -645,16 +656,16 @@ pub enum TypeStyleTextAutoResize {
 }
 
 /// Enum describing the text decoration of TypeStyle
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub enum TypeStyleTextDecoration {
     StrikeThrought,
     Underline,
 }
 
 /// Enum describing the line heignt unit of TypeStyle
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub enum TypeStyleLineHeightUnit {
     Pixels,
     FontSize,
@@ -662,24 +673,24 @@ pub enum TypeStyleLineHeightUnit {
 }
 
 /// Enum describing the semantic weight of TypeStyle
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub enum TypeStyleSemanticWeight {
     Bold,
     Normal,
 }
 
 /// Enum describing the semantic italic of TypeStyle
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub enum TypeStyleSemanticItalic {
     Italic,
     Normal,
 }
 
 /// Enum describing the text case of TypeStyle
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/typeStyle/")]
 pub enum TypeStyleTextCase {
     Upper,
     Lower,
@@ -689,9 +700,9 @@ pub enum TypeStyleTextCase {
 }
 
 /// A description of a main component. Helps you identify which component instances are attached to
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/component/")]
 pub struct Component {
     /// The key of the component
     key: String,
@@ -708,9 +719,9 @@ pub struct Component {
 }
 
 /// A description of a component set, which is a node containing a set of variants of a component
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/component/")]
 pub struct ComponentSet {
     /// The key of the component set
     key: String,
@@ -725,9 +736,9 @@ pub struct ComponentSet {
 }
 
 /// A set of properties that can be applied to nodes and published. Styles for a property can be created in the corresponding property's panel while editing a file
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct Style {
     /// The key of the style
     key: String,
@@ -746,8 +757,8 @@ pub struct Style {
 }
 
 /// Enum describing the type of style
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS, Hash, PartialEq, Eq)]
+#[ts(export, export_to = "properties/")]
 pub enum StyleType {
     Fill,
     Text,
@@ -756,8 +767,8 @@ pub enum StyleType {
 }
 
 /// Geometric shape type. Most shape types have the same name as their tooltip but there are a few exceptions. ENG_DATABASE: Cylinder, ENG_QUEUE: Horizontal cylinder, ENG_FILE: File, ENG_FOLDER: Folder.
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum ShapeType {
     Square,
     Ellipse,
@@ -791,9 +802,9 @@ pub enum ShapeType {
 }
 
 /// Stores canvas location for a connector start/end point.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct ConnectorEndpoint {
     /// ConnectorEndpoint with endpointNodeId and position only:
     
@@ -812,8 +823,8 @@ pub struct ConnectorEndpoint {
 }
 
 /// Enum describing magnet type
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum ConnectorMagnet {
     Auto,
     Top,
@@ -823,17 +834,17 @@ pub enum ConnectorMagnet {
 }
 
 /// Connector line type
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum ConnectorLineType {
     Elbowed,
     Straight,
 }
 
 /// Connector text background.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct ConnectorTextBackground {
     /// Radius of each corner of the rectangle if a single radius is set for all corners
     corner_radius: f32,
@@ -843,9 +854,9 @@ pub struct ConnectorTextBackground {
 
 
 /// Component property definition
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/component/")]
 pub struct ComponentPropertyDefinition {
     /// Type of this component property
     component_type: ComponentPropertyType,
@@ -857,17 +868,17 @@ pub struct ComponentPropertyDefinition {
     preferred_values: Vec<InstanceSwapPreferredValue>
 }
 
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/component/")]
 pub enum ComponentPropertyDefinitionDefaultValue {
     Bool(bool),
     String(String),
 }
 
 /// Component property
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/component/")]
 pub struct ComponentProperty {
     /// Type of this component property
     component_property_type: ComponentPropertyType,
@@ -879,16 +890,16 @@ pub struct ComponentProperty {
     bound_variables: HashMap<String, VariableAlias>,
 }
 
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/component/")]
 pub enum ComponentPropertyValue {
     Bool(bool),
     String(String),
 }
 
 /// Component property type
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/component/")]
 pub enum ComponentPropertyType {
     Boolean,
     InstanceSwap,
@@ -897,8 +908,8 @@ pub enum ComponentPropertyType {
 }
 
 /// Instance swap preferred value
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub struct InstanceSwapPreferredValue {
     /// Type of node for this preferred value
     istance_swap_preferred_value_type: InstanceSwapPreferredValueType,
@@ -907,17 +918,17 @@ pub struct InstanceSwapPreferredValue {
 }
 
 /// Enum describing InstanceSwapPreferredValueType
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum InstanceSwapPreferredValueType {
     Component,
     ComponentSet,
 }
 
 /// The device used to view a prototype
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct PrototypeDevice {
     prototype_device_type: PrototypeDeviceType,
     size: Size,
@@ -927,16 +938,16 @@ pub struct PrototypeDevice {
 }
 
 /// Enum desccribin PrototypeDeviceRotation
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum PrototypeDeviceRotation {
     None,
     CCW90,
 }
 
 /// Enum describing PrototypeDeviceType
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum PrototypeDeviceType {
     None,
     Preset,
@@ -945,23 +956,23 @@ pub enum PrototypeDeviceType {
 }
 
 /// A note and pinned properties left on a node in Dev Mode
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub struct Annotation {
     label: String,
     properties: Vec<AnnotationProperty>,
 }
 
 /// A pinned property in an Annotation
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub struct AnnotationProperty {
     annotation_property_type: AnnotationPropertyType,
 }
 
 /// Enum describing AnnotationPropertyType
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum AnnotationPropertyType {
     Width,
     Height,
@@ -991,9 +1002,9 @@ pub enum AnnotationPropertyType {
 }
 
 /// A pinned distance between two nodes in Dev Mode
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/measurement/")]
 pub struct Measurement {
     id: String,
     start: MeasurementStartEnd,
@@ -1004,26 +1015,26 @@ pub struct Measurement {
 }
 
 /// Enum describing the offest of a Measurement
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/measurement/")]
 pub enum MeasurementOffset {
     MeasurementOffsetInner(MeasurementOffsetInner),
     MeasurementOffsetOuter(MeasurementOffsetOuter),
 }
 
 /// The node and side a measurement is pinned to
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/measurement/")]
 pub struct MeasurementStartEnd {
     node_id: String,
     side: MeasurementStartEndSide,
 }
 
 /// Enum describing MeasurementStartEndSide
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/measurement/")]
 pub enum MeasurementStartEndSide {
     Top,
     Right,
@@ -1032,26 +1043,26 @@ pub enum MeasurementStartEndSide {
 }
 
 /// Measurement offset relative to the inside of the start node
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/measurement/")]
 pub struct MeasurementOffsetInner {
     measurement_offset_inner_type: String, // always 'INNER'
     relative: i32,
 }
 
 /// Measurement offset relative to the outside of the start nod
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/measurement/")]
 pub struct MeasurementOffsetOuter {
     measurement_offset_outer_type: String, // always 'OUTER'
     relative: i32,
 }
 
 /// Individual stroke weights
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/stroke/")]
 pub struct StrokeWeights {
     /// The top stroke weight
     top: i32,
@@ -1063,10 +1074,51 @@ pub struct StrokeWeights {
     left: i32,
 }
 
+/// Position of stroke relative to vector outline, as a string enum
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/stroke/")]
+pub enum StrokeAlign {
+    /// Stroke drawn inside the shape boundary
+    Inside,
+    /// Stroke drawn outside the shape boundary
+    Outside,
+    /// Stroke drawn centered along the shape boundary
+    Center
+}
+
+/// A string enum with values describing the end caps of vector paths.
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/stroke/")]
+pub enum StrokeCap {
+    None,
+    Round,
+    Square,
+    LineArrow,
+    TriangleArrow,
+    DiamondFilled,
+    CircleFilled,
+    TriangleFilled,
+    WashiTape1,
+    WashiTape2,
+    WashiTape3,
+    WashiTape4,
+    WashiTape5,
+    WashiTape6,
+}
+
+/// A string enum describing how corners in vector paths are rendered.
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/stroke/")]
+pub enum StrokeJoin {
+    Mitter,
+    Bevel,
+    Round,
+}
+
 /// Fields directly overridden on an instance. Inherited overrides are not included.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct Overrides {
     /// A unique ID for a node
     id: String,
@@ -1075,9 +1127,9 @@ pub struct Overrides {
 }
 
 /// Contains a variable alias.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct VariableAlias {
     variable_alias_type: String, // always 'VARIABLE_ALIAS'
     /// The id of the variable that the current variable is aliased to. This variable can be a local or remote variable, and both can be retrieved via the GET /v1/files/:file_key/variables/local endpoint.
@@ -1085,9 +1137,9 @@ pub struct VariableAlias {
 }
 
 /// Represents a handoff (or dev) status applied to a node.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct DevStatus {
     dev_status_type: DevStatusType,
     /// An optional field where the designer can add more information about the design and what has changed.
@@ -1095,16 +1147,16 @@ pub struct DevStatus {
 }
 
 /// Enum describing the type of DevStatus
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum DevStatusType {
     ReadyForDev,
     Completed,
 }
 
 /// An interaction in the Figma viewer, containing a trigger and one or more actions.
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/interaction/")]
 pub struct Interaction {
     /// The user event that initiates the interaction.
     trigger: Option<Trigger>,
@@ -1116,9 +1168,9 @@ pub struct Interaction {
 /// The "ON_HOVER" and "ON_PRESS" trigger types revert the navigation when the trigger is finished (the result is temporary).
 /// "MOUSE_ENTER", "MOUSE_LEAVE", "MOUSE_UP" and "MOUSE_DOWN" are permanent, one-way navigation. The delay parameter requires the trigger to be held for a certain duration of time before the action occurs. Both timeout and delay values are in milliseconds.
 /// The "ON_MEDIA_HIT" and "ON_MEDIA_END" trigger types can only trigger from a video. They fire when a video reaches a certain time or ends. The timestamp value is in seconds.'
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/interaction/")]
 pub struct Trigger {
     trigger_type: TriggerType,
     
@@ -1143,9 +1195,9 @@ pub struct Trigger {
 }
 
 /// Enum describing the device of a trigger
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/interaction/")]
 pub enum TriggerDevice {
     Keyboard,
     XboxOne,
@@ -1155,8 +1207,8 @@ pub enum TriggerDevice {
 }
 
 /// Enum describing the type of a trigger,
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/interaction/")]
 pub enum TriggerType {
     OnClick,
     OnHover,
@@ -1174,8 +1226,8 @@ pub enum TriggerType {
 }
 
 /// An action that is performed when a trigger is activated.
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/interaction/")]
 pub enum Action {
     /// An action can be one of the following types:
     BackAction,
@@ -1189,18 +1241,18 @@ pub enum Action {
 }
 
 /// An action that opens a URL.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/interaction/")]
 pub struct OpenURLAction {
     open_url_action_type: String, // always 'URL'
     url: String,
 }
 
 /// An action that affects a video node in the Figma viewer. For example, to play, pause, or skip.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/interaction/")]
 pub struct UpdateMediaRuntimeAction {
     update_media_runtime_type: String, // always 'UPDATE_MEDIA_RUNTIME'
     /// The node ID of the media node to update. If destinationId is null, the action will update the media node that contains the action.
@@ -1220,8 +1272,8 @@ pub struct UpdateMediaRuntimeAction {
 }
 
 /// Enum describing the media action of UpdateMediaRuntimeAction
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/interaction/")]
 pub enum UpdateMediaRuntimeActionMediaAction {
     Play,
     Pause,
@@ -1235,9 +1287,9 @@ pub enum UpdateMediaRuntimeActionMediaAction {
 }
 
 /// An action that navigates to a specific node in the Figma viewer.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/interaction/")]
 pub struct NodeAction {
     node_action_type: String, // alwasy 'NODE'
     destination_id: Option<String>,
@@ -1256,8 +1308,8 @@ pub struct NodeAction {
 }
 
 /// Enum describing the transition of a node action
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/transition/")]
 pub enum NodeActionTransition {
     SimpleTransition(SimpleTransition),
     DirectionalTransition(DirectionalTransition),
@@ -1270,16 +1322,16 @@ pub enum NodeActionTransition {
 ///- "SWAP": On an overlay, replaces the current (topmost) overlay with the destination. On a top-level frame, behaves the same as "NAVIGATE" except that no entry is added to the navigation history.
 ///- "SCROLL_TO": Scrolls to the destination on the current screen.
 ///- "CHANGE_TO": Changes the closest ancestor instance of source node to the specified variant.'
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct Navigation {
-    navigtion_type: NavigationType,
+    navigation_type: NavigationType,
 }
 
 /// Enum describing the type of an animation
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum NavigationType {
     Navigate,
     Swap,
@@ -1289,9 +1341,9 @@ pub enum NavigationType {
 }
 
 /// Describes an animation used when navigating in a prototype.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/transition/")]
 pub struct SimpleTransition {
     simple_transition_type: SimpleTransitionType,
     /// The duration of the transition in milliseconds.
@@ -1301,8 +1353,8 @@ pub struct SimpleTransition {
 }
 
 /// Enum describing the type of a simple transition
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/transition/")]
 pub enum SimpleTransitionType {
     Dissolve,
     SmartAnimate,
@@ -1310,9 +1362,9 @@ pub enum SimpleTransitionType {
 }
 
 /// Describes an animation used when navigating in a prototype.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/transition/")]
 pub struct DirectionalTransition {
     directional_transition_type: DirectionalTransitionType,
     direction: DirectionalTransitionDirection,
@@ -1325,8 +1377,8 @@ pub struct DirectionalTransition {
 }
 
 /// Enum describing the type of a DirectionalTransition
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/transition/")]
 pub enum DirectionalTransitionType {
     MoveIn,
     MoveOut,
@@ -1336,8 +1388,8 @@ pub enum DirectionalTransitionType {
 }
 
 /// Enum describing the directions of DirectionalTransition
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/transition/")]
 pub enum DirectionalTransitionDirection {
     Left,
     Right,
@@ -1346,9 +1398,9 @@ pub enum DirectionalTransitionDirection {
 }
 
 /// Describes an easing curve.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/easing/")]
 pub struct Easing {
     /// The type of easing curve.
     easing_type: EasingType,
@@ -1359,8 +1411,8 @@ pub struct Easing {
 }
 
 /// A cubic bezier curve that defines the easing.
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/easing/")]
 pub struct EasingFunctionCubicBezier {
     /// The x component of the first control point.
     x1: i32,
@@ -1373,8 +1425,8 @@ pub struct EasingFunctionCubicBezier {
 }
 
 /// A spring function that defines the easing.
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/easing/")]
 pub struct EasingFunctionSpring {
     mass: i32,
     stiffness: i32,
@@ -1382,9 +1434,9 @@ pub struct EasingFunctionSpring {
 }
 
 /// An action that sets a variable to a specific value.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct SetVariableAction {
     set_variable_action_type: String, // always 'SET_VARIABLE'
     variable_id: Option<String>,
@@ -1392,9 +1444,9 @@ pub struct SetVariableAction {
 }
 
 /// An action that sets a variable to a specific mode.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct SetVariableModeAction {
     set_variable_mode_action_type: String, // always 'SET_VARIABLE_MODE'
     variable_collection_id: Option<String>,
@@ -1402,18 +1454,18 @@ pub struct SetVariableModeAction {
 }
 
 /// An action that checks if a condition is met before performing certain actions by using an if/else conditional statement.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct ConditionalAction {
     conditional_action_type: String, // always 'CONDITIONAL'
     conditional_blocks: Vec<ConditionalBlock>,
 }
 
 /// A value to set a variable to during prototyping.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct VariableData {
     variable_data_type: VariableDataType,
     resolved_type: VariableResolvedDataType,
@@ -1421,8 +1473,8 @@ pub struct VariableData {
 }
 
 /// Enum decribing the value of a variable data
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum VariableDataValue {
     Bool(bool),
     I32(i32),
@@ -1434,9 +1486,9 @@ pub enum VariableDataValue {
 }
 
 /// Defines the types of data a VariableData object can hold.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub enum VariableDataType {
     Boolean,
     Float,
@@ -1447,8 +1499,8 @@ pub enum VariableDataType {
 }
 
 /// Defines the types of data a VariableData object can eventually equal.
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum VariableResolvedDataType {
     Boolean,
     Float,
@@ -1457,17 +1509,17 @@ pub enum VariableResolvedDataType {
 }
 
 /// Defines the Expression object, which contains a list of VariableData objects strung together by operators (VariableData).
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct Expression {
     expression_function: ExpressionFunction,
     expression_arguments: Vec<VariableData>,
 }
 
 /// Defines the list of operators available to use in an Expression.
-#[derive(Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/")]
 pub enum ExpressionFunction {
     Addition,
     Subtraction,
@@ -1486,9 +1538,9 @@ pub enum ExpressionFunction {
 }
 
 /// Either the if or else conditional blocks. The if block contains a condition to check. If that condition is met then it will run those list of actions, else it will run the actions in the else block.
-#[derive(Serialize, Deserialize, TS)]
+#[derive(Debug, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[ts(export, export_to = "properties/")]
 pub struct ConditionalBlock {
     condition: VariableData,
     actions: Vec<Action>,

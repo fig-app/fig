@@ -52,6 +52,12 @@ export function rect({ctx, x, y, width, height, colors, strokeWidth, radius}: Re
     if (typeof radius === "number" && radius > 0 || Array.isArray(radius) && radius.length > 0) {
         ctx.beginPath();
         ctx.roundRect(startX, startY, width, height, radius);
+        if (colors.background) {
+            ctx.fill();
+        }
+        if (colors.stroke) {
+            ctx.stroke();
+        }
         ctx.closePath();
     } else {
         if (colors.background) {
