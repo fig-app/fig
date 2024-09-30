@@ -6,8 +6,7 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 /// An RGBA color
-#[derive(Debug, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "properties/color/")]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Color {
     /// Red channel value, between 0 and 1
     r: f32,
@@ -20,8 +19,7 @@ pub struct Color {
 }
 
 /// An RBG Color
-#[derive(Debug, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "properties/color/")]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RGBColor {
     /// Red channel value, between 0 and 1
     r: f32,

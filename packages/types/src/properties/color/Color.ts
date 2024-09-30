@@ -3,20 +3,52 @@
 /**
  * An RGBA color
  */
-export type Color = { 
+export type ColorType = { 
 /**
  * Red channel value, between 0 and 1
  */
-r: number, 
+r: number,
 /**
  * Green channel value, between 0 and 1
  */
-g: number, 
+g: number,
 /**
  * Blue channel value, between 0 and 1
  */
-b: number, 
+b: number,
 /**
  * Alpha channel value, between 0 and 1
  */
 a: number, };
+
+
+/**
+ * An RGBA color
+ */
+export class Color {
+    r: number = 0;
+    g: number = 0;
+    b: number = 0;
+    a: number = 1;
+
+    constructor({r, g, b, a}: ColorType) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+    }
+
+    public toString(): string {
+        return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
+    }
+
+    public toObject(): ColorType {
+        return {
+            r: this.r,
+            g: this.g,
+            b: this.b,
+            a: this.a,
+        }
+    }
+
+}
