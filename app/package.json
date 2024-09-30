@@ -2,17 +2,19 @@
 	"name": "@fig/app",
 	"version": "0.0.1",
 	"private": true,
+	"prettier": "@fig/tools/prettier.config.js",
 	"scripts": {
 		"dev": "vite --clearScreen false",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"format": "prettier --write ./src"
 	},
 	"dependencies": {
 		"@fig/canvas": "workspace:*",
-		"@fig/ui": "workspace:*",
 		"@fig/types": "workspace:*",
+		"@fig/ui": "workspace:*",
 		"@tauri-apps/api": "^1.6.0"
 	},
 	"devDependencies": {
@@ -22,11 +24,13 @@
 		"@types/node": "^22.3.0",
 		"autoprefixer": "^10.4.20",
 		"postcss": "^8.4.47",
+		"prettier": "^3.3.3",
 		"svelte": "catalog:svelte",
 		"svelte-check": "catalog:svelte",
 		"tailwindcss": "^3.4.9",
 		"typescript": "^5.0.0",
-		"vite": "catalog:"
+		"vite": "catalog:",
+		"@fig/tools": "workspace:*"
 	},
 	"type": "module"
 }

@@ -1,53 +1,72 @@
 {
-	"name": "@fig/canvas",
-	"version": "0.0.1",
-	"type": "module",
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"package": "svelte-kit sync && svelte-package",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
-	},
-	"dependencies": {
-		"@fig/types": "workspace:*"
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-static": "catalog:svelte",
-		"@sveltejs/kit": "catalog:svelte",
-		"@sveltejs/vite-plugin-svelte": "catalog:svelte",
-		"@sveltejs/package": "^2.3.2",
-		"svelte": "catalog:svelte",
-		"svelte-check": "catalog:svelte",
-		"vite": "catalog:",
-		"typescript": "^5.0.0"
-	},
-	"exports": {
-		"./*.svelte": {
-			"svelte": "./dist/*.svelte",
-			"types": "./dist/*.svelte.d.ts"
-		},
-		"./*": {
-			"import": "./dist/*.js",
-			"types": "./dist/*.d.ts"
-		},
-		"./*.css": {
-			"import": "./dist/styles/*.css"
-		},
-		"./*.json": {
-			"import": "./dist/*.json",
-			"types": "./dist/*.json"
-		}
-	},
-	"files": [
-		"./dist/*.svelte",
-		"./dist/*.json",
-		"./dist/*.js",
-		"./dist/*.json",
-		"./dist/*.d.ts",
-		"!./dist/*.test.*",
-		"./dist/*.css",
-		"./dist/*.woff2"
-	]
+  "name": "@fig/canvas",
+  "version": "0.0.1",
+  "type": "module",
+  "prettier": "@fig/tools/prettier.config.js",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "package": "svelte-kit sync && svelte-package",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "format": "prettier --write ./src",
+	"storybook": "storybook dev -p 6006",
+	"build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "svelte": "catalog:svelte"
+  },
+  "dependencies": {
+    "@fig/types": "workspace:*"
+  },
+  "devDependencies": {
+	"@chromatic-com/storybook": "^1.9.0",
+	"@storybook/addon-essentials": "^8.3.1",
+	"@storybook/addon-interactions": "^8.3.1",
+	"@storybook/addon-links": "^8.3.1",
+	"@storybook/addon-svelte-csf": "^4.1.7",
+	"@storybook/blocks": "^8.3.1",
+	"@storybook/svelte": "^8.3.1",
+	"@storybook/sveltekit": "^8.3.1",
+	"@storybook/test": "^8.3.1",
+	"storybook": "^8.3.1",
+    "@fig/tools": "workspace:*",
+    "@sveltejs/adapter-static": "catalog:svelte",
+    "@sveltejs/kit": "catalog:svelte",
+    "@sveltejs/package": "^2.3.2",
+    "@sveltejs/vite-plugin-svelte": "catalog:svelte",
+    "prettier": "^3.3.3",
+    "svelte": "catalog:svelte",
+    "svelte-check": "catalog:svelte",
+    "typescript": "^5.0.0",
+    "vite": "catalog:"
+  },
+  "exports": {
+    "./*.svelte": {
+      "svelte": "./dist/*.svelte",
+      "types": "./dist/*.svelte.d.ts"
+    },
+    "./*": {
+      "import": "./dist/*.js",
+      "types": "./dist/*.d.ts"
+    },
+    "./*.css": {
+      "import": "./dist/styles/*.css"
+    },
+    "./*.json": {
+      "import": "./dist/*.json",
+      "types": "./dist/*.json"
+    }
+  },
+  "files": [
+    "./dist/*.svelte",
+    "./dist/*.json",
+    "./dist/*.js",
+    "./dist/*.json",
+    "./dist/*.d.ts",
+    "!./dist/*.test.*",
+    "./dist/*.css",
+    "./dist/*.woff2"
+  ]
 }
