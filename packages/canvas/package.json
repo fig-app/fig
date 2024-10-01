@@ -14,9 +14,6 @@
 	"storybook": "storybook dev -p 6006",
 	"build-storybook": "storybook build"
   },
-  "peerDependencies": {
-    "svelte": "catalog:svelte"
-  },
   "dependencies": {
     "@fig/types": "workspace:*"
   },

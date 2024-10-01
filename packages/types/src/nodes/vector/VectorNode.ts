@@ -3,6 +3,7 @@ import type { Annotation } from "../../properties/Annotation";
 import type { BlendMode } from "../../properties/BlendMode";
 import type { EasingType } from "../../properties/easing/EasingType";
 import type { Effect } from "../../properties/Effect";
+import type { ExportSetting } from "../../properties/export/ExportSetting";
 import type { LayoutAlign } from "../../properties/layout/LayoutAlign";
 import type { LayoutConstraint } from "../../properties/layout/LayoutConstraint";
 import type { Paint } from "../../properties/paint/Paint";
@@ -21,7 +22,7 @@ export type VectorNode<Data> = {
 /**
  * If true, layer is locked and cannot be edited.
  */
-locked: boolean, blendMode: BlendMode, 
+locked: boolean, exportSettings: Array<ExportSetting>, blendMode: BlendMode, 
 /**
  * Keep height and width constrained to same ratio
  */
