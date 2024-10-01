@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 use vector::{EmptyData, RectangleData, VectorNode};
 
-use crate::properties::{BlendMode, ColorType, LayoutConstraint};
+use crate::properties::{ColorType};
 
 pub mod vector;
 

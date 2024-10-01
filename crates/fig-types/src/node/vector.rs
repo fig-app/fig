@@ -4,8 +4,9 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 use crate::properties::{
-    Annotation, BlendMode, EasingType, Effect, LayoutAlign, LayoutConstraint, Paint, PaintOverride,
-    Path, Rectangle, Size, StrokeAlign, StrokeCap, StrokeJoin, StrokeWeights, StyleType, Transform,
+    Annotation, ArcData, BlendMode, EasingType, Effect, ExportSetting, LayoutAlign,
+    LayoutConstraint, Paint, PaintOverride, Path, Rectangle, Size, StrokeAlign, StrokeCap,
+    StrokeJoin, StrokeWeights, StyleType, Transform,
 };
 
 #[derive(Serialize, Deserialize, TS)]
@@ -15,7 +16,7 @@ pub struct VectorNode<Data> {
     /// If true, layer is locked and cannot be edited.
     locked: bool,
     //// An array of export settings representing images to export from the node.
-    // export_settings: Vec<ExportSetting>,
+    export_settings: Vec<ExportSetting>,
     //// How this node blends with nodes behind it in the scene
     blend_mode: BlendMode,
     /// Keep height and width constrained to same ratio
@@ -117,4 +118,14 @@ pub struct RectangleData {
     /// default and means that the corner is perfectly circular. A value of 0.6 means the corner
     /// matches the iOS 7 "squircle" icon shape. Other values produce various other curves.
     corner_smoothing: f32,
+}
+
+/// Specific data for ellipse.
+#[derive(Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "nodes/vector/")]
+pub struct EllipseData {
+    /// Start and end angles of the ellipse measured clockwise from the x axis, plus the inner
+    /// radius for donuts
+    arc_data: ArcData,
 }

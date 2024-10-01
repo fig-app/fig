@@ -3,6 +3,7 @@
   import type {CanvasContext} from "./types/CanvasContext";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
+  import {arc} from "$lib/primitive/arc";
 
   // Exports
   export let width = 100;
@@ -87,6 +88,19 @@
         width,
         height,
         color: backgroundColor
+      });
+      arc({
+          ctx,
+          x: 50,
+          y: 50,
+          radius: 50,
+          startAngle: 0,
+          endAngle: 3,
+          colors: {
+              background: "rgba(30, 230, 30, 1)",
+              stroke: "rgba(230, 230, 30, 1)",
+          },
+          strokeWeight: 5,
       });
     }
   }
