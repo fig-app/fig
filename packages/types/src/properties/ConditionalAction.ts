@@ -2,6 +2,7 @@
 import type { ConditionalBlock } from "./ConditionalBlock";
 
 /**
- * An action that checks if a condition is met before performing certain actions by using an if/else conditional statement.
+ * An action that checks if a condition is met before performing certain actions by using an
+ * if/else conditional statement.
  */
 export type ConditionalAction = { conditionalActionType: string, conditionalBlocks: Array<ConditionalBlock>, };

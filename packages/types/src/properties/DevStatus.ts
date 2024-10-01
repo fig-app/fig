@@ -6,6 +6,7 @@ import type { DevStatusType } from "./DevStatusType";
  */
 export type DevStatus = { devStatusType: DevStatusType, 
 /**
- * An optional field where the designer can add more information about the design and what has changed.
+ * An optional field where the designer can add more information about the design and what has
+ * changed.
  */
 description: string, };

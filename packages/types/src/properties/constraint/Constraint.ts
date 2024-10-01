@@ -13,6 +13,6 @@ export type Constraint = {
  */
 constraint_type: ConstraintType, 
 /**
- * See ctype property for effect of this field 
+ * See ctype property for effect of this field
  */
 value: number, };

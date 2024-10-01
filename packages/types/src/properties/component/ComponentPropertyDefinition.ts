@@ -20,6 +20,7 @@ defaultValue: ComponentPropertyDefinitionDefaultValue,
  */
 variantOptions: Array<string>, 
 /**
- * List of user-defined preferred values for this property. Only exists on INSTANCE_SWAP properties
+ * List of user-defined preferred values for this property. Only exists on INSTANCE_SWAP
+ * properties
  */
 preferredValues: Array<InstanceSwapPreferredValue>, };

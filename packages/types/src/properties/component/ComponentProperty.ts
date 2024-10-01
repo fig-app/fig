@@ -17,7 +17,8 @@ componentPropertyType: ComponentPropertyType,
  */
 value: ComponentPropertyValue, 
 /**
- * List of user-defined preferred values for this property. Only exists on INSTANCE_SWAP properties
+ * List of user-defined preferred values for this property. Only exists on INSTANCE_SWAP
+ * properties
  */
 preferredValues: Array<InstanceSwapPreferredValue>, 
 /**

@@ -3,6 +3,7 @@ import type { ExpressionFunction } from "./ExpressionFunction";
 import type { VariableData } from "./VariableData";
 
 /**
- * Defines the Expression object, which contains a list of VariableData objects strung together by operators (VariableData).
+ * Defines the Expression object, which contains a list of VariableData objects strung together by
+ * operators (VariableData).
  */
 export type Expression = { expressionFunction: ExpressionFunction, expressionArguments: Array<VariableData>, };

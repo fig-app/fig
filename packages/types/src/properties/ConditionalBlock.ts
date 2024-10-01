@@ -3,6 +3,8 @@ import type { Action } from "./interaction/Action";
 import type { VariableData } from "./VariableData";
 
 /**
- * Either the if or else conditional blocks. The if block contains a condition to check. If that condition is met then it will run those list of actions, else it will run the actions in the else block.
+ * Either the if or else conditional blocks. The if block contains a condition to check. If that
+ * condition is met then it will run those list of actions, else it will run the actions in the
+ * else block.
  */
 export type ConditionalBlock = { condition: VariableData, actions: Array<Action>, };

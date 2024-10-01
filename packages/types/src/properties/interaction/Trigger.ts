@@ -4,9 +4,12 @@ import type { TriggerType } from "./TriggerType";
 
 /**
  * A prototyping Trigger describes the user input needed to cause an interaction to happen.
- * The "ON_HOVER" and "ON_PRESS" trigger types revert the navigation when the trigger is finished (the result is temporary).
- * "MOUSE_ENTER", "MOUSE_LEAVE", "MOUSE_UP" and "MOUSE_DOWN" are permanent, one-way navigation. The delay parameter requires the trigger to be held for a certain duration of time before the action occurs. Both timeout and delay values are in milliseconds.
- * The "ON_MEDIA_HIT" and "ON_MEDIA_END" trigger types can only trigger from a video. They fire when a video reaches a certain time or ends. The timestamp value is in seconds.'
+ * The "ON_HOVER" and "ON_PRESS" trigger types revert the navigation when the trigger is finished
+ * (the result is temporary). "MOUSE_ENTER", "MOUSE_LEAVE", "MOUSE_UP" and "MOUSE_DOWN" are
+ * permanent, one-way navigation. The delay parameter requires the trigger to be held for a certain
+ * duration of time before the action occurs. Both timeout and delay values are in milliseconds.
+ * The "ON_MEDIA_HIT" and "ON_MEDIA_END" trigger types can only trigger from a video. They fire
+ * when a video reaches a certain time or ends. The timestamp value is in seconds.'
  */
 export type Trigger = { triggerType: TriggerType, 
 /**
@@ -18,7 +21,8 @@ timeout: number,
  */
 delay: number, 
 /**
- * Whether this is a deprecated version of the trigger that was left unchanged for backwards compatibility. If not present, the trigger is the latest version.
+ * Whether this is a deprecated version of the trigger that was left unchanged for backwards
+ * compatibility. If not present, the trigger is the latest version.
  */
 deprecatedVersion: boolean, 
 /**
