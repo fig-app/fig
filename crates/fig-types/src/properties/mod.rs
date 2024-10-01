@@ -475,7 +475,7 @@ pub enum PaintType {
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "properties/")]
 pub struct Path {
-    /// A series of path commands that encodes how to draw the path.
+    /// A series of [path commands](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands) that encodes how to draw the path.
     path: String,
     /// The winding rule for the path (same as in SVGs). This determines whether a given point in
     /// space is inside or outside the path.
