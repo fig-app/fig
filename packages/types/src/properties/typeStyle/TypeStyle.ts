@@ -68,22 +68,26 @@ textCase: TypeStyleTextCase,
 textDecoration: TypeStyleTextDecoration, 
 /**
  * default: NONE
- * Dimensions along which text will auto resize, default is that the text does not auto-resize. TRUNCATE means that the text will be shortened and trailing text will be replaced with "…" if the text contents is larger than the bounds. TRUNCATE as a return value is deprecated and will be removed in a future version. Read fromtextTruncation instead.
- * HEIGHT
+ * Dimensions along which text will auto resize, default is that the text does not
+ * auto-resize. TRUNCATE means that the text will be shortened and trailing text will be
+ * replaced with "…" if the text contents is larger than the bounds. TRUNCATE as a return
+ * value is deprecated and will be removed in a future version. Read fromtextTruncation
+ * instead. HEIGHT
  * WIDTH_AND_HEIGHT
  * [DEPRECATED] TRUNCATE
  */
 textAutoResize: TypeStyleTextAutoResize, 
 /**
  * default: NONE
- * Whether this text node will truncate with an ellipsis when the text contents is larger than the text node.
- * DISABLED
+ * Whether this text node will truncate with an ellipsis when the text contents is larger than
+ * the text node. DISABLED
  * ENDING
  */
 textTruncation: TypeStyleTextTruncation, 
 /**
  * default: DISABLED
- * When textTruncation: "ENDING" is set, maxLinesdetermines how many lines a text node can grow to before it truncates
+ * When textTruncation: "ENDING" is set, maxLinesdetermines how many lines a text node can
+ * grow to before it truncates
  */
 maxLines: number, 
 /**
@@ -115,7 +119,9 @@ fills: Array<Paint>,
  */
 hyperlink: HyperLink, 
 /**
- * A map of OpenType feature flags to 1 or 0, 1 if it is enabled and 0 if it is disabled. Note that some flags aren't reflected here. For example, SMCP (small caps) is still represented by the textCase field.
+ * A map of OpenType feature flags to 1 or 0, 1 if it is enabled and 0 if it is disabled. Note
+ * that some flags aren't reflected here. For example, SMCP (small caps) is still represented
+ * by the textCase field.
  */
 opentypeFlags: { [key in string]?: number }, 
 /**
@@ -124,12 +130,14 @@ opentypeFlags: { [key in string]?: number },
  */
 lineHeightPx: number, 
 /**
- * Line height as a percentage of normal line height. This is deprecated; in a future version of the API only lineHeightPx and lineHeightPercentFontSize will be returned.
+ * Line height as a percentage of normal line height. This is deprecated; in a future version
+ * of the API only lineHeightPx and lineHeightPercentFontSize will be returned.
  */
 lineHeightPercent: number, 
 /**
  * default: 100
- * Line height as a percentage of the font size. Only returned when lineHeightPercent is not 100.
+ * Line height as a percentage of the font size. Only returned when lineHeightPercent is not
+ * 100.
  */
 lineHeightPercentFontSize: number, 
 /**
@@ -140,7 +148,9 @@ lineHeightPercentFontSize: number,
  */
 lineHeightUnit: TypeStyleLineHeightUnit, 
 /**
- * Whether or not there are overrides over a text style. The possible fields to override are semanticWeight, semanticItalic, hyperlink, and textDecoration. If this is true, then those fields are overrides if present.
+ * Whether or not there are overrides over a text style. The possible fields to override are
+ * semanticWeight, semanticItalic, hyperlink, and textDecoration. If this is true, then those
+ * fields are overrides if present.
  */
 isOverrideOverTextStyle: boolean, 
 /**

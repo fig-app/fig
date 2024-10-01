@@ -16,6 +16,8 @@ duration: number,
  */
 easing: Easing, 
 /**
- * When the transition type is "SMART_ANIMATE" or when matchLayers is true, then the transition will be performed using smart animate, which attempts to match corresponding layers and interpolate other properties during the animation.
+ * When the transition type is "SMART_ANIMATE" or when matchLayers is true, then the
+ * transition will be performed using smart animate, which attempts to match corresponding
+ * layers and interpolate other properties during the animation.
  */
 matchLayers: boolean, };

@@ -9,7 +9,8 @@ export type Path = {
  */
 path: string, 
 /**
- * The winding rule for the path (same as in SVGs). This determines whether a given point in space is inside or outside the path.
+ * The winding rule for the path (same as in SVGs). This determines whether a given point in
+ * space is inside or outside the path.
  */
 windingRule: string, 
 /**

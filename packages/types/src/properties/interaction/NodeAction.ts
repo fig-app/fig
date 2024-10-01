@@ -8,22 +8,31 @@ import type { Vector } from "../Vector";
  */
 export type NodeAction = { nodeActionType: string, destinationId: string | null, navigation: Navigation, transition: NodeActionTransition, 
 /**
- * Whether the scroll offsets of any scrollable elements in the current screen or overlay are preserved when navigating to the destination. This is applicable only if the layout of both the current frame and its destination are the same.
+ * Whether the scroll offsets of any scrollable elements in the current screen or overlay are
+ * preserved when navigating to the destination. This is applicable only if the layout of both
+ * the current frame and its destination are the same.
  */
 preserveScrollPosition: boolean, 
 /**
- * Applicable only when navigation is "OVERLAY" and the destination is a frame with overlayPosition equal to "MANUAL". This value represents the offset by which the overlay is opened relative to this node.
+ * Applicable only when navigation is "OVERLAY" and the destination is a frame with
+ * overlayPosition equal to "MANUAL". This value represents the offset by which the overlay is
+ * opened relative to this node.
  */
 overlayRelativePosition: Vector, 
 /**
- * When true, all videos within the destination frame will reset their memorized playback position to 00:00 before starting to play.
+ * When true, all videos within the destination frame will reset their memorized playback
+ * position to 00:00 before starting to play.
  */
 resetVideoPosition: boolean, 
 /**
- * Whether the scroll offsets of any scrollable elements in the current screen or overlay reset when navigating to the destination. This is applicable only if the layout of both the current frame and its destination are the same.
+ * Whether the scroll offsets of any scrollable elements in the current screen or overlay
+ * reset when navigating to the destination. This is applicable only if the layout of both the
+ * current frame and its destination are the same.
  */
 resetScrollPosition: boolean, 
 /**
- * Whether the state of any interactive components in the current screen or overlay reset when navigating to the destination. This is applicable if there are interactive components in the destination frame.
+ * Whether the state of any interactive components in the current screen or overlay reset when
+ * navigating to the destination. This is applicable if there are interactive components in
+ * the destination frame.
  */
 resetInteractiveComponents: boolean, };

@@ -27,11 +27,14 @@ locked: boolean, blendMode: BlendMode,
  */
 preserveRatio: boolean, 
 /**
- * Determines if the layer should stretch along the parent’s counter axis. This property is only provided for direct children of auto-layout frames.
+ * Determines if the layer should stretch along the parent’s counter axis. This property is
+ * only provided for direct children of auto-layout frames.
  */
 layoutAlign: LayoutAlign, 
 /**
- * This property is applicable only for direct children of auto-layout frames, ignored otherwise. Determines whether a layer should stretch along the parent’s primary axis. A 0 corresponds to a fixed size and 1 corresponds to stretch
+ * This property is applicable only for direct children of auto-layout frames, ignored
+ * otherwise. Determines whether a layer should stretch along the parent’s primary axis. A 0
+ * corresponds to a fixed size and 1 corresponds to stretch
  */
 layoutGrow: number, 
 /**
@@ -59,7 +62,10 @@ opacity: number,
  */
 absoluteBoundingBox: Rectangle, 
 /**
- * The actual bounds of a node accounting for drop shadows, thick strokes, and anything else that may fall outside the node's regular bounding box defined in x, y, width, and height. The x and y inside this property represent the absolute position of the node on the page. This value will be null if the node is invisible.
+ * The actual bounds of a node accounting for drop shadows, thick strokes, and anything else
+ * that may fall outside the node's regular bounding box defined in x, y, width, and height.
+ * The x and y inside this property represent the absolute position of the node on the page.
+ * This value will be null if the node is invisible.
  */
 absoluteRenderBounds: Rectangle | null, 
 /**
@@ -67,11 +73,15 @@ absoluteRenderBounds: Rectangle | null,
  */
 effects: Array<Effect>, 
 /**
- * Width and height of element. This is different from the width and height of the bounding box in that the absolute bounding box represents the element after scaling and rotation. Only present if geometry=paths is passed
+ * Width and height of element. This is different from the width and height of the bounding
+ * box in that the absolute bounding box represents the element after scaling and rotation.
+ * Only present if geometry=paths is passed
  */
 size: Size, 
 /**
- * The top two rows of a matrix that represents the 2D transform of this node relative to its parent. The bottom row of the matrix is implicitly always (0, 0, 1). Use to transform coordinates in geometry. Only present if geometry=paths is passed
+ * The top two rows of a matrix that represents the 2D transform of this node relative to its
+ * parent. The bottom row of the matrix is implicitly always (0, 0, 1). Use to transform
+ * coordinates in geometry. Only present if geometry=paths is passed
  */
 relativeTransform: Transform, 
 /**
@@ -83,11 +93,14 @@ isMask: boolean,
  */
 fills: Array<Paint>, 
 /**
- * Only specified if parameter geometry=paths is used. An array of paths representing the object fill
+ * Only specified if parameter geometry=paths is used. An array of paths representing the
+ * object fill
  */
 fillGeometry: Array<Path>, 
 /**
- * Map from ID to PaintOverride for looking up fill overrides. To see which regions are overriden, you must use the geometry=paths option. Each path returned may have an overrideId which maps to this table.
+ * Map from ID to PaintOverride for looking up fill overrides. To see which regions are
+ * overriden, you must use the geometry=paths option. Each path returned may have an
+ * overrideId which maps to this table.
  */
 fillOverrideTable: { [key in number]?: PaintOverride }, 
 /**
@@ -99,7 +112,8 @@ strokes: Array<Paint>,
  */
 strokeWeight: number, 
 /**
- * An object including the top, bottom, left, and right stroke weights. Only returned if individual stroke weights are used.
+ * An object including the top, bottom, left, and right stroke weights. Only returned if
+ * individual stroke weights are used.
  */
 individualStrokeWeights: StrokeWeights, 
 /**
@@ -107,19 +121,24 @@ individualStrokeWeights: StrokeWeights,
  */
 strokeCap: StrokeCap, 
 /**
- *  A string enum with value of "MITER", "BEVEL", or "ROUND", describing how corners in vector paths are rendered.
+ *  A string enum with value of "MITER", "BEVEL", or "ROUND", describing how corners in vector
+ * paths are rendered.
  */
 strokeJoin: StrokeJoin, 
 /**
- * An array of floating point numbers describing the pattern of dash length and gap lengths that the vector path follows. For example a value of [1, 2] indicates that the path has a dash of length 1 followed by a gap of length 2, repeated.
+ * An array of floating point numbers describing the pattern of dash length and gap lengths
+ * that the vector path follows. For example a value of [1, 2] indicates that the path has a
+ * dash of length 1 followed by a gap of length 2, repeated.
  */
 strokeDashes: Array<number>, 
 /**
- * Only valid if strokeJoin is "MITER". The corner angle, in degrees, below which strokeJoin will be set to "BEVEL" to avoid super sharp corners. By default this is 28.96 degrees.
+ * Only valid if strokeJoin is "MITER". The corner angle, in degrees, below which strokeJoin
+ * will be set to "BEVEL" to avoid super sharp corners. By default this is 28.96 degrees.
  */
 strokeMiterAngle: number, 
 /**
- * Only specified if parameter geometry=paths is used. An array of paths representing the object stroke
+ * Only specified if parameter geometry=paths is used. An array of paths representing the
+ * object stroke
  */
 strokeGeometry: Array<Path>, 
 /**
@@ -127,10 +146,12 @@ strokeGeometry: Array<Path>,
  */
 strokeAlign: StrokeAlign, 
 /**
- * A mapping of a StyleType to style ID (see Style) of styles present on this node. The style ID can be used to look up more information about the style in the top-level styles field.
+ * A mapping of a StyleType to style ID (see Style) of styles present on this node. The style
+ * ID can be used to look up more information about the style in the top-level styles field.
  */
 styles: { [key in StyleType]?: string }, 
 /**
- * An array of annotations displaying notes and pinned properties of nodes in Dev Mode. Currently a maximum of 1 annotation is supported.
+ * An array of annotations displaying notes and pinned properties of nodes in Dev Mode.
+ * Currently a maximum of 1 annotation is supported.
  */
 annotations: Array<Annotation>, addidionalData: Data, };

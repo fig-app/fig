@@ -2,7 +2,8 @@
 import type { StyleType } from "./StyleType";
 
 /**
- * A set of properties that can be applied to nodes and published. Styles for a property can be created in the corresponding property's panel while editing a file
+ * A set of properties that can be applied to nodes and published. Styles for a property can be
+ * created in the corresponding property's panel while editing a file
  */
 export type Style = { 
 /**

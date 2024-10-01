@@ -5,8 +5,9 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 /// An RGBA color
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Color {
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/color/")]
+pub struct ColorType {
     /// Red channel value, between 0 and 1
     r: f32,
     /// Green channel value, between 0 and 1
@@ -18,8 +19,9 @@ pub struct Color {
 }
 
 /// An RBG Color
-#[derive(Debug, Serialize, Deserialize)]
-pub struct RGBColor {
+#[derive(Debug, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "properties/color/")]
+pub struct RGBColorType {
     /// Red channel value, between 0 and 1
     r: f32,
     /// Green channel value, between 0 and 1
@@ -244,7 +246,7 @@ pub struct LayoutGrid {
     /// Is the grid currently visible?
     visible: bool,
     /// Color of the grid
-    color: Color,
+    color: ColorType,
 
     /// The following properties are only meaningful for directional grids (COLUMNS or ROWS)
 
@@ -314,7 +316,7 @@ pub struct Effect {
     /// The following properties are for shadows only:
 
     /// The color of the shadow
-    color: Color,
+    color: ColorType,
     /// Blend mode of the shadow
     blend_mode: BlendMode,
     /// How far the shadow is projected in the x and y directions
@@ -396,7 +398,7 @@ pub struct Paint {
     /// For solid paints :
 
     /// Solid color of the paint
-    color: Color,
+    color: ColorType,
 
     /// For gradient paints :
 
@@ -543,7 +545,7 @@ pub struct ColorStop {
     /// Value between 0 and 1 representing position along gradient axis
     position: i32,
     /// Color attached to corresponding position
-    color: Color,
+    color: ColorType,
     /// Color variable that is attached to the stop if any
     bound_variables: HashMap<String, VariableAlias>,
 }
@@ -1547,8 +1549,8 @@ pub enum VariableDataValue {
     Bool(bool),
     I32(i32),
     String(String),
-    Color(Color),
-    RGBColor(RGBColor),
+    Color(ColorType),
+    RGBColor(RGBColorType),
     VariableAlias(VariableAlias),
     Expression(Expression),
 }
