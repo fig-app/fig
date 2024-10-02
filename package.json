@@ -9,7 +9,8 @@
     "dev:app": "pnpm tauri dev",
     "dev:internal-tauri": "turbo watch --filter @fig/app dev",
     "format": "turbo format",
-    "build:internal-tauri": "pnpm --filter @fig/app build"
+    "build:internal-tauri": "pnpm --filter @fig/app build",
+    "all:package": "turbo package"
   },
   "keywords": [],
   "author": "",

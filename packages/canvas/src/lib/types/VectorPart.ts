@@ -1,7 +1,6 @@
-import type { Node } from "@fig/types/nodes/Node";
 import type { CanvasDrawFunction } from "$lib/types/CanvasFunction";
 
-export type CanvasNode = {
+export type VectorPart = {
+  type: "point" | "line";
   draw: CanvasDrawFunction;
-  node: Node;
 };

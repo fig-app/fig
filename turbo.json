@@ -1,22 +1,23 @@
 {
-    "$schema": "https://turbo.build/schema.json",
-    "tasks": {
-        "package": {
-            "outputs": [
-                "dist/**"
-            ]
-        },
-        "dev": {
-            "dependsOn": [
-                "@fig/ui#package",
-                "@fig/canvas#package",
-                "@fig/types#package"
-            ],
-            "cache": false,
-            "persistent": true
-        },
-        "format": {
-            "cache": true
-        }
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "package": {
+      "cache": true,
+      "outputs": [
+        "dist/**"
+      ]
+    },
+    "dev": {
+      "dependsOn": [
+        "@fig/ui#package",
+        "@fig/canvas#package",
+        "@fig/types#package"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "format": {
+      "cache": true
     }
+  }
 }

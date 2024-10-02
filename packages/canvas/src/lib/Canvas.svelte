@@ -31,14 +31,14 @@
   afterUpdate(async () => {
     if (scheduled) return;
 
-    // await component uptate
+    // await canvas update
 
     scheduled = true;
     await tick();
     scheduled = false;
 
-    // component is updated
-    // so redraw the component
+    // canvas is updated
+    // so redraw the canvas background
     drawBackground();
   });
 
@@ -57,7 +57,7 @@
     afterUpdate(async () => {
       if (scheduled) return;
 
-      // await component uptate
+      // await component update
 
       scheduled = true;
       await tick();

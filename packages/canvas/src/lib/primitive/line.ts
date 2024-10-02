@@ -5,7 +5,7 @@ type LineArgs = {
   start: Vector;
   end: Vector;
   color?: string;
-  width?: number;
+  weight?: number;
   cap?: CanvasLineCap;
   join?: CanvasLineJoin;
   dash?: number[];
@@ -16,7 +16,7 @@ export function line({
   start,
   end,
   color = "#fff",
-  width = 1,
+  weight = 1,
   cap = "butt",
   join = "miter",
   dash = [],
@@ -24,7 +24,7 @@ export function line({
   ctx.save();
 
   ctx.strokeStyle = color;
-  ctx.lineWidth = width;
+  ctx.lineWidth = weight;
   ctx.lineCap = cap;
   ctx.lineJoin = join;
   if (dash.length > 0) {
