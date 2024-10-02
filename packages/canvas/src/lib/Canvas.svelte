@@ -4,6 +4,7 @@
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
   import {arc} from "$lib/primitive/arc";
+  import {cursorPosition} from "$lib/stores/cursorPosition";
 
   // Exports
   export let width = 100;
@@ -90,17 +91,17 @@
         color: backgroundColor
       });
       arc({
-          ctx,
-          x: 50,
-          y: 50,
-          radius: 50,
-          startAngle: 0,
-          endAngle: 3,
-          colors: {
-              background: "rgba(30, 230, 30, 1)",
-              stroke: "rgba(230, 230, 30, 1)",
-          },
-          strokeWeight: 5,
+        ctx,
+        x: 50,
+        y: 50,
+        radius: 50,
+        startAngle: 0,
+        endAngle: 3,
+        colors: {
+          background: "rgba(30, 230, 30, 1)",
+          stroke: "rgba(230, 230, 30, 1)",
+        },
+        strokeWeight: 5,
       });
     }
   }
@@ -128,7 +129,8 @@
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
                on:resize={handleWindowResize}/>
 
-<canvas bind:this={canvas} {width} {height}>
+<canvas bind:this={canvas} {width} {height}
+        on:mousemove={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}>
     <slot {width} {height}></slot>
 </canvas>
 
