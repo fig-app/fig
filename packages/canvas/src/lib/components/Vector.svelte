@@ -1,7 +1,14 @@
 <script lang="ts">
   import type {CanvasNode} from "$lib/types/CanvasNode";
-  import type {Node} from "@fig/types/nodes/Node";
-  import {getContext, onDestroy, onMount, setContext} from "svelte";
+  import type {Node} from "@fig/types/dist/nodes/Node";
+  import {
+    afterUpdate,
+    getContext,
+    onDestroy,
+    onMount,
+    setContext,
+    tick
+  } from "svelte";
   import type {CanvasContext} from "$lib/types/CanvasContext";
   import type {VectorPart} from "$lib/types/VectorPart";
   import type {VectorContext} from "$lib/types/VectorContext";
@@ -11,6 +18,7 @@
 
   export let node: Node;
 
+  let scheduled = false;
   let parts: Set<VectorPart> = new Set();
   let geometries_commands = [];
 
@@ -31,6 +39,7 @@
   // Register and unregister vector node
   let canvasNode: CanvasNode = {
     draw,
+    update,
     node: node
   };
 
@@ -53,9 +62,25 @@
     }
   }
 
+  function update() {
+    for (const part of parts) {
+      part.update();
+    }
+  }
+
   function register(part: VectorPart) {
     onMount(() => {
       parts.add(part);
+    });
+
+    afterUpdate(async () => {
+      if (scheduled) return;
+
+      scheduled = true;
+      await tick();
+      scheduled = false;
+
+      context.redraw();
     });
   }
 

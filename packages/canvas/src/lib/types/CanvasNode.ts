@@ -3,5 +3,6 @@ import type { CanvasDrawFunction } from "$lib/types/CanvasFunction";
 
 export type CanvasNode = {
   draw: CanvasDrawFunction;
+  update: () => void;
   node: Node;
 };

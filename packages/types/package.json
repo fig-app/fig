@@ -1,10 +1,17 @@
 {
   "name": "@fig/types",
   "version": "1.0.0",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "scripts": {
+    "package": "tsc"
+  },
   "exports": {
+    ".": {
+      "import": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
+    },
     "./*": {
       "import": "./dist/src/*.ts",
       "types": "./dist/src/*.d.ts"
@@ -13,9 +20,6 @@
   "files": [
     "dist"
   ],
-  "scripts": {
-    "package": "tsc"
-  },
   "devDependencies": {
     "@types/node": "^22.3.0",
     "typescript": "^5.0.0"

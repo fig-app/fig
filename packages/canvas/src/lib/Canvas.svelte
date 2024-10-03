@@ -15,6 +15,7 @@
 
   let canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D | null;
   let scheduled = false;
+  let frameId: number;
 
   let windowWidth = 0;
   let windowHeight = 0;
@@ -22,11 +23,24 @@
 
   onMount(() => {
     ctx = canvas.getContext("2d");
+
+    // Update loop
+    function loop() {
+      update();
+      frameId = requestAnimationFrame(loop);
+    }
+
+    frameId = requestAnimationFrame(loop);
+
     if (fullscreen) {
       width = windowWidth;
       height = windowHeight;
     }
     drawBackground();
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    }
   });
 
   afterUpdate(async () => {
@@ -45,7 +59,8 @@
 
   setContext<CanvasContext>("canvas", {
     register,
-    unregister
+    unregister,
+    redraw: draw
   });
 
   // Functions
@@ -63,6 +78,8 @@
       scheduled = true;
       await tick();
       scheduled = false;
+
+      console.log("Update")
 
       // component is updated
       // so redraw the component
@@ -92,7 +109,7 @@
       });
       arc({
         ctx,
-        x: 50,
+        x: 400,
         y: 50,
         radius: 50,
         startAngle: 0,
@@ -111,6 +128,22 @@
       for (const node of pipeline) {
         node.draw(ctx);
       }
+    }
+  }
+
+  function drawNode(nodeId: number) {
+    if (ctx) {
+      let node = Array.from(pipeline).at(nodeId);
+      if (node) {
+        node.draw(ctx);
+      }
+    }
+  }
+
+  function update() {
+    // console.log(cursorPosition.pos)
+    for (const node of pipeline) {
+      node.update();
     }
   }
 

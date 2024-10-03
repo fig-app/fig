@@ -3,4 +3,4 @@
 /**
  * An action that sets a variable to a specific mode.
  */
-export type SetVariableModeAction = { setVariableModeActionType: string, variableCollectionId: string | null, variableModeId: string | null, };
+export type SetVariableModeAction = { setVariableModeActionType: string, variableCollectionId?: string, variableModeId?: string, };

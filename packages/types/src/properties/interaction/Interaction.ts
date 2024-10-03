@@ -9,7 +9,7 @@ export type Interaction = {
 /**
  * The user event that initiates the interaction.
  */
-trigger: Trigger | null, 
+trigger?: Trigger, 
 /**
  * The actions that are performed when the trigger is activated.
  */
