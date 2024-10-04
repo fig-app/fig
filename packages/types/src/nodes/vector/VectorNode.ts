@@ -22,7 +22,15 @@ export type VectorNode<Data> = {
 /**
  * If true, layer is locked and cannot be edited.
  */
-locked: boolean, exportSettings: Array<ExportSetting>, blendMode: BlendMode, 
+locked: boolean, 
+/**
+ * An array of export settings representing images to export from the node.
+ */
+exportSettings: Array<ExportSetting>, 
+/**
+ * How this node blends with nodes behind it in the scene
+ */
+blendMode: BlendMode, 
 /**
  * Keep height and width constrained to same ratio
  */
@@ -45,11 +53,11 @@ constraint: LayoutConstraint,
 /**
  * Node ID of node to transition to in prototyping
  */
-transitionNodeId: string | null, 
+transitionNodeId?: string, 
 /**
  * The duration of the prototyping transition on this node (in milliseconds)
  */
-transitionDuration: number | null, 
+transitionDuration?: number, 
 /**
  * The easing curve used in the prototyping transition on this node
  */
@@ -68,7 +76,7 @@ absoluteBoundingBox: Rectangle,
  * The x and y inside this property represent the absolute position of the node on the page.
  * This value will be null if the node is invisible.
  */
-absoluteRenderBounds: Rectangle | null, 
+absoluteRenderBounds?: Rectangle, 
 /**
  * An array of effects attached to this node (see effects section for more details)
  */

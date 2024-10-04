@@ -6,7 +6,7 @@ import type { Vector } from "../Vector";
 /**
  * An action that navigates to a specific node in the Figma viewer.
  */
-export type NodeAction = { nodeActionType: string, destinationId: string | null, navigation: Navigation, transition: NodeActionTransition, 
+export type NodeAction = { nodeActionType: string, destinationId?: string, navigation: Navigation, transition: NodeActionTransition, 
 /**
  * Whether the scroll offsets of any scrollable elements in the current screen or overlay are
  * preserved when navigating to the destination. This is applicable only if the layout of both

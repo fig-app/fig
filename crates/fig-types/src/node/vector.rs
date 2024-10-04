@@ -15,9 +15,9 @@ use crate::properties::{
 pub struct VectorNode<Data> {
     /// If true, layer is locked and cannot be edited.
     locked: bool,
-    //// An array of export settings representing images to export from the node.
+    /// An array of export settings representing images to export from the node.
     export_settings: Vec<ExportSetting>,
-    //// How this node blends with nodes behind it in the scene
+    /// How this node blends with nodes behind it in the scene
     blend_mode: BlendMode,
     /// Keep height and width constrained to same ratio
     preserve_ratio: bool,
@@ -31,8 +31,10 @@ pub struct VectorNode<Data> {
     /// Horizontal and vertical layout constraints for node
     constraint: LayoutConstraint,
     /// Node ID of node to transition to in prototyping
+    #[ts(optional)]
     transition_node_id: Option<String>,
     /// The duration of the prototyping transition on this node (in milliseconds)
+    #[ts(optional)]
     transition_duration: Option<i32>,
     /// The easing curve used in the prototyping transition on this node
     transition_easing: EasingType,
@@ -44,6 +46,7 @@ pub struct VectorNode<Data> {
     /// that may fall outside the node's regular bounding box defined in x, y, width, and height.
     /// The x and y inside this property represent the absolute position of the node on the page.
     /// This value will be null if the node is invisible.
+    #[ts(optional)]
     absolute_render_bounds: Option<Rectangle>,
     /// An array of effects attached to this node (see effects section for more details)
     effects: Vec<Effect>,

@@ -7,7 +7,7 @@ use ts_rs::TS;
 /// An RGBA color
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "properties/color/")]
-pub struct ColorType {
+pub struct Color {
     /// Red channel value, between 0 and 1
     r: f32,
     /// Green channel value, between 0 and 1
@@ -21,7 +21,7 @@ pub struct ColorType {
 /// An RBG Color
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "properties/color/")]
-pub struct RGBColorType {
+pub struct RGBColor {
     /// Red channel value, between 0 and 1
     r: f32,
     /// Green channel value, between 0 and 1
@@ -246,7 +246,7 @@ pub struct LayoutGrid {
     /// Is the grid currently visible?
     visible: bool,
     /// Color of the grid
-    color: ColorType,
+    color: Color,
 
     /// The following properties are only meaningful for directional grids (COLUMNS or ROWS)
 
@@ -316,7 +316,7 @@ pub struct Effect {
     /// The following properties are for shadows only:
 
     /// The color of the shadow
-    color: ColorType,
+    color: Color,
     /// Blend mode of the shadow
     blend_mode: BlendMode,
     /// How far the shadow is projected in the x and y directions
@@ -398,7 +398,7 @@ pub struct Paint {
     /// For solid paints :
 
     /// Solid color of the paint
-    color: ColorType,
+    color: Color,
 
     /// For gradient paints :
 
@@ -545,7 +545,7 @@ pub struct ColorStop {
     /// Value between 0 and 1 representing position along gradient axis
     position: i32,
     /// Color attached to corresponding position
-    color: ColorType,
+    color: Color,
     /// Color variable that is attached to the stop if any
     bound_variables: HashMap<String, VariableAlias>,
 }
@@ -1214,6 +1214,7 @@ pub enum DevStatusType {
 #[ts(export, export_to = "properties/interaction/")]
 pub struct Interaction {
     /// The user event that initiates the interaction.
+    #[ts(optional)]
     trigger: Option<Trigger>,
     /// The actions that are performed when the trigger is activated.
     actions: Vec<Action>,
@@ -1312,6 +1313,7 @@ pub struct UpdateMediaRuntimeAction {
     update_media_runtime_type: String, // always 'UPDATE_MEDIA_RUNTIME'
     /// The node ID of the media node to update. If destinationId is null, the action will update
     /// the media node that contains the action.
+    #[ts(optional)]
     destination_id: Option<String>,
     /// The action to perform on the media node.
     media_action: UpdateMediaRuntimeActionMediaAction,
@@ -1348,6 +1350,7 @@ pub enum UpdateMediaRuntimeActionMediaAction {
 #[ts(export, export_to = "properties/interaction/")]
 pub struct NodeAction {
     node_action_type: String, // alwasy 'NODE'
+    #[ts(optional)]
     destination_id: Option<String>,
     navigation: Navigation,
     transition: NodeActionTransition,
@@ -1508,6 +1511,7 @@ pub struct EasingFunctionSpring {
 #[ts(export, export_to = "properties/")]
 pub struct SetVariableAction {
     set_variable_action_type: String, // always 'SET_VARIABLE'
+    #[ts(optional)]
     variable_id: Option<String>,
     variable_value: VariableData,
 }
@@ -1518,7 +1522,9 @@ pub struct SetVariableAction {
 #[ts(export, export_to = "properties/")]
 pub struct SetVariableModeAction {
     set_variable_mode_action_type: String, // always 'SET_VARIABLE_MODE'
+    #[ts(optional)]
     variable_collection_id: Option<String>,
+    #[ts(optional)]
     variable_mode_id: Option<String>,
 }
 
@@ -1549,8 +1555,8 @@ pub enum VariableDataValue {
     Bool(bool),
     I32(i32),
     String(String),
-    Color(ColorType),
-    RGBColor(RGBColorType),
+    Color(Color),
+    RGBColor(RGBColor),
     VariableAlias(VariableAlias),
     Expression(Expression),
 }
