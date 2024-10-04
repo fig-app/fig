@@ -1,6 +1,6 @@
 <script lang="ts">
   import type {CanvasNode} from "$lib/types/CanvasNode";
-  import type {Node} from "@fig/types/dist/nodes/Node";
+  import type {Node} from "@fig/types/nodes/Node";
   import {
     afterUpdate,
     getContext,
@@ -105,6 +105,10 @@
 
         {#if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
             <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
+        {/if}
+
+        {#if (command.type === "Z")}
+            <VectorLine geometryIndex={gi} startIndex={i} endIndex={0}/>
         {/if}
 
     {/each}

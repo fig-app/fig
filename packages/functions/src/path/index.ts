@@ -1,4 +1,4 @@
-import type { Vector } from "@fig/types/dist/properties/Vector";
+import type { Vector } from "@fig/types/properties/Vector";
 import { PathCommand } from "./PathCommand";
 
 type ArcDefinition = {

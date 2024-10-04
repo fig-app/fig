@@ -1,4 +1,4 @@
-import {Color} from "@fig/types/dist/properties/color/Color";
+import {Color} from "@fig/types/properties/color/Color";
 
 /**
  * Color to string

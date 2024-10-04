@@ -120,7 +120,7 @@
         end: endCommand.endPoint
       }, cursorPosition
     });
-    clicked = hovered && canvasClick.clicked;
+    clicked = hovered && canvasClick.single;
   }
 
 </script>

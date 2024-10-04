@@ -1,4 +1,4 @@
-import { Vector } from "@fig/types/dist/properties/Vector";
+import { Vector } from "@fig/types/properties/Vector";
 
 const { abs, pow, sqrt } = Math;
 

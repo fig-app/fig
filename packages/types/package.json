@@ -9,12 +9,12 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./*": {
-      "import": "./dist/src/*.ts",
-      "types": "./dist/src/*.d.ts"
+      "import": "./dist/*.ts",
+      "types": "./dist/*.d.ts"
     }
   },
   "files": [
