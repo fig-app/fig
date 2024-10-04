@@ -8,6 +8,7 @@
   import {cursorPosition} from "$lib/stores/cursorPosition";
   import {canvasClick} from "$lib/stores/canvasClick";
   import {arc} from "$lib/primitive/arc";
+  import {useId} from "@fig/functions/id";
 
   export let geometryIndex: number;
   export let startIndex: number;
@@ -15,46 +16,65 @@
 
   let hovered = false;
   let clicked = false;
+  let dragged = false;
+
+  // Register and unregister part
   let part: VectorPart = {
+    id: useId(),
     type: "line",
     draw,
     update,
     selected: false
   };
 
-  // Register and unregister part
   let context = getContext<VectorContext>("vector");
-
   context.register(part);
-
   onDestroy(() => {
     context.unregister(part);
   })
 
+  // Line commands
   let startCommand = context.geometries_commands[geometryIndex][startIndex] as MLTPathCommand;
   let endCommand = context.geometries_commands[geometryIndex][endIndex] as MLTPathCommand;
+
   let center = centerOfSegment({
     start: startCommand.endPoint,
     end: endCommand.endPoint
   });
 
-  console.log("Geometry", geometryIndex, "Line", startIndex, "Commands:", startCommand, endCommand)
+  // Force update when startCommand of endCommand change (trigger the redraw)
+  $: startCommand || endCommand;
 
+  // Debug
+  console.log("Geometry", geometryIndex, "Line", startIndex, endIndex, "Commands:", startCommand, endCommand)
   $: console.log("hovered", hovered, "clicked", clicked, "selected", part.selected);
+  // $: console.log(startIndex, endIndex, context.isDragged(part))
 
-  $: clicked && (() => {
-    if (clicked && part.selected) {
-      part.selected = false;
-      context.setSelectedPart(null);
-    } else if (clicked && !part.selected) {
+  // Update selected state
+  $: dragged && (() => {
+    context.setDraggedPart(part);
+
+    if (dragged && !part.selected && context.isDragged(part)) {
       part.selected = true;
       context.setSelectedPart(part);
     }
-  })()
+  })();
+
+  $: !dragged && !canvasClick.pressed && (() => {
+    context.setDraggedPart(null, part);
+  })();
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
-    if (hovered && part.selected) {
+    if (dragged) {
+      line({
+        ctx,
+        start: startCommand.endPoint,
+        end: endCommand.endPoint,
+        color: "rgb(12, 140, 233)",
+        weight: 2
+      });
+    } else if (hovered && part.selected) {
       line({
         ctx,
         start: startCommand.endPoint,
@@ -121,6 +141,24 @@
       }, cursorPosition
     });
     clicked = hovered && canvasClick.single;
+    dragged = dragged && canvasClick.pressed && context.isDragged(part) || hovered && canvasClick.pressed && !context.isDragged(part);
+
+    center = centerOfSegment({
+      start: startCommand.endPoint,
+      end: endCommand.endPoint
+    });
+
+    if (dragged) {
+      let x = cursorPosition.x - canvasClick.clickPoint.x;
+      let y = cursorPosition.y - canvasClick.clickPoint.y;
+      canvasClick.setClickPoint(cursorPosition.pos)
+
+      startCommand.endPoint.x += x;
+      startCommand.endPoint.y += y;
+
+      endCommand.endPoint.x += x;
+      endCommand.endPoint.y += y;
+    }
   }
 
 </script>

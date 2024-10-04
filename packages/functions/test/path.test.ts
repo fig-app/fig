@@ -8,12 +8,12 @@ describe("Test parsePathString function", () => {
   });
 
   it("With simple path", () => {
-    let path = "M 15.2 40 v 5.30 M 10,5.4";
+    let path = "M 15.2 40 v 5.30 M 10,5.4 Z";
     expect(parsePathString(path)).toStrictEqual([
       {
         type: "M",
         relative: false,
-        end_point: { x: 15.2, y: 40 },
+        endPoint: { x: 15.2, y: 40 },
       },
       {
         type: "v",
@@ -23,7 +23,11 @@ describe("Test parsePathString function", () => {
       {
         type: "M",
         relative: false,
-        end_point: { x: 10, y: 5.4 },
+        endPoint: { x: 10, y: 5.4 },
+      },
+      {
+        type: "Z",
+        relative: false,
       },
     ]);
   });

@@ -145,9 +145,8 @@
 
   function update() {
     // console.log(cursorPosition.pos)
-    // console.log("Single", canvasClick.single)
+    // console.log("Single", canvasClick.single, "Pressed", canvasClick.pressed)
     // console.log("Double", canvasClick.double)
-    // console.log("Pressed", canvasClick.pressed)
     for (const node of pipeline) {
       node.update();
     }
@@ -169,19 +168,20 @@
                on:resize={handleWindowResize}/>
 
 <canvas bind:this={canvas} {width} {height}
-        on:mousemove={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}
+        on:mousemove|preventDefault={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}
         on:click={(e) => {
-          canvasClick.setSingleClick(true, {x: e.clientX, y: e.clientY});
-          clearTimeout(clickTimeout);
-          clickTimeout = setTimeout(() => {
-              canvasClick.resetClick();
-          }, 100)
+            canvasClick.setSingleClick(true, {x: e.clientX, y: e.clientY});
+
+            clearTimeout(clickTimeout);
+            clickTimeout = setTimeout(() => {
+                canvasClick.resetClick()
+            }, 100)
         }}
-        on:dblclick={(_) => {
-          canvasClick.setDoubleClick(true);
+        on:dblclick={(e) => {
+          canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
         }}
-        on:mousedown={(_) => {
-          canvasClick.setPress(true)
+        on:mousedown={(e) => {
+          canvasClick.setPress(true, {x: e.clientX, y: e.clientY})
         }}
         on:mouseup={(_) => canvasClick.resetClick()}>
     <slot {width} {height}></slot>
