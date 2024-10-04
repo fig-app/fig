@@ -1,5 +1,6 @@
 import { Vector } from "@fig/types/dist/properties/Vector";
 import { pointsDistance } from "./point";
+import { Line } from "@fig/types/dist/shapes/Line";
 
 const { abs, pow, sqrt } = Math;
 
@@ -15,10 +16,7 @@ type HoverLineArgs = {
  * Check if the cursor is on the mouse.
  */
 export function hoverLine({ line, cursorPosition }: HoverLineArgs): boolean {
-  if (pointToSegmentDistance({ line, point: cursorPosition }) < 5) {
-    return true;
-  }
-  return false;
+  return pointToSegmentDistance({ line, point: cursorPosition }) < 6;
 }
 
 type PointToLineDistanceArgs = {
@@ -55,19 +53,19 @@ export function pointToSegmentDistance({
   line: { start, end },
   point,
 }: PointToLineDistanceArgs) {
-  var A = point.x - start.x;
-  var B = point.y - start.y;
-  var C = end.x - start.x;
-  var D = end.y - start.y;
+  let A = point.x - start.x;
+  let B = point.y - start.y;
+  let C = end.x - start.x;
+  let D = end.y - start.y;
 
-  var dot = A * C + B * D;
-  var len_sq = C * C + D * D;
-  var param = -1;
+  let dot = A * C + B * D;
+  let len_sq = C * C + D * D;
+  let param = -1;
   if (len_sq != 0)
     //in case of 0 length line
     param = dot / len_sq;
 
-  var xx, yy;
+  let xx, yy;
 
   if (param < 0) {
     xx = start.x;
@@ -80,8 +78,15 @@ export function pointToSegmentDistance({
     yy = start.y + param * D;
   }
 
-  var dx = point.x - xx;
-  var dy = point.y - yy;
+  let dx = point.x - xx;
+  let dy = point.y - yy;
 
   return sqrt(dx * dx + dy * dy);
+}
+
+export function centerOfSegment(line: Line): Vector {
+  return {
+    x: (line.start.x + line.end.x) / 2,
+    y: (line.start.y + line.end.y) / 2,
+  };
 }
