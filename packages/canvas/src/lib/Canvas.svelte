@@ -5,6 +5,7 @@
   import {fillRect} from "$lib/primitive/rect";
   import {arc} from "$lib/primitive/arc";
   import {cursorPosition} from "$lib/stores/cursorPosition";
+  import {canvasClick} from "$lib/stores/canvasClick";
 
   // Exports
   export let width = 100;
@@ -20,6 +21,8 @@
   let windowWidth = 0;
   let windowHeight = 0;
   let resizeTimeout: NodeJS.Timeout;
+
+  let clickTimeout: NodeJS.Timeout;
 
   onMount(() => {
     ctx = canvas.getContext("2d");
@@ -113,7 +116,7 @@
         y: 50,
         radius: 50,
         startAngle: 0,
-        endAngle: 3,
+        endAngle: 2,
         colors: {
           background: "rgba(30, 230, 30, 1)",
           stroke: "rgba(230, 230, 30, 1)",
@@ -142,6 +145,7 @@
 
   function update() {
     // console.log(cursorPosition.pos)
+    // console.log(canvasClick.clicked)
     for (const node of pipeline) {
       node.update();
     }
@@ -163,7 +167,11 @@
                on:resize={handleWindowResize}/>
 
 <canvas bind:this={canvas} {width} {height}
-        on:mousemove={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}>
+        on:mousemove={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}
+        on:mousedown={(_) => {
+          canvasClick.setClick(true)
+        }}
+        on:mouseup={(_) => canvasClick.setClick(false)}>
     <slot {width} {height}></slot>
 </canvas>
 

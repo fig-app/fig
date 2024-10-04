@@ -21,7 +21,9 @@
   let scheduled = false;
   let parts: Set<VectorPart> = new Set();
   let geometries_commands = [];
+  let selectedPart: VectorPart | null = null;
 
+  // Parse all geometries path to an array of PathCommand
   if (node.node.type === "vector") {
     let geometries = node.node.data.strokeGeometry;
     for (const geometry of geometries) {
@@ -33,6 +35,7 @@
   setContext<VectorContext>("vector", {
     register,
     unregister,
+    setSelectedPart,
     geometries_commands,
   });
 
@@ -86,6 +89,13 @@
 
   function unregister(part: VectorPart) {
     parts.delete(part);
+  }
+
+  function setSelectedPart(part: VectorPart | null) {
+    if (selectedPart) {
+      selectedPart.selected = false;
+    }
+    selectedPart = part;
   }
 
 </script>

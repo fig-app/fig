@@ -4,5 +4,5 @@ export type VectorPart = {
   type: "point" | "line";
   draw: CanvasDrawFunction;
   update: () => void;
-  hovered: boolean;
+  selected: boolean;
 };
