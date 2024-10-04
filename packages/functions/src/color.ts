@@ -1,15 +1,15 @@
-import {ColorType} from "@fig/types/dist/properties/color/ColorType";
+import {Color} from "@fig/types/dist/properties/color/Color";
 
 /**
  * Color to string
  */
-export function colorToString(color: ColorType): string {
+export function colorToString(color: Color): string {
   return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
 }
 
 /**
  * RGBColor to string
  */
-export function rgbColorToString(color: ColorType): string {
+export function rgbColorToString(color: Color): string {
   return `rgb(${color.r}, ${color.g}, ${color.b})`;
 }

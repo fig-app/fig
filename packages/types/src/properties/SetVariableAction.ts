@@ -4,4 +4,4 @@ import type { VariableData } from "./VariableData";
 /**
  * An action that sets a variable to a specific value.
  */
-export type SetVariableAction = { setVariableActionType: string, variableId: string | null, variableValue: VariableData, };
+export type SetVariableAction = { setVariableActionType: string, variableId?: string, variableValue: VariableData, };

@@ -9,7 +9,7 @@ export type UpdateMediaRuntimeAction = { updateMediaRuntimeType: string,
  * The node ID of the media node to update. If destinationId is null, the action will update
  * the media node that contains the action.
  */
-destinationId: string | null, 
+destinationId?: string, 
 /**
  * The action to perform on the media node.
  */

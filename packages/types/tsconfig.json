@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "module": "ESNext",
+    "module": "ES6",
     "outDir": "dist",
     "moduleResolution": "Node",
     "declaration": true,
@@ -11,7 +11,9 @@
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-		"strictPropertyInitialization": false,
+    "strictPropertyInitialization": false
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts"
+  ]
 }

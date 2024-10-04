@@ -6,7 +6,7 @@ type ArcDefinition = {
   rotation: number;
   large: boolean;
   clockwise: boolean;
-  end_point: Vector;
+  endPoint: Vector;
 };
 
 /**
@@ -58,7 +58,7 @@ export function parsePathString(d: string): PathCommand[] {
         rotation: rotation,
         large: large,
         clockwise: sweep,
-        end_point: end,
+        endPoint: end,
       };
     },
   };
@@ -91,7 +91,7 @@ export function parsePathString(d: string): PathCommand[] {
         sequence.push({
           type: command,
           relative,
-          end_point: getSequence<Vector>("coordinate_pair")[0],
+          endPoint: getSequence<Vector>("coordinate_pair")[0],
         });
         break;
 
@@ -103,8 +103,8 @@ export function parsePathString(d: string): PathCommand[] {
         sequence.push({
           type: command,
           relative,
-          end_point: coords[0],
-          control_points: {
+          endPoint: coords[0],
+          controlPoints: {
             start: coords[1],
             end: coords[2],
           },
@@ -122,8 +122,8 @@ export function parsePathString(d: string): PathCommand[] {
         sequence.push({
           type: command,
           relative,
-          end_point: coords[0],
-          control_point: coords[1],
+          endPoint: coords[0],
+          controlPoint: coords[1],
         });
         break;
 
@@ -154,7 +154,7 @@ export function parsePathString(d: string): PathCommand[] {
           rotation: data.rotation,
           large: data.large,
           clockwise: data.clockwise,
-          end_point: data.end_point,
+          endPoint: data.endPoint,
         });
         break;
 

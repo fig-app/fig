@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 use vector::{EmptyData, RectangleData, VectorNode};
 
-use crate::properties::{ColorType};
+use crate::properties::Color;
 
 pub mod vector;
 
@@ -49,7 +49,7 @@ pub struct CanvasNode {
     /// An array of top level layers on the canvas
     children: Vec<Node>,
     //// Background color of the canvas.
-    background_color: ColorType,
+    background_color: Color,
     //// An array of export settings representing images to export from the canvas
     // export_settings: Vec<ExportSetting>
 }

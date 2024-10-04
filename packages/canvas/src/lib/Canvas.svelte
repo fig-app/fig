@@ -4,6 +4,7 @@
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
   import {arc} from "$lib/primitive/arc";
+  import {cursorPosition} from "$lib/stores/cursorPosition";
 
   // Exports
   export let width = 100;
@@ -14,6 +15,7 @@
 
   let canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D | null;
   let scheduled = false;
+  let frameId: number;
 
   let windowWidth = 0;
   let windowHeight = 0;
@@ -21,11 +23,24 @@
 
   onMount(() => {
     ctx = canvas.getContext("2d");
+
+    // Update loop
+    function loop() {
+      update();
+      frameId = requestAnimationFrame(loop);
+    }
+
+    frameId = requestAnimationFrame(loop);
+
     if (fullscreen) {
       width = windowWidth;
       height = windowHeight;
     }
     drawBackground();
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    }
   });
 
   afterUpdate(async () => {
@@ -44,7 +59,8 @@
 
   setContext<CanvasContext>("canvas", {
     register,
-    unregister
+    unregister,
+    redraw: draw
   });
 
   // Functions
@@ -62,6 +78,8 @@
       scheduled = true;
       await tick();
       scheduled = false;
+
+      console.log("Update")
 
       // component is updated
       // so redraw the component
@@ -90,17 +108,17 @@
         color: backgroundColor
       });
       arc({
-          ctx,
-          x: 50,
-          y: 50,
-          radius: 50,
-          startAngle: 0,
-          endAngle: 3,
-          colors: {
-              background: "rgba(30, 230, 30, 1)",
-              stroke: "rgba(230, 230, 30, 1)",
-          },
-          strokeWeight: 5,
+        ctx,
+        x: 400,
+        y: 50,
+        radius: 50,
+        startAngle: 0,
+        endAngle: 3,
+        colors: {
+          background: "rgba(30, 230, 30, 1)",
+          stroke: "rgba(230, 230, 30, 1)",
+        },
+        strokeWeight: 5,
       });
     }
   }
@@ -110,6 +128,22 @@
       for (const node of pipeline) {
         node.draw(ctx);
       }
+    }
+  }
+
+  function drawNode(nodeId: number) {
+    if (ctx) {
+      let node = Array.from(pipeline).at(nodeId);
+      if (node) {
+        node.draw(ctx);
+      }
+    }
+  }
+
+  function update() {
+    // console.log(cursorPosition.pos)
+    for (const node of pipeline) {
+      node.update();
     }
   }
 
@@ -128,7 +162,8 @@
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
                on:resize={handleWindowResize}/>
 
-<canvas bind:this={canvas} {width} {height}>
+<canvas bind:this={canvas} {width} {height}
+        on:mousemove={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}>
     <slot {width} {height}></slot>
 </canvas>
 

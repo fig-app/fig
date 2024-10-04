@@ -5,7 +5,7 @@
  */
 export type Path = { 
 /**
- * A series of path commands that encodes how to draw the path.
+ * A series of [path commands](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands) that encodes how to draw the path.
  */
 path: string, 
 /**
