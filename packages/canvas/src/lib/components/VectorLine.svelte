@@ -93,6 +93,8 @@
           end: endCommand.endPoint,
           weight: 2
         });
+
+        // center of line
         arc({
           ctx,
           x: center.x / 2,
