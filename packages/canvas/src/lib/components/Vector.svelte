@@ -34,6 +34,7 @@
   }
 
   console.log(geometries_commands)
+  // $: console.log("Dragged part", draggedPart?.id);
 
   // Create vector context
   setContext<VectorContext>("vector", {
@@ -121,7 +122,7 @@
     if (draggedPart) {
       return part.id === draggedPart.id;
     } else {
-      return false;
+      return null;
     }
   }
 </script>

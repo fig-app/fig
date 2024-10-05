@@ -42,13 +42,13 @@
     end: endCommand.endPoint
   });
 
-  // Force update when startCommand of endCommand change (trigger the redraw)
-  $: startCommand || endCommand;
+  // Force update when this variables change (trigger the redraw)
+  $: startCommand || endCommand || hovered || clicked;
 
   // Debug
   console.log("Geometry", geometryIndex, "Line", startIndex, endIndex, "Commands:", startCommand, endCommand)
-  $: console.log("hovered", hovered, "clicked", clicked, "selected", part.selected);
-  // $: console.log(startIndex, endIndex, context.isDragged(part))
+  // $: console.log("hovered", hovered, "clicked", clicked, "selected", part.selected);
+  // $: console.log(part.id, context.isDragged(part), part.selected)
 
   // Update selected state
   $: dragged && (() => {
@@ -66,70 +66,20 @@
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
-    if (dragged) {
-      line({
-        ctx,
-        start: startCommand.endPoint,
-        end: endCommand.endPoint,
-        color: "rgb(12, 140, 233)",
-        weight: 2
-      });
+    if (dragged && context.isDragged(part)) {
+      drawSelected(ctx);
     } else if (hovered && part.selected) {
-      line({
-        ctx,
-        start: startCommand.endPoint,
-        end: endCommand.endPoint,
-        weight: 2
-      });
-      arc({
-        ctx,
-        x: center.x / 2,
-        y: center.y / 2,
-        colors: {background: "#fff", stroke: "rgb(12, 140, 233)"},
-        radius: 4,
-        strokeWeight: 1
-      });
+      drawHovered(ctx);
     } else if (part.selected) {
-      line({
-        ctx,
-        start: startCommand.endPoint,
-        end: endCommand.endPoint,
-        color: "rgb(12, 140, 233)",
-        weight: 2
-      });
-    } else if (hovered) {
+      drawSelected(ctx);
+    } else if (hovered && context.isDragged(part) === null) {
       if (clicked) {
-        line({
-          ctx,
-          start: startCommand.endPoint,
-          end: endCommand.endPoint,
-          color: "rgb(12, 140, 233)",
-          weight: 2
-        });
+        drawSelected(ctx);
       } else {
-        line({
-          ctx,
-          start: startCommand.endPoint,
-          end: endCommand.endPoint,
-          weight: 2
-        });
-
-        // center of line
-        arc({
-          ctx,
-          x: center.x / 2,
-          y: center.y / 2,
-          colors: {background: "#fff", stroke: "rgb(12, 140, 233)"},
-          radius: 4,
-          strokeWeight: 1
-        });
+        drawHovered(ctx);
       }
     } else {
-      line({
-        ctx,
-        start: startCommand.endPoint,
-        end: endCommand.endPoint,
-      });
+      drawDefault(ctx);
     }
   }
 
@@ -141,14 +91,14 @@
       }, cursorPosition
     });
     clicked = hovered && canvasClick.single;
-    dragged = dragged && canvasClick.pressed && context.isDragged(part) || hovered && canvasClick.pressed && !context.isDragged(part);
+    dragged = dragged && canvasClick.pressed || hovered && canvasClick.pressed && !context.isDragged(part);
 
     center = centerOfSegment({
       start: startCommand.endPoint,
       end: endCommand.endPoint
     });
 
-    if (dragged) {
+    if (dragged && context.isDragged(part)) {
       let x = cursorPosition.x - canvasClick.clickPoint.x;
       let y = cursorPosition.y - canvasClick.clickPoint.y;
       canvasClick.setClickPoint(cursorPosition.pos)
@@ -159,6 +109,44 @@
       endCommand.endPoint.x += x;
       endCommand.endPoint.y += y;
     }
+  }
+
+  // Draw functions
+  function drawDefault(ctx: CanvasRenderingContext2D) {
+    line({
+      ctx,
+      start: startCommand.endPoint,
+      end: endCommand.endPoint,
+    });
+  }
+
+  function drawHovered(ctx: CanvasRenderingContext2D) {
+    line({
+      ctx,
+      start: startCommand.endPoint,
+      end: endCommand.endPoint,
+      weight: 2
+    });
+
+    // center of line
+    arc({
+      ctx,
+      x: center.x / 2,
+      y: center.y / 2,
+      colors: {background: "#fff", stroke: "rgb(12, 140, 233)"},
+      radius: 4,
+      strokeWeight: 1
+    });
+  }
+
+  function drawSelected(ctx: CanvasRenderingContext2D) {
+    line({
+      ctx,
+      start: startCommand.endPoint,
+      end: endCommand.endPoint,
+      color: "rgb(12, 140, 233)",
+      weight: 2
+    });
   }
 
 </script>

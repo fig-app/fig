@@ -6,6 +6,6 @@ export type VectorContext = {
   unregister: (part: VectorPart) => void;
   setSelectedPart: (part: VectorPart | null) => void;
   setDraggedPart: (part: VectorPart | null, from?: VectorPart) => void;
-  isDragged: (part: VectorPart) => boolean;
+  isDragged: (part: VectorPart) => boolean | null;
   geometries_commands: PathCommand[][];
 };
