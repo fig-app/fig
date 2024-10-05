@@ -1,6 +1,6 @@
-import { Vector } from "@fig/types/dist/properties/Vector";
+import { Vector } from "@fig/types/properties/Vector";
 import { pointsDistance } from "./point";
-import { Line } from "@fig/types/dist/shapes/Line";
+import { Line } from "@fig/types/shapes/Line";
 
 const { abs, pow, sqrt } = Math;
 

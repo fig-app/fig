@@ -26,8 +26,8 @@ pub struct Node {
 
 #[derive(Serialize, Deserialize, TS)]
 #[serde(rename_all = "lowercase")]
-#[serde(tag = "type", content = "data")]
-#[ts(export, export_to = "nodes/")]
+// #[serde(tag = "type", content = "data")]
+// #[ts(export, export_to = "nodes/")]
 pub enum NodeType {
     Document(DocumentNode),
     Canvas(CanvasNode),

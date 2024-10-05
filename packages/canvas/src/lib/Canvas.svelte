@@ -57,7 +57,7 @@
 
     // canvas is updated
     // so redraw the canvas background
-    drawBackground();
+    draw();
   });
 
   setContext<CanvasContext>("canvas", {
@@ -145,7 +145,8 @@
 
   function update() {
     // console.log(cursorPosition.pos)
-    // console.log(canvasClick.clicked)
+    // console.log("Single", canvasClick.single, "Pressed", canvasClick.pressed)
+    // console.log("Double", canvasClick.double)
     for (const node of pipeline) {
       node.update();
     }
@@ -167,11 +168,22 @@
                on:resize={handleWindowResize}/>
 
 <canvas bind:this={canvas} {width} {height}
-        on:mousemove={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}
-        on:mousedown={(_) => {
-          canvasClick.setClick(true)
+        on:mousemove|preventDefault={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}
+        on:click={(e) => {
+            canvasClick.setSingleClick(true, {x: e.clientX, y: e.clientY});
+
+            clearTimeout(clickTimeout);
+            clickTimeout = setTimeout(() => {
+                canvasClick.resetClick()
+            }, 100)
         }}
-        on:mouseup={(_) => canvasClick.setClick(false)}>
+        on:dblclick={(e) => {
+          canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
+        }}
+        on:mousedown={(e) => {
+          canvasClick.setPress(true, {x: e.clientX, y: e.clientY})
+        }}
+        on:mouseup={(_) => canvasClick.resetClick()}>
     <slot {width} {height}></slot>
 </canvas>
 

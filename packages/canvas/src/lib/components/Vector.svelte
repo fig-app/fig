@@ -1,6 +1,5 @@
 <script lang="ts">
   import type {CanvasNode} from "$lib/types/CanvasNode";
-  import type {Node} from "@fig/types/dist/nodes/Node";
   import {
     afterUpdate,
     getContext,
@@ -15,13 +14,16 @@
   import {parsePathString} from "@fig/functions/path/index";
   import VectorLine from "$lib/components/VectorLine.svelte";
   import {normalize} from "@fig/functions/path/normalize";
+  import type {Node} from "@fig/types/nodes/Node"
 
   export let node: Node;
 
   let scheduled = false;
   let parts: Set<VectorPart> = new Set();
   let geometries_commands = [];
+
   let selectedPart: VectorPart | null = null;
+  let draggedPart: VectorPart | null = null;
 
   // Parse all geometries path to an array of PathCommand
   if (node.node.type === "vector") {
@@ -31,11 +33,16 @@
     }
   }
 
+  console.log(geometries_commands)
+  // $: console.log("Dragged part", draggedPart?.id);
+
   // Create vector context
   setContext<VectorContext>("vector", {
     register,
     unregister,
     setSelectedPart,
+    setDraggedPart,
+    isDragged,
     geometries_commands,
   });
 
@@ -98,13 +105,37 @@
     selectedPart = part;
   }
 
+  function setDraggedPart(part: VectorPart | null, from?: VectorPart) {
+    if (!draggedPart && part) {
+      draggedPart = part;
+    }
+    // only the drag part can be reset the draggedPart
+    else if (draggedPart && from && draggedPart.id === from.id) {
+      draggedPart = null;
+    }
+  }
+
+  /**
+   * Checks whether the part passed in parameter is the one being dragged
+   */
+  function isDragged(part: VectorPart) {
+    if (draggedPart) {
+      return part.id === draggedPart.id;
+    } else {
+      return null;
+    }
+  }
 </script>
 
 {#each geometries_commands as path_commands, gi}
     {#each path_commands as command, i}
 
-        {#if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
-            <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
+        {#if (command.type === "Z")}
+            <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
+        {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
+            {#if path_commands[i + 1]?.endPoint}
+                <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
+            {/if}
         {/if}
 
     {/each}

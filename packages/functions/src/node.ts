@@ -1,4 +1,4 @@
-import type { Node } from "@fig/types/dist/nodes/Node";
+import type { Node } from "@fig/types/nodes/Node";
 
 export function isDocument(node: Node) {
   return node.node.type === "document";
