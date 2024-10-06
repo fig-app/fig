@@ -22,6 +22,8 @@ class Keys {
   }
 
   private handleKeyDown(e: KeyboardEvent) {
+    e.preventDefault();
+
     let key = e.key;
     // console.log("Key", e.key, "is pressed");
     this.store.update((store) => {
@@ -34,6 +36,8 @@ class Keys {
   }
 
   private handleKeyUp(e: KeyboardEvent) {
+    e.preventDefault();
+
     let isCommand = e.ctrlKey || e.altKey || e.shiftKey || e.metaKey;
 
     this.store.update((store) => {
@@ -63,10 +67,18 @@ class Keys {
     return this.currentKey === key;
   }
 
+  checkCombo(keys: KeyboardKey[]): boolean {
+    return this.combo === keys;
+  }
+
+  containKey(key: KeyboardKey): boolean {
+    return this.combo.includes(key);
+  }
+
   containCommandsKey(): boolean {
     let commands: KeyboardKey[] = ["Control", "Alt", "Shift", "Meta"];
     for (const key of commands) {
-      if (this.combo.includes(key)) {
+      if (this.containKey(key)) {
         return true;
       }
     }

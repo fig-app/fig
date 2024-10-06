@@ -9,6 +9,7 @@
   import {canvasClick} from "$lib/stores/canvasClick";
   import {arc} from "$lib/primitive/arc";
   import {useId} from "@fig/functions/id";
+  import {keys} from "$lib/stores/keys";
 
   export let geometryIndex: number;
   export let startIndex: number;
@@ -51,18 +52,18 @@
   // $: console.log(part.id, context.isDragged(part), part.selected)
 
   // Update selected state
-  $: dragged && (() => {
+  $: if (dragged) {
     context.setDraggedPart(part);
 
     if (dragged && !part.selected && context.isDragged(part)) {
       part.selected = true;
       context.setSelectedPart(part);
     }
-  })();
+  }
 
-  $: !dragged && !canvasClick.pressed && (() => {
+  $: if (!dragged && !canvasClick.pressed) {
     context.setDraggedPart(null, part);
-  })();
+  }
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
@@ -108,6 +109,18 @@
 
       endCommand.endPoint.x += x;
       endCommand.endPoint.y += y;
+    }
+
+    if (part.selected && keys.currentKey) {
+      let shiftMultiplier = keys.containKey("Shift") ? 10 : 1;
+      let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
+      let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
+
+      startCommand.endPoint.x += xShift;
+      startCommand.endPoint.y += yShift;
+
+      endCommand.endPoint.x += xShift;
+      endCommand.endPoint.y += yShift;
     }
   }
 
