@@ -131,7 +131,7 @@
   // }
 
   function update() {
-    // console.log(keys.getCombo);
+    // console.log("Combo", keys.combo);
     // console.log(cursorPosition.pos)
     // console.log("Single", canvasClick.single, "Pressed", canvasClick.pressed)
     // console.log("Double", canvasClick.double)
