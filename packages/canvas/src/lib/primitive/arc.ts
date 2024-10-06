@@ -1,3 +1,6 @@
+import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
+const STROKE_DEFAULT: number = 1;
+
 type StrokeArcArgs = {
   ctx: CanvasRenderingContext2D;
   x: number;
@@ -22,7 +25,7 @@ export function strokeArc({
   color,
 }: StrokeArcArgs) {
   ctx.save();
-  ctx.translate(x, y);
+  ctx.moveTo(x, y);
 
   ctx.beginPath();
   ctx.arc(
@@ -62,7 +65,7 @@ export function fillArc({
   color,
 }: FillArcArgs) {
   ctx.save();
-  ctx.translate(x, y);
+  ctx.moveTo(x, y);
 
   ctx.beginPath();
   ctx.arc(
@@ -87,8 +90,8 @@ type ArcArgs = {
   startAngle?: number;
   endAngle?: number;
   counterclockwise?: boolean;
-  strokeWeight: number;
-  colors: {
+  strokeWeight?: number;
+  colors?: {
     background: string;
     stroke: string;
   };
@@ -100,13 +103,14 @@ export function arc({
   y,
   radius,
   startAngle = 0,
-  endAngle = 2,
+  endAngle = Math.PI,
   counterclockwise,
-  colors,
-  strokeWeight,
+  colors = {background: getPrimitiveWhite(), stroke: getPrimitiveBlue()},
+  strokeWeight = STROKE_DEFAULT,
+
 }: ArcArgs) {
   ctx.save();
-  ctx.translate(x, y);
+  ctx.moveTo(x, y);
 
   ctx.beginPath();
   ctx.arc(

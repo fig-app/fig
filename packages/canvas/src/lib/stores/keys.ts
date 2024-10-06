@@ -19,7 +19,7 @@ class Keys {
   }
 
   handleKeyDown(e: KeyboardEvent) {
-    console.log("Key", e.key, "is pressed");
+    // console.log("Key", e.key, "is pressed");
     this.store.update((store) => {
       store.currentKey = e.key;
       return store;
