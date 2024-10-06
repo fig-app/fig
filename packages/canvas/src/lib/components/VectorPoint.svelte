@@ -11,6 +11,7 @@
   import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
 
   export let centerPoint: Vector;
+  export let isBuilt: boolean;
   // No need for radius variable, because this will be a const
   const RADIUS_DEFAULT: number = 4;
   const RADIUS_SELECTED: number = 5;

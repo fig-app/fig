@@ -154,5 +154,9 @@
 
 <!--TODO : CHECK IF VECTOR POINT NOT ALREADY DRAWN FROM PREVIOUS LINE-->
 <!--CURRENT STATE : ALL VECTOR LINES DRAW THEIR VECTOR POINTS, SO EACH TIME, TWO VECTOR POINTS OVERLAP-->
-<VectorPoint centerPoint={startCommand.endPoint} />
-<VectorPoint centerPoint={endCommand.endPoint} />
+
+{#if hovered}
+    <VectorPoint centerPoint={center} isBuilt={false} />
+{/if}
+<VectorPoint centerPoint={startCommand.endPoint} isBuilt={true} />
+<VectorPoint centerPoint={endCommand.endPoint} isBuilt={true} />
