@@ -31,6 +31,8 @@
     for (const geometry of geometries) {
       geometries_commands.push(parsePathString(normalize(geometry.path)));
     }
+  } else {
+    console.error(`${node.name} isn't an vector.`);
   }
 
   console.log(geometries_commands)

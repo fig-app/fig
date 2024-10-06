@@ -170,6 +170,12 @@ importers:
       '@fig/types':
         specifier: workspace:*
         version: link:../types
+      path-data-parser:
+        specifier: ^0.1.0
+        version: 0.1.0
+      svg-path-commander:
+        specifier: ^2.0.10
+        version: 2.0.10
     devDependencies:
       '@types/node':
         specifier: ^22.3.0
@@ -1086,6 +1092,9 @@ packages:
     engines: {node: '>=12', npm: '>=6'}
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
+
+  '@thednp/dommatrix@2.0.8':
+    resolution: {integrity: sha512-uITrAo0Oyu8BCHfhsBPmbqGoXwcyHUi7N2gPiI3lXItysPp+X8g7ZqGHi5/VBbaEHrv4eJxll8nFwL6SO25hzA==}
 
   '@types/aria-query@5.0.4':
     resolution: {integrity: sha512-rfT93uj5s0PRL7EzccGMs3brplhcrghnDoV26NqKhCAS1hVo+WdNsPvE/yb6ilfr5hi2MEk6d5EWJTKdxg8jVw==}
@@ -2238,6 +2247,9 @@ packages:
   pascal-case@3.1.2:
     resolution: {integrity: sha512-uWlGT3YSnK9x3BQJaOdcZwrnV6hPpd8jFH1/ucpiLRPh/2zCVJKS19E4GvYHvaCcACn3foXZ0cLB9Wrx1KGe5g==}
 
+  path-data-parser@0.1.0:
+    resolution: {integrity: sha512-NOnmBpt5Y2RWbuv0LMzsayp3lVylAHLPUTut412ZA3l+C4uw4ZVkQbjShYCQ8TCpUMdPapr4YjUqLYD6v68j+w==}
+
   path-exists@4.0.0:
     resolution: {integrity: sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==}
     engines: {node: '>=8'}
@@ -2672,6 +2684,10 @@ packages:
   sveltedoc-parser@4.2.1:
     resolution: {integrity: sha512-sWJRa4qOfRdSORSVw9GhfDEwsbsYsegnDzBevUCF6k/Eis/QqCu9lJ6I0+d/E2wOWCjOhlcJ3+jl/Iur+5mmCw==}
     engines: {node: '>=10.0.0'}
+
+  svg-path-commander@2.0.10:
+    resolution: {integrity: sha512-DGYaXpW6cD0ML3Qj/Md/2al4p44wm/THVQMd2wL5w5LlbFWM/iU8BMvWjUDRzJXe8tpQG3LVsuEQftzdjQE+Vg==}
+    engines: {node: '>=16', pnpm: '>=8.6.0'}
 
   tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
@@ -3979,6 +3995,8 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.0
 
+  '@thednp/dommatrix@2.0.8': {}
+
   '@types/aria-query@5.0.4': {}
 
   '@types/body-parser@1.19.5':
@@ -5127,6 +5145,8 @@ snapshots:
       no-case: 3.0.4
       tslib: 2.7.0
 
+  path-data-parser@0.1.0: {}
+
   path-exists@4.0.0: {}
 
   path-is-absolute@1.0.1: {}
@@ -5580,6 +5600,10 @@ snapshots:
       htmlparser2-svelte: 4.1.0
     transitivePeerDependencies:
       - supports-color
+
+  svg-path-commander@2.0.10:
+    dependencies:
+      '@thednp/dommatrix': 2.0.8
 
   tabbable@6.2.0: {}
 

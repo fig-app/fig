@@ -22,7 +22,9 @@
     "dist"
   ],
   "dependencies": {
-    "@fig/types": "workspace:*"
+    "@fig/types": "workspace:*",
+    "svg-path-commander": "^2.0.10",
+    "path-data-parser": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.3.0",
