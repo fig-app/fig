@@ -3,7 +3,6 @@
   import type {CanvasContext} from "./types/CanvasContext";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
-  import {arc} from "$lib/primitive/arc";
   import {cursorPosition} from "$lib/stores/cursorPosition";
   import {canvasClick} from "$lib/stores/canvasClick";
 
@@ -72,7 +71,6 @@
       pipeline.add(node);
       return () => pipeline.delete(node);
     });
-  }
 
     // This function is not in 'register' anymore to avoid the repetition of calls to afterUpdate
     afterUpdate(async () => {
@@ -89,13 +87,14 @@
       // so redraw the component
       draw();
     });
+  }
 
   function unregister(node: CanvasNode) {
     pipeline.delete(node);
   }
 
   function draw() {
-      console.log("Redrawing...");
+    console.log("Redrawing...");
     drawBackground();
     drawNodes();
   }
@@ -132,6 +131,7 @@
   // }
 
   function update() {
+    // console.log(keys.getCombo);
     // console.log(cursorPosition.pos)
     // console.log("Single", canvasClick.single, "Pressed", canvasClick.pressed)
     // console.log("Double", canvasClick.double)

@@ -5,10 +5,7 @@ import { Line } from "@fig/types/shapes/Line";
 const { abs, sqrt } = Math;
 
 type HoverLineArgs = {
-  line: {
-    start: Vector;
-    end: Vector;
-  };
+  line: Line;
   cursorPosition: Vector;
 };
 
@@ -20,10 +17,7 @@ export function hoverLine({ line, cursorPosition }: HoverLineArgs): boolean {
 }
 
 type PointToLineDistanceArgs = {
-  line: {
-    start: Vector;
-    end: Vector;
-  };
+  line: Line;
   point: Vector;
 };
 

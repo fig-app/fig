@@ -15,6 +15,7 @@
   import VectorLine from "$lib/components/VectorLine.svelte";
   import {normalize} from "@fig/functions/path/normalize";
   import type {Node} from "@fig/types/nodes/Node"
+  import VectorPoint from "$lib/components/VectorPoint.svelte";
 
   export let node: Node;
 
@@ -129,6 +130,7 @@
   }
 </script>
 
+<!-- Draw lines -->
 {#each geometries_commands as path_commands, gi}
     {#each path_commands as command, i}
         {#if (command.type === "Z")}
@@ -137,6 +139,15 @@
             {#if path_commands[i + 1]?.endPoint}
                 <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
             {/if}
+        {/if}
+    {/each}
+{/each}
+
+<!-- Draw points -->
+{#each geometries_commands as path_commands, gi}
+    {#each path_commands as command, i}
+        {#if ((command.type === "M" || command.type === "L"))}
+            <VectorPoint geometryIndex={gi} pointIndex={i} isBuilt={true}/>
         {/if}
     {/each}
 {/each}

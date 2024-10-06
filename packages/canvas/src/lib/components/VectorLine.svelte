@@ -9,8 +9,6 @@
   import {canvasClick} from "$lib/stores/canvasClick";
   import {arc} from "$lib/primitive/arc";
   import {useId} from "@fig/functions/id";
-  import VectorPoint from "$lib/components/VectorPoint.svelte";
-  import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
 
   export let geometryIndex: number;
   export let startIndex: number;
@@ -70,10 +68,10 @@
   function draw(ctx: CanvasRenderingContext2D) {
     if (dragged && context.isDragged(part)) {
       drawSelected(ctx);
-    } else if (part.selected) {
-      drawSelected(ctx);
     } else if (hovered && part.selected) {
       drawHovered(ctx);
+    } else if (part.selected) {
+      drawSelected(ctx);
     } else if (hovered && context.isDragged(part) === null) {
       if (clicked) {
         drawSelected(ctx);
@@ -135,7 +133,7 @@
       ctx,
       x: center.x,
       y: center.y,
-      colors: {background: getPrimitiveWhite(), stroke: getPrimitiveBlue()},
+      colors: {background: "#fff", stroke: "rgb(12, 140, 233)"},
       radius: 4,
       strokeWeight: 1
     });
@@ -146,17 +144,11 @@
       ctx,
       start: startCommand.endPoint,
       end: endCommand.endPoint,
-      color: getPrimitiveBlue(),
+      color: "rgb(12, 140, 233)",
       weight: 2
     });
   }
+
 </script>
 
-<!--TODO : CHECK IF VECTOR POINT NOT ALREADY DRAWN FROM PREVIOUS LINE-->
-<!--CURRENT STATE : ALL VECTOR LINES DRAW THEIR VECTOR POINTS, SO EACH TIME, TWO VECTOR POINTS OVERLAP-->
 
-{#if hovered}
-    <VectorPoint centerPoint={center} isBuilt={false} />
-{/if}
-<VectorPoint centerPoint={startCommand.endPoint} isBuilt={true} />
-<VectorPoint centerPoint={endCommand.endPoint} isBuilt={true} />
