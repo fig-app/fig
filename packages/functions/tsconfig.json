@@ -17,5 +17,5 @@
     "src/**/*.ts",
     "test/**/*.ts",
     "vitest.config.ts"
-  ]
+  ],
 }
