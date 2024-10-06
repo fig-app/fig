@@ -35,7 +35,7 @@
     console.error(`${node.name} isn't an vector.`);
   }
 
-  console.log(geometries_commands)
+  // console.log(geometries_commands)
   // $: console.log("Dragged part", draggedPart?.id);
 
   // Create vector context
@@ -131,7 +131,6 @@
 
 {#each geometries_commands as path_commands, gi}
     {#each path_commands as command, i}
-
         {#if (command.type === "Z")}
             <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
         {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
@@ -139,6 +138,5 @@
                 <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
             {/if}
         {/if}
-
     {/each}
 {/each}

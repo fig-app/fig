@@ -9,6 +9,8 @@
   import {canvasClick} from "$lib/stores/canvasClick";
   import {arc} from "$lib/primitive/arc";
   import {useId} from "@fig/functions/id";
+  import VectorPoint from "$lib/components/VectorPoint.svelte";
+  import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
 
   export let geometryIndex: number;
   export let startIndex: number;
@@ -46,7 +48,7 @@
   $: startCommand || endCommand || hovered || clicked;
 
   // Debug
-  console.log("Geometry", geometryIndex, "Line", startIndex, endIndex, "Commands:", startCommand, endCommand)
+  // console.log("Geometry", geometryIndex, "Line", startIndex, endIndex, "Commands:", startCommand, endCommand)
   // $: console.log("hovered", hovered, "clicked", clicked, "selected", part.selected);
   // $: console.log(part.id, context.isDragged(part), part.selected)
 
@@ -68,10 +70,10 @@
   function draw(ctx: CanvasRenderingContext2D) {
     if (dragged && context.isDragged(part)) {
       drawSelected(ctx);
-    } else if (hovered && part.selected) {
-      drawHovered(ctx);
     } else if (part.selected) {
       drawSelected(ctx);
+    } else if (hovered && part.selected) {
+      drawHovered(ctx);
     } else if (hovered && context.isDragged(part) === null) {
       if (clicked) {
         drawSelected(ctx);
@@ -131,9 +133,9 @@
     // center of line
     arc({
       ctx,
-      x: center.x / 2,
-      y: center.y / 2,
-      colors: {background: "#fff", stroke: "rgb(12, 140, 233)"},
+      x: center.x,
+      y: center.y,
+      colors: {background: getPrimitiveWhite(), stroke: getPrimitiveBlue()},
       radius: 4,
       strokeWeight: 1
     });
@@ -144,11 +146,17 @@
       ctx,
       start: startCommand.endPoint,
       end: endCommand.endPoint,
-      color: "rgb(12, 140, 233)",
+      color: getPrimitiveBlue(),
       weight: 2
     });
   }
-
 </script>
 
+<!--TODO : CHECK IF VECTOR POINT NOT ALREADY DRAWN FROM PREVIOUS LINE-->
+<!--CURRENT STATE : ALL VECTOR LINES DRAW THEIR VECTOR POINTS, SO EACH TIME, TWO VECTOR POINTS OVERLAP-->
 
+{#if hovered}
+    <VectorPoint centerPoint={center} isBuilt={false} />
+{/if}
+<VectorPoint centerPoint={startCommand.endPoint} isBuilt={true} />
+<VectorPoint centerPoint={endCommand.endPoint} isBuilt={true} />

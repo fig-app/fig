@@ -72,12 +72,13 @@
       pipeline.add(node);
       return () => pipeline.delete(node);
     });
+  }
 
+    // This function is not in 'register' anymore to avoid the repetition of calls to afterUpdate
     afterUpdate(async () => {
       if (scheduled) return;
 
       // await component update
-
       scheduled = true;
       await tick();
       scheduled = false;
@@ -88,13 +89,13 @@
       // so redraw the component
       draw();
     });
-  }
 
   function unregister(node: CanvasNode) {
     pipeline.delete(node);
   }
 
   function draw() {
+      console.log("Redrawing...");
     drawBackground();
     drawNodes();
   }
@@ -110,19 +111,6 @@
         height,
         color: backgroundColor
       });
-      arc({
-        ctx,
-        x: 400,
-        y: 50,
-        radius: 50,
-        startAngle: 0,
-        endAngle: 2,
-        colors: {
-          background: "rgba(30, 230, 30, 1)",
-          stroke: "rgba(230, 230, 30, 1)",
-        },
-        strokeWeight: 5,
-      });
     }
   }
 
@@ -134,14 +122,14 @@
     }
   }
 
-  function drawNode(nodeId: number) {
-    if (ctx) {
-      let node = Array.from(pipeline).at(nodeId);
-      if (node) {
-        node.draw(ctx);
-      }
-    }
-  }
+  // function drawNode(nodeId: number) {
+  //   if (ctx) {
+  //     let node = Array.from(pipeline).at(nodeId);
+  //     if (node) {
+  //       node.draw(ctx);
+  //     }
+  //   }
+  // }
 
   function update() {
     // console.log(cursorPosition.pos)
