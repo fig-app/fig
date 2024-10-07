@@ -39,8 +39,8 @@
   })
 
   // Line commands
-  let startCommand = context.geometries_commands[geometryIndex][startIndex] as MLTPathCommand;
-  let endCommand = context.geometries_commands[geometryIndex][endIndex] as MLTPathCommand;
+  let startCommand = context.stroke_geometries_commands[geometryIndex][startIndex] as MLTPathCommand;
+  let endCommand = context.stroke_geometries_commands[geometryIndex][endIndex] as MLTPathCommand;
 
   let center = centerOfSegment({
     start: startCommand.endPoint,
@@ -60,13 +60,12 @@
     context.setDraggedPart(part);
 
     if (dragged && !part.selected && context.isDragged(part)) {
-      part.selected = true;
       context.setSelectedPart(part);
     }
   }
 
   $: if (!dragged && !canvasClick.pressed) {
-    context.setDraggedPart(null, part);
+    context.resetDraggedPart(part);
   }
 
   // Functions
@@ -103,6 +102,7 @@
       end: endCommand.endPoint
     });
 
+    // Move with cursor
     if (dragged && context.isDragged(part)) {
       let x = cursorPosition.x - canvasClick.clickPoint.x;
       let y = cursorPosition.y - canvasClick.clickPoint.y;
@@ -115,6 +115,7 @@
       endCommand.endPoint.y += y;
     }
 
+    // Move with arrow keys
     if (keyTimer.finished() && part.selected && keys.currentKey) {
       let shiftMultiplier = keys.containKey("Shift") ? 10 : 1;
       let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;

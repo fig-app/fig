@@ -9,7 +9,6 @@
   import {useId} from "@fig/functions/id";
   import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
-  import {centerOfSegment} from "@fig/functions/shape/line";
 
   export let geometryIndex: number;
   export let pointIndex: number;
@@ -41,7 +40,7 @@
   })
 
   // Point command
-  let command = context.geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
+  let command = context.stroke_geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
   let centerPoint = command.endPoint;
 
   // Force update when this variables change (trigger the redraw)
@@ -60,7 +59,7 @@
   })();
 
   $: !dragged && !canvasClick.pressed && (() => {
-    context.setDraggedPart(null, part);
+    context.resetDraggedPart(part);
   })();
 
   // Functions
@@ -95,12 +94,12 @@
     dragged = dragged && canvasClick.pressed || hovered && canvasClick.pressed && !context.isDragged(part);
 
     if (dragged && context.isDragged(part)) {
-        let x = cursorPosition.x - canvasClick.clickPoint.x;
-        let y = cursorPosition.y - canvasClick.clickPoint.y;
-        canvasClick.setClickPoint(cursorPosition.pos)
+      let x = cursorPosition.x - canvasClick.clickPoint.x;
+      let y = cursorPosition.y - canvasClick.clickPoint.y;
+      canvasClick.setClickPoint(cursorPosition.pos)
 
-        command.endPoint.x += x;
-        command.endPoint.y += y;
+      command.endPoint.x += x;
+      command.endPoint.y += y;
     }
   }
 
