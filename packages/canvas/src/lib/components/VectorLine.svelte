@@ -11,6 +11,7 @@
   import {useId} from "@fig/functions/id";
   import {keys} from "$lib/stores/keys";
   import {Timer} from "$lib/stores/canvasTime";
+  import VectorPoint from "$lib/components/VectorPoint.svelte";
 
   export let geometryIndex: number;
   export let startIndex: number;
@@ -164,7 +165,4 @@
       weight: 2
     });
   }
-
 </script>
-
-

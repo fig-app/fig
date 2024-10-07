@@ -9,6 +9,7 @@
   import {useId} from "@fig/functions/id";
   import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
+  import {centerOfSegment} from "@fig/functions/shape/line";
 
   export let geometryIndex: number;
   export let pointIndex: number;
@@ -92,6 +93,15 @@
 
     clicked = hovered && canvasClick.single;
     dragged = dragged && canvasClick.pressed || hovered && canvasClick.pressed && !context.isDragged(part);
+
+    if (dragged && context.isDragged(part)) {
+        let x = cursorPosition.x - canvasClick.clickPoint.x;
+        let y = cursorPosition.y - canvasClick.clickPoint.y;
+        canvasClick.setClickPoint(cursorPosition.pos)
+
+        command.endPoint.x += x;
+        command.endPoint.y += y;
+    }
   }
 
   // Draw functions
