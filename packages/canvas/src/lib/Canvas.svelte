@@ -5,6 +5,7 @@
   import {fillRect} from "$lib/primitive/rect";
   import {cursorPosition} from "$lib/stores/cursorPosition";
   import {canvasClick} from "$lib/stores/canvasClick";
+  import {canvasTime} from "$lib/stores/canvasTime";
 
   // Exports
   export let width = 100;
@@ -27,8 +28,8 @@
     ctx = canvas.getContext("2d");
 
     // Update loop
-    function loop() {
-      update();
+    function loop(timestamp: number) {
+      update(timestamp);
       frameId = requestAnimationFrame(loop);
     }
 
@@ -130,7 +131,11 @@
   //   }
   // }
 
-  function update() {
+  function update(timestamp: number) {
+    canvasTime.updateTimestamp(timestamp);
+    canvasTime.updateTimers();
+
+    // console.log("Time", canvasTime.timestamp)
     // console.log("Combo", keys.combo);
     // console.log(cursorPosition.pos)
     // console.log("Single", canvasClick.single, "Pressed", canvasClick.pressed)

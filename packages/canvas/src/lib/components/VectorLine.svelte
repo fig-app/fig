@@ -10,6 +10,7 @@
   import {arc} from "$lib/primitive/arc";
   import {useId} from "@fig/functions/id";
   import {keys} from "$lib/stores/keys";
+  import {Timer} from "$lib/stores/canvasTime";
 
   export let geometryIndex: number;
   export let startIndex: number;
@@ -18,6 +19,8 @@
   let hovered = false;
   let clicked = false;
   let dragged = false;
+
+  let keyTimer = new Timer(100, "Repeating");
 
   // Register and unregister part
   let part: VectorPart = {
@@ -111,7 +114,7 @@
       endCommand.endPoint.y += y;
     }
 
-    if (part.selected && keys.currentKey) {
+    if (keyTimer.finished() && part.selected && keys.currentKey) {
       let shiftMultiplier = keys.containKey("Shift") ? 10 : 1;
       let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
       let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
