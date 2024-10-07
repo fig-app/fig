@@ -9,8 +9,8 @@
   import {canvasClick} from "$lib/stores/canvasClick";
   import {arc} from "$lib/primitive/arc";
   import {useId} from "@fig/functions/id";
-  import VectorPoint from "$lib/components/VectorPoint.svelte";
-  import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
+  import {keys} from "$lib/stores/keys";
+  import {Timer} from "$lib/stores/canvasTime";
 
   export let geometryIndex: number;
   export let startIndex: number;
@@ -19,6 +19,8 @@
   let hovered = false;
   let clicked = false;
   let dragged = false;
+
+  let keyTimer = new Timer(100, "Repeating");
 
   // Register and unregister part
   let part: VectorPart = {
@@ -53,27 +55,27 @@
   // $: console.log(part.id, context.isDragged(part), part.selected)
 
   // Update selected state
-  $: dragged && (() => {
+  $: if (dragged) {
     context.setDraggedPart(part);
 
     if (dragged && !part.selected && context.isDragged(part)) {
       part.selected = true;
       context.setSelectedPart(part);
     }
-  })();
+  }
 
-  $: !dragged && !canvasClick.pressed && (() => {
+  $: if (!dragged && !canvasClick.pressed) {
     context.setDraggedPart(null, part);
-  })();
+  }
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
     if (dragged && context.isDragged(part)) {
       drawSelected(ctx);
-    } else if (part.selected) {
-      drawSelected(ctx);
     } else if (hovered && part.selected) {
       drawHovered(ctx);
+    } else if (part.selected) {
+      drawSelected(ctx);
     } else if (hovered && context.isDragged(part) === null) {
       if (clicked) {
         drawSelected(ctx);
@@ -111,6 +113,18 @@
       endCommand.endPoint.x += x;
       endCommand.endPoint.y += y;
     }
+
+    if (keyTimer.finished() && part.selected && keys.currentKey) {
+      let shiftMultiplier = keys.containKey("Shift") ? 10 : 1;
+      let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
+      let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
+
+      startCommand.endPoint.x += xShift;
+      startCommand.endPoint.y += yShift;
+
+      endCommand.endPoint.x += xShift;
+      endCommand.endPoint.y += yShift;
+    }
   }
 
   // Draw functions
@@ -135,7 +149,7 @@
       ctx,
       x: center.x,
       y: center.y,
-      colors: {background: getPrimitiveWhite(), stroke: getPrimitiveBlue()},
+      colors: {background: "#fff", stroke: "rgb(12, 140, 233)"},
       radius: 4,
       strokeWeight: 1
     });
@@ -146,17 +160,11 @@
       ctx,
       start: startCommand.endPoint,
       end: endCommand.endPoint,
-      color: getPrimitiveBlue(),
+      color: "rgb(12, 140, 233)",
       weight: 2
     });
   }
+
 </script>
 
-<!--TODO : CHECK IF VECTOR POINT NOT ALREADY DRAWN FROM PREVIOUS LINE-->
-<!--CURRENT STATE : ALL VECTOR LINES DRAW THEIR VECTOR POINTS, SO EACH TIME, TWO VECTOR POINTS OVERLAP-->
 
-{#if hovered}
-    <VectorPoint centerPoint={center} isBuilt={false} />
-{/if}
-<VectorPoint centerPoint={startCommand.endPoint} isBuilt={true} />
-<VectorPoint centerPoint={endCommand.endPoint} isBuilt={true} />

@@ -1,6 +1,13 @@
-export function normalize(string: string): string {
-  return string;
-  // let parsed = parsePath(string);
-  // let normalized = normalizeSegment(parsed);
-  // return serialize(normalized);
+import {
+  absolutize,
+  normalize as normalizeSegment,
+  parsePath,
+  serialize,
+} from "path-data-parser";
+
+export function normalize(string: string) {
+  let segments = parsePath(string);
+  let absolute = absolutize(segments);
+  let normalize = normalizeSegment(absolute);
+  return serialize(normalize);
 }

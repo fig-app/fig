@@ -3,9 +3,9 @@
   import type {CanvasContext} from "./types/CanvasContext";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
-  import {arc} from "$lib/primitive/arc";
   import {cursorPosition} from "$lib/stores/cursorPosition";
   import {canvasClick} from "$lib/stores/canvasClick";
+  import {canvasTime} from "$lib/stores/canvasTime";
 
   // Exports
   export let width = 100;
@@ -28,8 +28,8 @@
     ctx = canvas.getContext("2d");
 
     // Update loop
-    function loop() {
-      update();
+    function loop(timestamp: number) {
+      update(timestamp);
       frameId = requestAnimationFrame(loop);
     }
 
@@ -72,7 +72,6 @@
       pipeline.add(node);
       return () => pipeline.delete(node);
     });
-  }
 
     // This function is not in 'register' anymore to avoid the repetition of calls to afterUpdate
     afterUpdate(async () => {
@@ -89,13 +88,14 @@
       // so redraw the component
       draw();
     });
+  }
 
   function unregister(node: CanvasNode) {
     pipeline.delete(node);
   }
 
   function draw() {
-      console.log("Redrawing...");
+    console.log("Redrawing...");
     drawBackground();
     drawNodes();
   }
@@ -131,7 +131,12 @@
   //   }
   // }
 
-  function update() {
+  function update(timestamp: number) {
+    canvasTime.updateTimestamp(timestamp);
+    canvasTime.updateTimers();
+
+    // console.log("Time", canvasTime.timestamp)
+    // console.log("Combo", keys.combo);
     // console.log(cursorPosition.pos)
     // console.log("Single", canvasClick.single, "Pressed", canvasClick.pressed)
     // console.log("Double", canvasClick.double)

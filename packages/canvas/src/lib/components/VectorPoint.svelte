@@ -7,11 +7,13 @@
   import {canvasClick} from "$lib/stores/canvasClick";
   import {arc} from "$lib/primitive/arc";
   import {useId} from "@fig/functions/id";
-  import type {Vector} from "@fig/types/properties/Vector";
   import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
+  import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
 
-  export let centerPoint: Vector;
+  export let geometryIndex: number;
+  export let pointIndex: number;
   export let isBuilt: boolean;
+
   // No need for radius variable, because this will be a const
   const RADIUS_DEFAULT: number = 4;
   const RADIUS_SELECTED: number = 5;
@@ -36,6 +38,10 @@
   onDestroy(() => {
     context.unregister(part);
   })
+
+  // Point command
+  let command = context.geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
+  let centerPoint = command.endPoint;
 
   // Force update when this variables change (trigger the redraw)
   $: hovered || clicked;
@@ -77,11 +83,11 @@
 
   function update() {
     hovered = isCursorHoveringArc({
-        cursorPosition,
-        arc : {
-            centerPosition: centerPoint,
-            radius: RADIUS_DEFAULT,
-        }
+      cursorPosition,
+      arc: {
+        centerPosition: centerPoint,
+        radius: RADIUS_DEFAULT,
+      }
     });
 
     clicked = hovered && canvasClick.single;
@@ -100,27 +106,27 @@
 
   function drawHovered(ctx: CanvasRenderingContext2D) {
     arc({
-        ctx,
-        x: centerPoint.x,
-        y: centerPoint.y,
-        radius: RADIUS_DEFAULT,
-        colors: {
-            background: PRIMITIVE_WHITE,
-            stroke: PRIMITIVE_WHITE,
-        }
+      ctx,
+      x: centerPoint.x,
+      y: centerPoint.y,
+      radius: RADIUS_DEFAULT,
+      colors: {
+        background: PRIMITIVE_WHITE,
+        stroke: PRIMITIVE_WHITE,
+      }
     });
   }
 
   function drawSelected(ctx: CanvasRenderingContext2D) {
     arc({
-        ctx,
-        x: centerPoint.x,
-        y: centerPoint.y,
-        radius: RADIUS_SELECTED,
-        colors: {
-            background: PRIMITIVE_BLUE,
-            stroke: PRIMITIVE_WHITE,
-        },
+      ctx,
+      x: centerPoint.x,
+      y: centerPoint.y,
+      radius: RADIUS_SELECTED,
+      colors: {
+        background: PRIMITIVE_BLUE,
+        stroke: PRIMITIVE_WHITE,
+      },
     });
   }
 
