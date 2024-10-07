@@ -13,7 +13,7 @@ type HoverLineArgs = {
  * Check if the cursor is on the mouse.
  */
 export function hoverLine({ line, cursorPosition }: HoverLineArgs): boolean {
-  return pointToSegmentDistance({ line, point: cursorPosition }) < 6;
+  return pointToSegmentDistance({ line: shortenLine(line, 10), point: cursorPosition }) < 6;
 }
 
 type PointToLineDistanceArgs = {
@@ -82,5 +82,39 @@ export function centerOfSegment(line: Line): Vector {
   return {
     x: (line.start.x + line.end.x) / 2,
     y: (line.start.y + line.end.y) / 2,
+  };
+}
+
+// Function that shorten a line of a distance (each edge is closer to the center)
+export function shortenLine(line: Line, distance: number): Line {
+  // Calculate the midpoint
+  const midX = (line.start.x + line.end.x) / 2;
+  const midY = (line.start.y + line.end.y) / 2;
+
+  // Calculate the direction vector
+  const dirX = line.end.x - line.start.x;
+  const dirY = line.end.y - line.start.y;
+
+  // Calculate the length of the line
+  const length = Math.sqrt(dirX * dirX + dirY * dirY);
+
+  // Normalize the direction vector
+  const normDirX = dirX / length;
+  const normDirY = dirY / length;
+
+  // Calculate the new start and end points
+  const newStart: Vector = {
+    x: line.start.x + normDirX * distance,
+    y: line.start.y + normDirY * distance
+  };
+
+  const newEnd: Vector = {
+    x: line.end.x - normDirX * distance,
+    y: line.end.y - normDirY * distance
+  };
+
+  return {
+    start: newStart,
+    end: newEnd
   };
 }

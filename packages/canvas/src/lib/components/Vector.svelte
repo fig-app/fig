@@ -130,9 +130,9 @@
   }
 </script>
 
-<!-- Draw lines -->
 {#each geometries_commands as path_commands, gi}
     {#each path_commands as command, i}
+        <!-- Draw lines -->
         {#if (command.type === "Z")}
             <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
         {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
@@ -140,12 +140,7 @@
                 <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
             {/if}
         {/if}
-    {/each}
-{/each}
-
-<!-- Draw points -->
-{#each geometries_commands as path_commands, gi}
-    {#each path_commands as command, i}
+        <!-- Draw points -->
         {#if ((command.type === "M" || command.type === "L"))}
             <VectorPoint geometryIndex={gi} pointIndex={i} isBuilt={true}/>
         {/if}
