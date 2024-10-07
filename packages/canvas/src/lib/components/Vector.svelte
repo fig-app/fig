@@ -28,8 +28,12 @@
   let stroke_paths_syncronization: Path2D[] = [];
   let stroke_geometries_commands: PathCommand[][] = [];
 
+  let selected = false;
+
   let selectedPart: VectorPart | null = null;
   let draggedPart: VectorPart | null = null;
+
+  let updateTrigger = false;
 
   // Create vector context
   setContext<VectorContext>("vector", {
@@ -40,6 +44,9 @@
     resetDraggedPart,
     isDragged,
     stroke_geometries_commands,
+    updateVector: () => {
+      updateTrigger = !updateTrigger;
+    }
   });
 
   let vectorContext = getContext<VectorContext>("vector");
@@ -173,21 +180,25 @@
 
 </script>
 
-{#each stroke_geometries_commands as path_commands, gi}
-  {#each path_commands as command, i}
-    
-    <!-- Draw lines -->
-    {#if (command.type === "Z")}
-      <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
-    {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
-      {#if path_commands[i + 1]?.endPoint}
-        <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
-      {/if}
-    {/if}
+<span></span>
 
-    <!-- Draw points -->
-    {#if ((command.type === "M" || command.type === "L"))}
-      <VectorPoint geometryIndex={gi} pointIndex={i} isBuilt={true}/>
-    {/if}
+{#key updateTrigger}
+  {#each stroke_geometries_commands as path_commands, gi}
+    {#each path_commands as command, i}
+
+      <!-- Draw lines -->
+      {#if (command.type === "Z")}
+        <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
+      {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
+        {#if path_commands[i + 1]?.endPoint}
+          <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
+        {/if}
+      {/if}
+
+      <!-- Draw points -->
+      {#if ((command.type === "M" || command.type === "L"))}
+        <VectorPoint geometryIndex={gi} pointIndex={i}/>
+      {/if}
+    {/each}
   {/each}
-{/each}
+{/key}

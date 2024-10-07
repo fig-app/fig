@@ -12,7 +12,7 @@
 
   export let geometryIndex: number;
   export let pointIndex: number;
-  export let isBuilt: boolean;
+  export let isBuilt: boolean = true;
 
   // No need for radius variable, because this will be a const
   const RADIUS_DEFAULT: number = 4;
@@ -44,7 +44,7 @@
   let centerPoint = command.endPoint;
 
   // Force update when this variables change (trigger the redraw)
-  $: hovered || clicked;
+  $: command || hovered || clicked;
 
   // Debug
 
@@ -86,7 +86,7 @@
       cursorPosition,
       arc: {
         centerPosition: centerPoint,
-        radius: RADIUS_DEFAULT,
+        radius: RADIUS_DEFAULT + 1,
       }
     });
 

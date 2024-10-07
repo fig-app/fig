@@ -15,6 +15,8 @@ export function drawPath({ ctx, path, colors, strokeWeight = 1 }: PathArgs) {
 
   ctx.save();
 
+  ctx.lineCap = "round";
+
   if (colors.background) {
     ctx.fillStyle = colors.background;
     ctx.fill(path);

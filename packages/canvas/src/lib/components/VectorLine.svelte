@@ -7,11 +7,10 @@
   import {centerOfSegment, hoverLine} from "@fig/functions/shape/line";
   import {cursorPosition} from "$lib/stores/cursorPosition";
   import {canvasClick} from "$lib/stores/canvasClick";
-  import {arc} from "$lib/primitive/arc";
   import {useId} from "@fig/functions/id";
   import {keys} from "$lib/stores/keys";
   import {Timer} from "$lib/stores/canvasTime";
-  import VectorPoint from "$lib/components/VectorPoint.svelte";
+  import {EditPoint} from "$lib/components/EditPoint";
 
   export let geometryIndex: number;
   export let startIndex: number;
@@ -20,6 +19,8 @@
   let hovered = false;
   let clicked = false;
   let dragged = false;
+
+  let centerPoint = new EditPoint();
 
   let keyTimer = new Timer(100, "Repeating");
 
@@ -56,7 +57,7 @@
   // $: console.log(part.id, context.isDragged(part), part.selected)
 
   // Update selected state
-  $: if (dragged) {
+  $: if (!centerPoint.hovered && dragged) {
     context.setDraggedPart(part);
 
     if (dragged && !part.selected && context.isDragged(part)) {
@@ -88,6 +89,10 @@
   }
 
   function update() {
+    // Update center point
+    centerPoint.updateCenterPoint(center);
+    centerPoint.update();
+
     hovered = hoverLine({
       line: {
         start: startCommand.endPoint,
@@ -127,6 +132,16 @@
       endCommand.endPoint.x += xShift;
       endCommand.endPoint.y += yShift;
     }
+
+    // Add a new point when clicking on the center point
+    if (centerPoint.clicked) {
+      context.stroke_geometries_commands[geometryIndex].splice(startIndex + 1, 0, {
+        type: "L",
+        relative: false,
+        endPoint: center
+      });
+      context.updateVector();
+    }
   }
 
   // Draw functions
@@ -146,15 +161,7 @@
       weight: 2
     });
 
-    // center of line
-    arc({
-      ctx,
-      x: center.x,
-      y: center.y,
-      colors: {background: "#fff", stroke: "rgb(12, 140, 233)"},
-      radius: 4,
-      strokeWeight: 1
-    });
+    centerPoint.draw(ctx);
   }
 
   function drawSelected(ctx: CanvasRenderingContext2D) {
