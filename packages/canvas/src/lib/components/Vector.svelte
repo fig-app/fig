@@ -180,8 +180,6 @@
 
 </script>
 
-<span></span>
-
 {#key updateTrigger}
   {#each stroke_geometries_commands as path_commands, gi}
     {#each path_commands as command, i}

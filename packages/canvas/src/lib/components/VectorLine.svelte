@@ -134,7 +134,7 @@
     }
 
     // Add a new point when clicking on the center point
-    if (centerPoint.clicked) {
+    if (centerPoint.clicked && context.isDragged(part) === null) {
       context.stroke_geometries_commands[geometryIndex].splice(startIndex + 1, 0, {
         type: "L",
         relative: false,
