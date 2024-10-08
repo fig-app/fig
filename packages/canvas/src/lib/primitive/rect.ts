@@ -8,7 +8,7 @@ type RectArgs = {
     background: string | null;
     stroke: string | null;
   };
-  strokeWidth: number;
+  strokeWeight: number;
   radius: number | number[];
 };
 
@@ -38,14 +38,14 @@ export function rect({
   width,
   height,
   colors,
-  strokeWidth,
+  strokeWeight,
   radius,
 }: RectArgs) {
   ctx.save();
 
   ctx.translate(x, y);
 
-  ctx.lineWidth = strokeWidth;
+  ctx.lineWidth = strokeWeight;
   if (colors.background) {
     ctx.fillStyle = colors.background;
   }
