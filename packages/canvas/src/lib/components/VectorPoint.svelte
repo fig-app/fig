@@ -9,10 +9,10 @@
   import {useId} from "@fig/functions/id";
   import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
+  import {navigation} from "$lib/stores/navigation";
 
   export let geometryIndex: number;
   export let pointIndex: number;
-  export let isBuilt: boolean = true;
 
   // No need for radius variable, because this will be a const
   const RADIUS_DEFAULT: number = 4;
@@ -39,12 +39,13 @@
     context.unregister(part);
   })
 
-  // Point command
-  let command = context.stroke_geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
-  let centerPoint = command.endPoint;
+  // Point virtualCommand
+  let realCommand = context.stroke_geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
+  let virtualCommand = {...realCommand};
+  $: centerPoint = virtualCommand.endPoint;
 
   // Force update when this variables change (trigger the redraw)
-  $: command || hovered || clicked;
+  $: realCommand || hovered || clicked || virtualCommand;
 
   // Debug
 
@@ -82,6 +83,8 @@
   }
 
   function update() {
+    virtualCommand.endPoint = navigation.toVirtualPoint(realCommand.endPoint);
+
     hovered = isCursorHoveringArc({
       cursorPosition,
       arc: {
@@ -91,15 +94,15 @@
     });
 
     clicked = hovered && canvasClick.single;
-    dragged = dragged && canvasClick.pressed || hovered && canvasClick.pressed && !context.isDragged(part);
+    dragged = (dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part));
 
     if (dragged && context.isDragged(part)) {
       let x = cursorPosition.x - canvasClick.clickPoint.x;
       let y = cursorPosition.y - canvasClick.clickPoint.y;
       canvasClick.setClickPoint(cursorPosition.pos)
 
-      command.endPoint.x += x;
-      command.endPoint.y += y;
+      realCommand.endPoint.x += x;
+      realCommand.endPoint.y += y;
     }
   }
 

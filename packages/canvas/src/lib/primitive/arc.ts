@@ -1,4 +1,5 @@
-import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
+import { getPrimitiveBlue, getPrimitiveWhite } from "@fig/functions/color";
+
 const STROKE_DEFAULT: number = 1;
 
 type StrokeArcArgs = {
@@ -105,9 +106,8 @@ export function arc({
   startAngle = 0,
   endAngle = Math.PI,
   counterclockwise,
-  colors = {background: getPrimitiveWhite(), stroke: getPrimitiveBlue()},
+  colors = { background: getPrimitiveWhite(), stroke: getPrimitiveBlue() },
   strokeWeight = STROKE_DEFAULT,
-
 }: ArcArgs) {
   ctx.save();
   ctx.moveTo(x, y);

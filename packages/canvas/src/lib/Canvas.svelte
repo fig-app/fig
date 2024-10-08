@@ -5,7 +5,9 @@
     import {fillRect} from "$lib/primitive/rect";
     import {cursorPosition} from "$lib/stores/cursorPosition";
     import {canvasClick} from "$lib/stores/canvasClick";
-    import {canvasTime} from "$lib/stores/canvasTime.js";
+    import {canvasTime} from "$lib/stores/canvasTime";
+    import {keys} from "$lib/stores/keys";
+    import {navigation} from "$lib/stores/navigation";
 
     // Exports
   export let width = 100;
@@ -23,6 +25,8 @@
   let resizeTimeout: NodeJS.Timeout;
 
   let clickTimeout: NodeJS.Timeout;
+
+  const ZOOM_AMOUNT: number = .2;
 
   onMount(() => {
     ctx = canvas.getContext("2d");
@@ -45,6 +49,7 @@
       cancelAnimationFrame(frameId);
     }
   });
+
 
   afterUpdate(async () => {
     if (scheduled) return;
@@ -95,7 +100,6 @@
   }
 
   function draw() {
-    console.log("Redrawing...");
     drawBackground();
     drawNodes();
   }
@@ -122,24 +126,10 @@
     }
   }
 
-  // function drawNode(nodeId: number) {
-  //   if (ctx) {
-  //     let node = Array.from(pipeline).at(nodeId);
-  //     if (node) {
-  //       node.draw(ctx);
-  //     }
-  //   }
-  // }
-
   function update(timestamp: number) {
     canvasTime.updateTimestamp(timestamp);
     canvasTime.updateTimers();
 
-    // console.log("Time", canvasTime.timestamp)
-    // console.log("Combo", keys.combo);
-    // console.log(cursorPosition.pos)
-    // console.log("Single", canvasClick.single, "Pressed", canvasClick.pressed)
-    // console.log("Double", canvasClick.double)
     for (const node of pipeline) {
       node.update();
     }
@@ -155,28 +145,53 @@
       }, 100);
     }
   }
+
+  function handleWheel(event: WheelEvent) {
+    if (keys.containKey("Control")) {
+      handleZoom(event);
+    } else {
+      handleScroll(event);
+    }
+  }
+
+  function handleZoom(event: WheelEvent) {
+    if (navigation.scale > 0) {
+      navigation.scale += event.deltaY / 100 / navigation.scale;
+    }
+  }
+
+  function handleScroll(event: WheelEvent) {
+    console.log("Scrolling...");
+    // Pan = Absolute distance to move (raw amount of scroll)
+    let panX = event.deltaX;
+    let panY = event.deltaY;
+    // Update offsets for virtual coordinates (check out for scale)
+    navigation.offsetX -= panX / navigation.scale;
+    navigation.offsetY -= (panY / navigation.scale) / 2;
+  }
+
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
                on:resize={handleWindowResize}/>
 
-<canvas bind:this={canvas} {width} {height}
+<canvas on:wheel|preventDefault={handleWheel} bind:this={canvas} {width}
+        {height}
         on:mousemove|preventDefault={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}
         on:click={(e) => {
-            canvasClick.setSingleClick(true, {x: e.clientX, y: e.clientY});
+    canvasClick.setSingleClick(true, {x: e.clientX, y: e.clientY});
 
-            clearTimeout(clickTimeout);
-            clickTimeout = setTimeout(() => {
-                canvasClick.resetClick()
-            }, 100)
-        }}
+    clearTimeout(clickTimeout);
+    clickTimeout = setTimeout(() => {
+        canvasClick.resetClick()
+    }, 100)
+}}
         on:dblclick={(e) => {
-          canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
-        }}
+    canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
+}}
         on:mousedown={(e) => {
-          canvasClick.setPress(true, {x: e.clientX, y: e.clientY})
-        }}
+    canvasClick.setPress(true, {x: e.clientX, y: e.clientY})
+}}
         on:mouseup={(_) => canvasClick.resetClick()}>
   <slot {width} {height}></slot>
 </canvas>
-

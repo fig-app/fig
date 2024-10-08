@@ -20,16 +20,17 @@
   import {drawPath} from "$lib/primitive/path";
   import {colorToString, getPrimitiveBlue} from "@fig/functions/color";
   import type {PathCommand} from "@fig/functions/path/PathCommand";
+  import {navigation} from "$lib/stores/navigation";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
-  import {strokeRect} from "$lib/primitive/rect";
   import {Rect} from "$lib/Rect";
+  import {strokeRect} from "$lib/primitive/rect";
   import {canvasClick} from "$lib/stores/canvasClick";
 
   export let node: Node;
 
   let scheduled = false;
   let parts: Set<VectorPart> = new Set();
-  let stroke_paths_syncronization: Path2D[] = [];
+  let stroke_paths_synchronization: Path2D[] = [];
   let stroke_geometries_commands: PathCommand[][] = [];
 
   let bbox = getGeometryBbox(stroke_geometries_commands);
@@ -46,6 +47,11 @@
 
   let strokeColor = colorToString(node.node.data.strokes[0].color);
   let strokeWeight = node.node.data.strokeWeight;
+
+  $: hovered;
+  $: dblclick && (() => {
+    editMode = !editMode;
+  })()
 
   // Create vector context
   setContext<VectorContext>("vector", {
@@ -85,19 +91,15 @@
     context.unregister(canvasNode);
   });
 
-  $: hovered;
-
-  $: dblclick && (() => {
-    editMode = !editMode;
-  })()
-
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
+
+    // Show bounding box
     if (!editMode && hovered) {
       strokeRect({
         ctx,
-        x: bbox.center.x,
-        y: bbox.center.y,
+        x: navigation.toVirtualX(bbox.center.x),
+        y: navigation.toVirtualY(bbox.center.y),
         width: bbox.width + strokeWeight + 2,
         height: bbox.height + strokeWeight + 2,
         color: getPrimitiveBlue(),
@@ -106,15 +108,15 @@
     }
 
     // Update string paths commands of node
-    stroke_paths_syncronization = [];
+    stroke_paths_synchronization = [];
     for (const geometriesCommand of stroke_geometries_commands) {
-      let path = new Path2D(serializeCommands(geometriesCommand));
-      stroke_paths_syncronization.push(path)
+      let path = new Path2D(serializeCommands(navigation.toVirtualGeometryCommand(geometriesCommand)));
+      stroke_paths_synchronization.push(path)
     }
 
     if (node.node.type === "vector") {
       // draw stylized vector
-      for (let path of stroke_paths_syncronization) {
+      for (let path of stroke_paths_synchronization) {
         drawPath({
           ctx,
           path,
@@ -125,7 +127,7 @@
 
       // draw vector skeleton on hover
       if (!editMode && hovered) {
-        for (let path of stroke_paths_syncronization) {
+        for (let path of stroke_paths_synchronization) {
           drawPath({
             ctx,
             path,
@@ -157,7 +159,7 @@
 
   function updateRect() {
     bbox = getGeometryBbox(stroke_geometries_commands);
-    rect.update(bbox.min.x, bbox.min.y, bbox.width + strokeWeight / 2, bbox.height + strokeWeight / 2);
+    rect.update(navigation.toVirtualX(bbox.min.x), navigation.toVirtualY(bbox.min.y), bbox.width + strokeWeight / 2, bbox.height + strokeWeight / 2);
   }
 
   function register(part: VectorPart) {
