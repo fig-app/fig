@@ -5,23 +5,27 @@
   import {line} from "$lib/primitive/line";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
   import {centerOfSegment, hoverLine} from "@fig/functions/shape/line";
-  import {cursorPosition} from "$lib/stores/cursorPosition";
-  import {canvasClick} from "$lib/stores/canvasClick";
+  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {useId} from "@fig/functions/id";
-  import {keys} from "$lib/stores/keys";
-  import {Timer} from "$lib/stores/canvasTime";
-  import {EditPoint} from "$lib/components/EditPoint";
+  import {keys} from "../stores/keys.svelte";
+  import {Timer} from "$lib/stores/canvasTime.svelte";
+  import {EditPointSvelte} from "$lib/components/EditPoint.svelte";
   import {navigation} from "$lib/stores/navigation";
 
-  export let geometryIndex: number;
-  export let startIndex: number;
-  export let endIndex: number;
+  type Props = {
+    geometryIndex: number;
+    startIndex: number;
+    endIndex: number;
+  }
 
-  let hovered = false;
-  let clicked = false;
-  let dragged = false;
+  let {geometryIndex, startIndex, endIndex}: Props = $props();
 
-  let centerPoint = new EditPoint();
+  let hovered = $state(false);
+  let clicked = $state(false);
+  let dragged = $state(false);
+
+  let centerPoint = new EditPointSvelte();
 
   let keyTimer = new Timer(100, "Repeating");
 
@@ -52,22 +56,26 @@
   });
 
   // Force update when this variables change (trigger the redraw)
-  $: virtualStartCommand || virtualEndCommand || hovered || clicked;
+  // $effect(() => {
+  // virtualStartCommand || virtualEndCommand || hovered || clicked;
+  // });
 
   // Debug
 
   // Update selected state
-  $: if (!centerPoint.hovered && dragged) {
-    context.setDraggedPart(part);
+  $effect(() => {
+    if (!centerPoint.hovered && dragged) {
+      context.setDraggedPart(part);
 
-    if (dragged && !part.selected && context.isDragged(part)) {
-      context.setSelectedPart(part);
+      if (dragged && !part.selected && context.isDragged(part)) {
+        context.setSelectedPart(part);
+      }
     }
-  }
 
-  $: if (!dragged && !canvasClick.pressed) {
-    context.resetDraggedPart(part);
-  }
+    if (!dragged && !canvasClick.pressed) {
+      context.resetDraggedPart(part);
+    }
+  });
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
