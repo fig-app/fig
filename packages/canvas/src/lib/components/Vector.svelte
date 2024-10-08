@@ -18,8 +18,12 @@
   import VectorPoint from "$lib/components/VectorPoint.svelte";
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
-  import {colorToString, getPrimitiveWhite} from "@fig/functions/color";
+  import {colorToString, getPrimitiveBlue} from "@fig/functions/color";
   import type {PathCommand} from "@fig/functions/path/PathCommand";
+  import {getGeometryBbox} from "@fig/functions/path/bBox";
+  import {strokeRect} from "$lib/primitive/rect";
+  import {Rect} from "$lib/Rect";
+  import {canvasClick} from "$lib/stores/canvasClick";
 
   export let node: Node;
 
@@ -28,12 +32,20 @@
   let stroke_paths_syncronization: Path2D[] = [];
   let stroke_geometries_commands: PathCommand[][] = [];
 
+  let bbox = getGeometryBbox(stroke_geometries_commands);
+  let rect = new Rect(0, 0, 0, 0);
+
+  let hovered = false;
+  let dblclick = false;
   let selected = false;
 
   let selectedPart: VectorPart | null = null;
   let draggedPart: VectorPart | null = null;
 
   let updateTrigger = false;
+
+  let strokeColor = colorToString(node.node.data.strokes[0].color);
+  let strokeWeight = node.node.data.strokeWeight;
 
   // Create vector context
   setContext<VectorContext>("vector", {
@@ -48,8 +60,6 @@
       updateTrigger = !updateTrigger;
     }
   });
-
-  let vectorContext = getContext<VectorContext>("vector");
 
   // Parse all geometries path to an array of PathCommand
   if (node.node.type === "vector") {
@@ -75,8 +85,25 @@
     context.unregister(canvasNode);
   });
 
+  $: hovered;
+
+  $: dblclick && (() => {
+    selected = !selected;
+  })()
+
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
+    if (!selected && hovered) {
+      strokeRect({
+        ctx,
+        x: bbox.center.x,
+        y: bbox.center.y,
+        width: bbox.width + strokeWeight + 2,
+        height: bbox.height + strokeWeight + 2,
+        color: getPrimitiveBlue(),
+        strokeWidth: 2,
+      })
+    }
 
     // Update string paths commands of node
     stroke_paths_syncronization = [];
@@ -88,8 +115,6 @@
     if (node.node.type === "vector") {
       // draw stylized vector
       for (let path of stroke_paths_syncronization) {
-        let strokeColor = colorToString(node.node.data.strokes[0].color);
-        let strokeWeight = node.node.data.strokeWeight;
         drawPath({
           ctx,
           path,
@@ -99,18 +124,21 @@
       }
 
       // draw vector skeleton on hover
-      for (let path of stroke_paths_syncronization) {
-        let strokeColor = colorToString(node.node.data.strokes[0].color);
-        drawPath({
-          ctx,
-          path,
-          colors: {stroke: getPrimitiveWhite()}
-        });
+      if (!selected && hovered) {
+        for (let path of stroke_paths_syncronization) {
+          drawPath({
+            ctx,
+            path,
+            colors: {stroke: getPrimitiveBlue()}
+          });
+        }
       }
 
       // draw all parts
-      for (const part of parts) {
-        part.draw(ctx);
+      if (selected) {
+        for (const part of parts) {
+          part.draw(ctx);
+        }
       }
     } else {
       console.error(`${node.name} isn't a vector.`);
@@ -118,9 +146,18 @@
   }
 
   function update() {
+    updateRect();
+    hovered = rect.hovered();
+    dblclick = hovered && canvasClick.double;
+
     for (const part of parts) {
       part.update();
     }
+  }
+
+  function updateRect() {
+    bbox = getGeometryBbox(stroke_geometries_commands);
+    rect.update(bbox.min.x, bbox.min.y, bbox.width + strokeWeight / 2, bbox.height + strokeWeight / 2);
   }
 
   function register(part: VectorPart) {
@@ -181,22 +218,24 @@
 </script>
 
 {#key updateTrigger}
-  {#each stroke_geometries_commands as path_commands, gi}
-    {#each path_commands as command, i}
+  {#if selected}
+    {#each stroke_geometries_commands as path_commands, gi}
+      {#each path_commands as command, i}
 
-      <!-- Draw lines -->
-      {#if (command.type === "Z")}
-        <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
-      {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
-        {#if path_commands[i + 1]?.endPoint}
-          <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
+        <!-- Draw lines -->
+        {#if (command.type === "Z")}
+          <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
+        {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
+          {#if path_commands[i + 1]?.endPoint}
+            <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
+          {/if}
         {/if}
-      {/if}
 
-      <!-- Draw points -->
-      {#if ((command.type === "M" || command.type === "L"))}
-        <VectorPoint geometryIndex={gi} pointIndex={i}/>
-      {/if}
+        <!-- Draw points -->
+        {#if ((command.type === "M" || command.type === "L"))}
+          <VectorPoint geometryIndex={gi} pointIndex={i}/>
+        {/if}
+      {/each}
     {/each}
-  {/each}
+  {/if}
 {/key}
