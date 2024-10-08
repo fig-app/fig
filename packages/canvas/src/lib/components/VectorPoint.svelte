@@ -40,12 +40,12 @@
     })
 
     // Point virtualCommand
-    let realCommand = context.geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
+    let realCommand = context.stroke_geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
     let virtualCommand = {...realCommand};
     $: centerPoint = virtualCommand.endPoint;
 
     // Force update when this variables change (trigger the redraw)
-    $: hovered || clicked || virtualCommand;
+    $: realCommand || hovered || clicked || virtualCommand;
 
     // Debug
 
@@ -60,7 +60,7 @@
     })();
 
     $: !dragged && !canvasClick.pressed && (() => {
-        context.setDraggedPart(null, part);
+        context.resetDraggedPart(part);
     })();
 
     // Functions
@@ -89,7 +89,7 @@
             cursorPosition,
             arc: {
                 centerPosition: centerPoint,
-                radius: RADIUS_DEFAULT,
+                radius: RADIUS_DEFAULT + 1,
             }
         });
 

@@ -156,11 +156,8 @@
     }
 
     function handleZoom(event: WheelEvent) {
-        console.log("Zooming...");
-        if (event.deltaY > 0) {
-            navigation.scale += event.deltaY;
-        } else if (event.deltaY < 0) {
-            navigation.scale -= event.deltaY;
+        if (navigation.scale > 0) {
+            navigation.scale += event.deltaY / 100 / navigation.scale;
         }
     }
 

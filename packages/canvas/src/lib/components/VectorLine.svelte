@@ -7,10 +7,10 @@
     import {centerOfSegment, hoverLine} from "@fig/functions/shape/line";
     import {cursorPosition} from "$lib/stores/cursorPosition";
     import {canvasClick} from "$lib/stores/canvasClick";
-    import {arc} from "$lib/primitive/arc";
     import {useId} from "@fig/functions/id";
     import {keys} from "$lib/stores/keys";
     import {Timer} from "$lib/stores/canvasTime";
+    import {EditPoint} from "$lib/components/EditPoint";
     import {navigation} from "$lib/stores/navigation";
 
     export let geometryIndex: number;
@@ -20,6 +20,8 @@
     let hovered = false;
     let clicked = false;
     let dragged = false;
+
+    let centerPoint = new EditPoint();
 
     let keyTimer = new Timer(100, "Repeating");
 
@@ -39,12 +41,12 @@
     })
 
     // Line commands
-    let realStartCommand = context.geometries_commands[geometryIndex][startIndex] as MLTPathCommand;
-    let realEndCommand = context.geometries_commands[geometryIndex][endIndex] as MLTPathCommand;
+    let realStartCommand = context.stroke_geometries_commands[geometryIndex][startIndex] as MLTPathCommand;
+    let realEndCommand = context.stroke_geometries_commands[geometryIndex][endIndex] as MLTPathCommand;
     let virtualStartCommand = {...realStartCommand};
     let virtualEndCommand = {...realEndCommand};
 
-    $: center = centerOfSegment({
+    let center = centerOfSegment({
         start: virtualStartCommand.endPoint,
         end: virtualEndCommand.endPoint
     });
@@ -55,17 +57,16 @@
     // Debug
 
     // Update selected state
-    $: if (dragged) {
+    $: if (!centerPoint.hovered && dragged) {
         context.setDraggedPart(part);
 
         if (dragged && !part.selected && context.isDragged(part)) {
-            part.selected = true;
             context.setSelectedPart(part);
         }
     }
 
     $: if (!dragged && !canvasClick.pressed) {
-        context.setDraggedPart(null, part);
+        context.resetDraggedPart(part);
     }
 
     // Functions
@@ -91,6 +92,10 @@
         virtualStartCommand.endPoint = navigation.toVirtualPoint(realStartCommand.endPoint);
         virtualEndCommand.endPoint = navigation.toVirtualPoint(realEndCommand.endPoint);
 
+        // Update center point
+        centerPoint.updateCenterPoint(center);
+        centerPoint.update();
+
         hovered = hoverLine({
             line: {
                 start: virtualStartCommand.endPoint,
@@ -105,6 +110,7 @@
             end: virtualEndCommand.endPoint
         });
 
+        // Move with cursor
         if (dragged && context.isDragged(part)) {
             let x = cursorPosition.x - canvasClick.clickPoint.x;
             let y = cursorPosition.y - canvasClick.clickPoint.y;
@@ -117,6 +123,7 @@
             realEndCommand.endPoint.y += y;
         }
 
+        // Move with arrow keys
         if (keyTimer.finished() && part.selected && keys.currentKey) {
             let shiftMultiplier = keys.containKey("Shift") ? 10 : 1;
             let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
@@ -130,6 +137,16 @@
         }
     }
 
+    // Add a new point when clicking on the center point
+    if (centerPoint.clicked && context.isDragged(part) === null) {
+        context.stroke_geometries_commands[geometryIndex].splice(startIndex + 1, 0, {
+            type: "L",
+            relative: false,
+            endPoint: center
+        });
+        context.updateVector();
+    }
+
     // Draw functions
     function drawDefault(ctx: CanvasRenderingContext2D) {
         line({
@@ -140,7 +157,6 @@
     }
 
     function drawHovered(ctx: CanvasRenderingContext2D) {
-        console.log(virtualStartCommand.endPoint);
         line({
             ctx,
             start: virtualStartCommand.endPoint,
@@ -148,15 +164,7 @@
             weight: 2
         });
 
-        // center of line
-        arc({
-            ctx,
-            x: center.x,
-            y: center.y,
-            colors: {background: "#fff", stroke: "rgb(12, 140, 233)"},
-            radius: 4,
-            strokeWeight: 1
-        });
+        centerPoint.draw(ctx);
     }
 
     function drawSelected(ctx: CanvasRenderingContext2D) {

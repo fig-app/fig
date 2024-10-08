@@ -5,4 +5,4 @@ import type { EmptyData } from "./nodes/vector/EmptyData";
 import type { RectangleData } from "./nodes/vector/RectangleData";
 import type { VectorNode } from "./nodes/vector/VectorNode";
 
-export type NodeType = { "document": DocumentNode } | { "canvas": CanvasNode } | { "vector": VectorNode<EmptyData> } | { "rectangle": VectorNode<RectangleData> };
+export type NodeType = { "type": "document", "data": DocumentNode } | { "type": "canvas", "data": CanvasNode } | { "type": "vector", "data": VectorNode<EmptyData> } | { "type": "rectangle", "data": VectorNode<RectangleData> };

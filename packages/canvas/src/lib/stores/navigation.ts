@@ -1,5 +1,6 @@
 import { get, writable, type Writable } from "svelte/store";
 import type { Vector } from "@fig/types/properties/Vector";
+import type { PathCommand } from "@fig/functions/path/PathCommand";
 
 type OffsetStore = {
   offsetX: number;
@@ -51,6 +52,34 @@ class Navigation {
       store.offsetY = value;
       return store;
     });
+  }
+
+  toVirtualGeometryCommand(geometryCommands: PathCommand[]): PathCommand[] {
+    let to_ret: PathCommand[] = [];
+
+    for (let command of geometryCommands) {
+      switch (command.type) {
+        case "T":
+        case "L":
+        case "M": {
+          to_ret.push({
+            type: command.type,
+            endPoint: this.toVirtualPoint(command.endPoint),
+            relative: command.relative,
+          });
+          break;
+        }
+        case "Z": {
+          to_ret.push({
+            type: command.type,
+            relative: command.relative,
+          });
+          break;
+        }
+      }
+    }
+
+    return to_ret;
   }
 
   toVirtualPoint(point: Vector) {
