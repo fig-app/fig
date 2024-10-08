@@ -1,143 +1,146 @@
 <script lang="ts">
-  import {getContext, onDestroy} from "svelte";
-  import type {VectorContext} from "$lib/types/VectorContext";
-  import type {VectorPart} from "$lib/types/VectorPart";
-  import {cursorPosition} from "$lib/stores/cursorPosition";
-  import {isCursorHoveringArc} from "@fig/functions/shape/arc";
-  import {canvasClick} from "$lib/stores/canvasClick";
-  import {arc} from "$lib/primitive/arc";
-  import {useId} from "@fig/functions/id";
-  import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
-  import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
+    import {getContext, onDestroy} from "svelte";
+    import type {VectorContext} from "$lib/types/VectorContext";
+    import type {VectorPart} from "$lib/types/VectorPart";
+    import {cursorPosition} from "$lib/stores/cursorPosition";
+    import {isCursorHoveringArc} from "@fig/functions/shape/arc";
+    import {canvasClick} from "$lib/stores/canvasClick";
+    import {arc} from "$lib/primitive/arc";
+    import {useId} from "@fig/functions/id";
+    import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
+    import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
+    import {navigation} from "$lib/stores/navigation";
 
-  export let geometryIndex: number;
-  export let pointIndex: number;
-  export let isBuilt: boolean = true;
+    export let geometryIndex: number;
+    export let pointIndex: number;
 
-  // No need for radius variable, because this will be a const
-  const RADIUS_DEFAULT: number = 4;
-  const RADIUS_SELECTED: number = 5;
-  const PRIMITIVE_BLUE: string = getPrimitiveBlue();
-  const PRIMITIVE_WHITE: string = getPrimitiveWhite();
+    // No need for radius variable, because this will be a const
+    const RADIUS_DEFAULT: number = 4;
+    const RADIUS_SELECTED: number = 5;
+    const PRIMITIVE_BLUE: string = getPrimitiveBlue();
+    const PRIMITIVE_WHITE: string = getPrimitiveWhite();
 
-  let hovered = false;
-  let clicked = false;
-  let dragged = false;
+    let hovered = false;
+    let clicked = false;
+    let dragged = false;
 
-  // Register and unregister part
-  let part: VectorPart = {
-    id: useId(),
-    type: "point",
-    draw,
-    update,
-    selected: false
-  };
+    // Register and unregister part
+    let part: VectorPart = {
+        id: useId(),
+        type: "point",
+        draw,
+        update,
+        selected: false
+    };
 
-  let context = getContext<VectorContext>("vector");
-  context.register(part);
-  onDestroy(() => {
-    context.unregister(part);
-  })
+    let context = getContext<VectorContext>("vector");
+    context.register(part);
+    onDestroy(() => {
+        context.unregister(part);
+    })
 
-  // Point command
-  let command = context.stroke_geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
-  let centerPoint = command.endPoint;
+    // Point virtualCommand
+    let realCommand = context.stroke_geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
+    let virtualCommand = {...realCommand};
+    $: centerPoint = virtualCommand.endPoint;
 
-  // Force update when this variables change (trigger the redraw)
-  $: command || hovered || clicked;
+    // Force update when this variables change (trigger the redraw)
+    $: realCommand || hovered || clicked || virtualCommand;
 
-  // Debug
+    // Debug
 
-  // Update selected state
-  $: dragged && (() => {
-    context.setDraggedPart(part);
+    // Update selected state
+    $: dragged && (() => {
+        context.setDraggedPart(part);
 
-    if (dragged && !part.selected && context.isDragged(part)) {
-      part.selected = true;
-      context.setSelectedPart(part);
+        if (dragged && !part.selected && context.isDragged(part)) {
+            part.selected = true;
+            context.setSelectedPart(part);
+        }
+    })();
+
+    $: !dragged && !canvasClick.pressed && (() => {
+        context.resetDraggedPart(part);
+    })();
+
+    // Functions
+    function draw(ctx: CanvasRenderingContext2D) {
+        if (dragged && context.isDragged(part)) {
+            drawSelected(ctx);
+        } else if (hovered && part.selected) {
+            drawHovered(ctx);
+        } else if (part.selected) {
+            drawSelected(ctx);
+        } else if (hovered && context.isDragged(part) === null) {
+            if (clicked) {
+                drawSelected(ctx);
+            } else {
+                drawHovered(ctx);
+            }
+        } else {
+            drawDefault(ctx);
+        }
     }
-  })();
 
-  $: !dragged && !canvasClick.pressed && (() => {
-    context.resetDraggedPart(part);
-  })();
+    function update() {
+        virtualCommand.endPoint = navigation.toVirtualPoint(realCommand.endPoint);
 
-  // Functions
-  function draw(ctx: CanvasRenderingContext2D) {
-    if (dragged && context.isDragged(part)) {
-      drawSelected(ctx);
-    } else if (hovered && part.selected) {
-      drawHovered(ctx);
-    } else if (part.selected) {
-      drawSelected(ctx);
-    } else if (hovered && context.isDragged(part) === null) {
-      if (clicked) {
-        drawSelected(ctx);
-      } else {
-        drawHovered(ctx);
-      }
-    } else {
-      drawDefault(ctx);
+        hovered = isCursorHoveringArc({
+            cursorPosition,
+            arc: {
+                centerPosition: centerPoint,
+                radius: RADIUS_DEFAULT + 1,
+            }
+        });
+
+        clicked = hovered && canvasClick.single;
+        dragged = (dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part));
+
+        if (dragged && context.isDragged(part)) {
+            let x = cursorPosition.x - canvasClick.clickPoint.x;
+            let y = cursorPosition.y - canvasClick.clickPoint.y;
+            canvasClick.setClickPoint(cursorPosition.pos)
+
+            realCommand.endPoint.x += x;
+            realCommand.endPoint.y += y;
+        }
     }
-  }
 
-  function update() {
-    hovered = isCursorHoveringArc({
-      cursorPosition,
-      arc: {
-        centerPosition: centerPoint,
-        radius: RADIUS_DEFAULT + 1,
-      }
-    });
-
-    clicked = hovered && canvasClick.single;
-    dragged = dragged && canvasClick.pressed || hovered && canvasClick.pressed && !context.isDragged(part);
-
-    if (dragged && context.isDragged(part)) {
-      let x = cursorPosition.x - canvasClick.clickPoint.x;
-      let y = cursorPosition.y - canvasClick.clickPoint.y;
-      canvasClick.setClickPoint(cursorPosition.pos)
-
-      command.endPoint.x += x;
-      command.endPoint.y += y;
+    // Draw functions
+    function drawDefault(ctx: CanvasRenderingContext2D) {
+        arc({
+            ctx,
+            x: centerPoint.x,
+            y: centerPoint.y,
+            radius: RADIUS_DEFAULT,
+        });
     }
-  }
 
-  // Draw functions
-  function drawDefault(ctx: CanvasRenderingContext2D) {
-    arc({
-      ctx,
-      x: centerPoint.x,
-      y: centerPoint.y,
-      radius: RADIUS_DEFAULT,
-    });
-  }
+    function drawHovered(ctx: CanvasRenderingContext2D) {
+        arc({
+            ctx,
+            x: centerPoint.x,
+            y: centerPoint.y,
+            radius: RADIUS_DEFAULT,
+            colors: {
+                background: PRIMITIVE_WHITE,
+                stroke: PRIMITIVE_WHITE,
+            }
+        });
+    }
 
-  function drawHovered(ctx: CanvasRenderingContext2D) {
-    arc({
-      ctx,
-      x: centerPoint.x,
-      y: centerPoint.y,
-      radius: RADIUS_DEFAULT,
-      colors: {
-        background: PRIMITIVE_WHITE,
-        stroke: PRIMITIVE_WHITE,
-      }
-    });
-  }
-
-  function drawSelected(ctx: CanvasRenderingContext2D) {
-    arc({
-      ctx,
-      x: centerPoint.x,
-      y: centerPoint.y,
-      radius: RADIUS_SELECTED,
-      colors: {
-        background: PRIMITIVE_BLUE,
-        stroke: PRIMITIVE_WHITE,
-      },
-    });
-  }
+    function drawSelected(ctx: CanvasRenderingContext2D) {
+        arc({
+            ctx,
+            x: centerPoint.x,
+            y: centerPoint.y,
+            radius: RADIUS_SELECTED,
+            colors: {
+                background: PRIMITIVE_BLUE,
+                stroke: PRIMITIVE_WHITE,
+            },
+        });
+    }
 
 </script>
 
