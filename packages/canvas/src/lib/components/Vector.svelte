@@ -1,133 +1,126 @@
 <script lang="ts">
-  import type {CanvasNode} from "$lib/types/CanvasNode";
-  import {
-    afterUpdate,
-    getContext,
-    onDestroy,
-    onMount,
-    setContext,
-    tick
-  } from "svelte";
-  import type {CanvasContext} from "$lib/types/CanvasContext";
-  import type {VectorPart} from "$lib/types/VectorPart";
-  import type {VectorContext} from "$lib/types/VectorContext";
-  import {parsePathString} from "@fig/functions/path/index";
-  import VectorLine from "$lib/components/VectorLine.svelte";
-  import {normalize} from "@fig/functions/path/normalize";
-  import type {Node} from "@fig/types/nodes/Node"
-  import VectorPoint from "$lib/components/VectorPoint.svelte";
+    import type {CanvasNode} from "$lib/types/CanvasNode";
+    import {afterUpdate, getContext, onDestroy, onMount, setContext, tick} from "svelte";
+    import type {CanvasContext} from "$lib/types/CanvasContext";
+    import type {VectorPart} from "$lib/types/VectorPart";
+    import type {VectorContext} from "$lib/types/VectorContext";
+    import {parsePathString} from "@fig/functions/path/index";
+    import VectorLine from "$lib/components/VectorLine.svelte";
+    import {normalize} from "@fig/functions/path/normalize";
+    import type {Node} from "@fig/types/nodes/Node"
+    import VectorPoint from "$lib/components/VectorPoint.svelte";
 
-  export let node: Node;
+    export let node: Node;
 
-  let scheduled = false;
-  let parts: Set<VectorPart> = new Set();
-  let geometries_commands = [];
+    let scheduled = false;
+    let parts: Set<VectorPart> = new Set();
+    let geometries_commands = [];
 
-  let selectedPart: VectorPart | null = null;
-  let draggedPart: VectorPart | null = null;
+    let selectedPart: VectorPart | null = null;
+    let draggedPart: VectorPart | null = null;
 
-  // Parse all geometries path to an array of PathCommand
-  if (node.node.type === "vector") {
-    let geometries = node.node.data.strokeGeometry;
-    for (const geometry of geometries) {
-      geometries_commands.push(parsePathString(normalize(geometry.path)));
-    }
-  } else {
-    console.error(`${node.name} isn't an vector.`);
-  }
-
-  // console.log(geometries_commands)
-  // $: console.log("Dragged part", draggedPart?.id);
-
-  // Create vector context
-  setContext<VectorContext>("vector", {
-    register,
-    unregister,
-    setSelectedPart,
-    setDraggedPart,
-    isDragged,
-    geometries_commands,
-  });
-
-  // Register and unregister vector node
-  let canvasNode: CanvasNode = {
-    draw,
-    update,
-    node: node
-  };
-
-  let context = getContext<CanvasContext>("canvas");
-  context.register(canvasNode);
-
-  onDestroy(() => {
-    context.unregister(canvasNode);
-  });
-
-  // Functions
-  function draw(ctx: CanvasRenderingContext2D) {
+    // Parse all geometries path to an array of PathCommand
     if (node.node.type === "vector") {
-      // draw all parts
-      for (const part of parts) {
-        part.draw(ctx);
-      }
+        let geometries = node.node.data.strokeGeometry;
+        for (const geometry of geometries) {
+            geometries_commands.push(parsePathString(normalize(geometry.path)));
+        }
     } else {
-      console.error(`${node.name} isn't a vector.`);
+        console.error(`${node.name} isn't an vector.`);
     }
-  }
 
-  function update() {
-    for (const part of parts) {
-      part.update();
-    }
-  }
+    // console.log(geometries_commands)
+    // $: console.log("Dragged part", draggedPart?.id);
 
-  function register(part: VectorPart) {
-    onMount(() => {
-      parts.add(part);
+    // Create vector context
+    setContext<VectorContext>("vector", {
+        register,
+        unregister,
+        setSelectedPart,
+        setDraggedPart,
+        isDragged,
+        geometries_commands,
     });
 
-    afterUpdate(async () => {
-      if (scheduled) return;
+    // Register and unregister vector node
+    let canvasNode: CanvasNode = {
+        draw,
+        update,
+        node: node
+    };
 
-      scheduled = true;
-      await tick();
-      scheduled = false;
+    let context = getContext<CanvasContext>("canvas");
+    context.register(canvasNode);
 
-      context.redraw();
+    onDestroy(() => {
+        context.unregister(canvasNode);
     });
-  }
 
-  function unregister(part: VectorPart) {
-    parts.delete(part);
-  }
+    // Functions
+    function draw(ctx: CanvasRenderingContext2D) {
+        if (node.node.type === "vector") {
+            // draw all parts
+            for (const part of parts) {
+                part.draw(ctx);
+            }
+        } else {
+            console.error(`${node.name} isn't a vector.`);
+        }
+    }
 
-  function setSelectedPart(part: VectorPart | null) {
-    if (selectedPart) {
-      selectedPart.selected = false;
+    function update() {
+        for (const part of parts) {
+            part.update();
+        }
     }
-    selectedPart = part;
-  }
 
-  function setDraggedPart(part: VectorPart | null, from?: VectorPart) {
-    if (!draggedPart && part) {
-      draggedPart = part;
-    }
-    // only the drag part can be reset the draggedPart
-    else if (draggedPart && from && draggedPart.id === from.id) {
-      draggedPart = null;
-    }
-  }
+    function register(part: VectorPart) {
+        onMount(() => {
+            parts.add(part);
+        });
 
-  /**
-   * Checks whether the part passed in parameter is the one being dragged
-   */
-  function isDragged(part: VectorPart) {
-    if (draggedPart) {
-      return part.id === draggedPart.id;
-    } else {
-      return null;
+        afterUpdate(async () => {
+            if (scheduled) return;
+
+            scheduled = true;
+            await tick();
+            scheduled = false;
+
+            context.redraw();
+        });
     }
-  }
+
+    function unregister(part: VectorPart) {
+        parts.delete(part);
+    }
+
+    function setSelectedPart(part: VectorPart | null) {
+        if (selectedPart) {
+            selectedPart.selected = false;
+        }
+        selectedPart = part;
+    }
+
+    function setDraggedPart(part: VectorPart | null, from?: VectorPart) {
+        if (!draggedPart && part) {
+            draggedPart = part;
+        }
+        // only the drag part can be reset the draggedPart
+        else if (draggedPart && from && draggedPart.id === from.id) {
+            draggedPart = null;
+        }
+    }
+
+    /**
+     * Checks whether the part passed in parameter is the one being dragged
+     */
+    function isDragged(part: VectorPart) {
+        if (draggedPart) {
+            return part.id === draggedPart.id;
+        } else {
+            return null;
+        }
+    }
 </script>
 
 {#each geometries_commands as path_commands, gi}
@@ -142,7 +135,7 @@
         {/if}
         <!-- Draw points -->
         {#if ((command.type === "M" || command.type === "L"))}
-            <VectorPoint geometryIndex={gi} pointIndex={i} isBuilt={true}/>
+            <VectorPoint geometryIndex={gi} pointIndex={i}/>
         {/if}
     {/each}
 {/each}
