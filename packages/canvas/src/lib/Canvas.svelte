@@ -1,15 +1,15 @@
 <script lang="ts">
-    import {afterUpdate, onMount, setContext, tick} from "svelte";
-    import type {CanvasContext} from "./types/CanvasContext";
-    import type {CanvasNode} from "./types/CanvasNode";
-    import {fillRect} from "$lib/primitive/rect";
-    import {cursorPosition} from "$lib/stores/cursorPosition";
-    import {canvasClick} from "$lib/stores/canvasClick";
-    import {canvasTime} from "$lib/stores/canvasTime";
-    import {keys} from "$lib/stores/keys";
-    import {navigation} from "$lib/stores/navigation";
+  import {afterUpdate, onMount, setContext, tick} from "svelte";
+  import type {CanvasContext} from "./types/CanvasContext";
+  import type {CanvasNode} from "./types/CanvasNode";
+  import {fillRect} from "$lib/primitive/rect";
+  import {cursorPosition} from "$lib/stores/cursorPosition";
+  import {canvasClick} from "$lib/stores/canvasClick";
+  import {canvasTime} from "$lib/stores/canvasTime";
+  import {keys} from "$lib/stores/keys";
+  import {navigation} from "$lib/stores/navigation";
 
-    // Exports
+  // Exports
   export let width = 100;
   export let height = 100;
   export let fullscreen = false;
@@ -70,6 +70,7 @@
     unregister,
     redraw: draw
   });
+
 
   // Functions
   function register(node: CanvasNode) {

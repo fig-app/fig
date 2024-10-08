@@ -92,11 +92,6 @@
     virtualStartCommand.endPoint = navigation.toVirtualPoint(realStartCommand.endPoint);
     virtualEndCommand.endPoint = navigation.toVirtualPoint(realEndCommand.endPoint);
 
-    center = centerOfSegment({
-      start: virtualStartCommand.endPoint,
-      end: virtualEndCommand.endPoint
-    });
-    
     // Update center point
     centerPoint.updateCenterPoint(center);
     centerPoint.update();
@@ -110,6 +105,10 @@
     clicked = hovered && canvasClick.single;
     dragged = (dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part));
 
+    center = centerOfSegment({
+      start: virtualStartCommand.endPoint,
+      end: virtualEndCommand.endPoint
+    });
 
     // Move with cursor
     if (dragged && context.isDragged(part)) {
