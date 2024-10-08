@@ -37,7 +37,7 @@
 
   let hovered = false;
   let dblclick = false;
-  let selected = false;
+  let editMode = false;
 
   let selectedPart: VectorPart | null = null;
   let draggedPart: VectorPart | null = null;
@@ -88,12 +88,12 @@
   $: hovered;
 
   $: dblclick && (() => {
-    selected = !selected;
+    editMode = !editMode;
   })()
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
-    if (!selected && hovered) {
+    if (!editMode && hovered) {
       strokeRect({
         ctx,
         x: bbox.center.x,
@@ -124,7 +124,7 @@
       }
 
       // draw vector skeleton on hover
-      if (!selected && hovered) {
+      if (!editMode && hovered) {
         for (let path of stroke_paths_syncronization) {
           drawPath({
             ctx,
@@ -135,7 +135,7 @@
       }
 
       // draw all parts
-      if (selected) {
+      if (editMode) {
         for (const part of parts) {
           part.draw(ctx);
         }
@@ -218,7 +218,7 @@
 </script>
 
 {#key updateTrigger}
-  {#if selected}
+  {#if editMode}
     {#each stroke_geometries_commands as path_commands, gi}
       {#each path_commands as command, i}
 

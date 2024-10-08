@@ -9,7 +9,7 @@
   import {canvasClick} from "$lib/stores/canvasClick";
   import {useId} from "@fig/functions/id";
   import {keys} from "$lib/stores/keys";
-  import {Timer} from "$lib/stores/canvasTime";
+  import {Timer} from "$lib/stores/canvasTime.js";
   import {EditPoint} from "$lib/components/EditPoint";
 
   export let geometryIndex: number;

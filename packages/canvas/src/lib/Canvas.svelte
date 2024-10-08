@@ -1,13 +1,13 @@
 <script lang="ts">
-  import {afterUpdate, onMount, setContext, tick} from "svelte";
-  import type {CanvasContext} from "./types/CanvasContext";
-  import type {CanvasNode} from "./types/CanvasNode";
-  import {fillRect} from "$lib/primitive/rect";
-  import {cursorPosition} from "$lib/stores/cursorPosition";
-  import {canvasClick} from "$lib/stores/canvasClick";
-  import {canvasTime} from "$lib/stores/canvasTime";
+    import {afterUpdate, onMount, setContext, tick} from "svelte";
+    import type {CanvasContext} from "./types/CanvasContext";
+    import type {CanvasNode} from "./types/CanvasNode";
+    import {fillRect} from "$lib/primitive/rect";
+    import {cursorPosition} from "$lib/stores/cursorPosition";
+    import {canvasClick} from "$lib/stores/canvasClick";
+    import {canvasTime} from "$lib/stores/canvasTime.js";
 
-  // Exports
+    // Exports
   export let width = 100;
   export let height = 100;
   export let fullscreen = false;
@@ -177,6 +177,6 @@
           canvasClick.setPress(true, {x: e.clientX, y: e.clientY})
         }}
         on:mouseup={(_) => canvasClick.resetClick()}>
-    <slot {width} {height}></slot>
+  <slot {width} {height}></slot>
 </canvas>
 
