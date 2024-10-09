@@ -49,14 +49,6 @@
 
   // Force update when this variables change (trigger the redraw)
   canvasContext.updateCanvas(() => [realCommand, hovered, clicked, part.selected])
-  // watch([() => realCommand, () => virtualCommand, () => hovered, () => clicked], () => {
-  //   canvasContext.redraw();
-  // });
-  // $effect(() => {
-  //   if (realCommand || hovered || clicked || virtualCommand) {
-  //     canvasContext.redraw();
-  //   }
-  // })
 
   // Debug
 

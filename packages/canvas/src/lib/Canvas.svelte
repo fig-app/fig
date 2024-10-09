@@ -160,12 +160,31 @@
   }
 
   function handleZoom(event: WheelEvent) {
-    console.log("Zooming...");
+
+    let oldScale = navigation.scale;
+    // zooming considering the position of the cursor
     if (event.deltaY > 0) {
       navigation.scale /= ZOOM_AMOUNT;
     } else if (event.deltaY < 0) {
       navigation.scale *= ZOOM_AMOUNT;
     }
+    let zoomRatio = (navigation.scale / oldScale);
+
+    // positive if zoomed, negative if de-zoomed, hence the 1
+    const scaleAmount = 1 - zoomRatio;
+
+    const zoomRatioX = cursorPosition.x / canvas.clientWidth;
+    const zoomRatioY = cursorPosition.y / canvas.clientHeight;
+
+    // Amount zoomed from each edge of the screen
+    const unitsZoomedX = (canvas.width / navigation.scale) * scaleAmount;
+    const unitsZoomedY = (canvas.height / navigation.scale) * scaleAmount;
+
+    const unitsAddLeft = unitsZoomedX * zoomRatioX;
+    const unitsAddTop = unitsZoomedY * zoomRatioY;
+
+    navigation.offsetX += unitsAddLeft;
+    navigation.offsetY += unitsAddTop;
   }
 
   function handleScroll(event: WheelEvent) {
