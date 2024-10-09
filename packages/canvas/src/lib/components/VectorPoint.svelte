@@ -1,20 +1,14 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
-  import {isCursorHoveringArc} from "@fig/functions/shape/arc";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
-  import {arc} from "$lib/primitive/arc";
   import {useId} from "@fig/functions/id";
-  import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
-  import {
-    getVectorContext,
-    registerVectorPart
-  } from "$lib/context/vectorContext";
+  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
   import {EditPoint} from "$lib/components/EditPoint.svelte";
-  import {Timer} from "$lib/stores/canvasTime.svelte";
+  import {Timer} from "$lib/stores/canvasTime.svelte"
 
   type Props = {
     geometryIndex: number;
