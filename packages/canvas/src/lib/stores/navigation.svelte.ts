@@ -1,5 +1,5 @@
-import type {Vector} from "@fig/types/properties/Vector";
-import type {PathCommand} from "@fig/functions/path/PathCommand";
+import type { Vector } from "@fig/types/properties/Vector";
+import type { PathCommand } from "@fig/functions/path/PathCommand";
 
 type OffsetStore = {
   offsetX: number;
@@ -16,11 +16,14 @@ class NavigationSvelte {
     cellSize: 10,
   });
 
-  constructor() {
-  }
+  constructor() {}
 
   get scale(): number {
     return this.states.scale;
+  }
+
+  get percentScale(): number {
+    return this.scale * 100;
   }
 
   set scale(value: number) {
@@ -59,10 +62,7 @@ class NavigationSvelte {
           break;
         }
         case "Z": {
-          to_ret.push({
-            type: command.type,
-            relative: command.relative,
-          });
+          to_ret.push(command);
           break;
         }
       }
@@ -82,7 +82,7 @@ class NavigationSvelte {
     return {
       x: this.toRealX(point.x),
       y: this.toRealY(point.y),
-    }
+    };
   }
 
   toVirtualX(xReal: number): number {

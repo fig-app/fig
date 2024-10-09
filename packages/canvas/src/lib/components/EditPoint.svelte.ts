@@ -16,7 +16,7 @@ type EditPointStates = {
   centerPoint: Vector;
 };
 
-export class EditPointSvelte {
+export class EditPoint {
   private states: EditPointStates = $state({
     hovered: false,
     clicked: false,
@@ -46,7 +46,7 @@ export class EditPointSvelte {
       cursorPosition,
       arc: {
         centerPosition: this.states.centerPoint,
-        radius: RADIUS_DEFAULT + 1,
+        radius: RADIUS_DEFAULT + 2,
       },
     });
 

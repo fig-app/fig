@@ -8,9 +8,12 @@
   import {useId} from "@fig/functions/id";
   import {keys} from "../stores/keys.svelte";
   import {Timer} from "$lib/stores/canvasTime.svelte";
-  import {EditPointSvelte} from "$lib/components/EditPoint.svelte";
+  import {EditPoint} from "$lib/components/EditPoint.svelte";
   import {navigation} from "$lib/stores/navigation.svelte";
-  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
+  import {
+    getVectorContext,
+    registerVectorPart
+  } from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
 
   type Props = {
@@ -25,9 +28,10 @@
   let clicked = $state(false);
   let dragged = $state(false);
 
-  let centerPoint = new EditPointSvelte();
+  let centerPoint = new EditPoint();
 
   let keyTimer = new Timer(100, "Repeating");
+  let loadTimer = new Timer(10, "Once");
 
   let canvasContext = getCanvasContext();
   let context = getVectorContext();
@@ -55,15 +59,7 @@
   }));
 
   // Force update when this variables change (trigger the redraw)
-  canvasContext.updateCanvas(() => [realStartCommand, realEndCommand, hovered, clicked, part.selected]);
-  // watch([() => virtualStartCommand, () => virtualEndCommand, () => hovered, () => clicked], () => {
-  //   canvasContext.redraw();
-  // });
-  // $effect(() => {
-  //   if (virtualStartCommand || virtualEndCommand || hovered || clicked) {
-  //     canvasContext.redraw();
-  //   }
-  // });
+  canvasContext.updateCanvas(() => [realStartCommand, realEndCommand, hovered, clicked, part.selected, centerPoint.hovered]);
 
   // Update selected state
   $effect(() => {
@@ -82,6 +78,8 @@
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
+    if (!loadTimer.finished()) return;
+
     if (dragged && context.isDragged(part)) {
       drawSelected(ctx);
     } else if (hovered && part.selected) {
