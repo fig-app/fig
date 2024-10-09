@@ -22,7 +22,10 @@
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {keys} from "$lib/stores/keys.svelte";
-  import {registerCanvasNode} from "$lib/context/canvasContext";
+  import {
+    getCanvasContext,
+    registerCanvasNode
+  } from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
 
   let {node}: { node: Node } = $props();
@@ -31,12 +34,13 @@
   let strokePathsSynchronization: Path2D[] = $state([]);
   let strokeGeometriesCommands: PathCommand[][] = $state([]);
 
-  let bbox = getGeometryBbox(strokeGeometriesCommands);
+  let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
   let rect = new Rect(0, 0, 0, 0);
 
   let hovered = $state(false);
   let dblclick = $state(false);
   let editMode = $state(false);
+  let triggerUpdate = $state(false);
 
   let editTimer = new Timer(100, "Once");
 
@@ -46,6 +50,7 @@
   let strokeColor = colorToString(node.node.data.strokes[0].color);
   let strokeWeight = node.node.data.strokeWeight;
 
+  let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
 
   $inspect(strokeGeometriesCommands).with((type, values) => {
@@ -60,9 +65,15 @@
     }
   })
 
-  // $effect(() => {
-  //   if (hovered || bbox) {
+  // Force update when this variables change (trigger the redraw)
+  canvasContext.updateCanvas(() => [hovered, bbox])
+  // watch([() => hovered, () => bbox], () => {
+  //   canvasContext.redraw();
+  // });
   //
+  // $effect(() => {
+  //   if (bbox) {
+  //     canvasContext.redraw();
   //   }
   // })
 
@@ -74,6 +85,7 @@
     setDraggedPart,
     resetDraggedPart,
     isDragged,
+    updateVector,
     strokeGeometriesCommands: strokeGeometriesCommands,
   });
 
@@ -178,7 +190,7 @@
   }
 
   function updateRect() {
-    bbox = getGeometryBbox(strokeGeometriesCommands);
+    // bbox = getGeometryBbox(strokeGeometriesCommands);
     rect.update(navigation.toVirtualX(bbox.min.x), navigation.toVirtualY(bbox.min.y), bbox.width + strokeWeight / 2, bbox.height + strokeWeight / 2);
   }
 
@@ -232,10 +244,14 @@
     }
   }
 
+  function updateVector() {
+    triggerUpdate = !triggerUpdate;
+  }
+
 </script>
 
 {#if (editMode)}
-  {#key strokeGeometriesCommands}
+  {#key triggerUpdate}
     {#each strokeGeometriesCommands as path_commands, gi}
       {#each path_commands as command, i}
 

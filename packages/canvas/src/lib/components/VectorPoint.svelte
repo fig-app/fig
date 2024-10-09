@@ -12,6 +12,7 @@
     getVectorContext,
     registerVectorPart
   } from "$lib/context/vectorContext";
+  import {getCanvasContext} from "$lib/context/canvasContext";
 
   type Props = {
     geometryIndex: number;
@@ -30,16 +31,17 @@
   let clicked = $state(false);
   let dragged = $state(false);
 
+  let canvasContext = getCanvasContext();
   let context = getVectorContext();
 
   // Register point part
-  let part: VectorPart = {
+  let part: VectorPart = $state({
     id: useId(),
     type: "point",
     draw,
     update,
     selected: false
-  };
+  });
 
   registerVectorPart(part);
 
@@ -49,11 +51,15 @@
   let centerPoint = $derived(virtualCommand.endPoint);
 
   // Force update when this variables change (trigger the redraw)
+  canvasContext.updateCanvas(() => [realCommand, hovered, clicked, part.selected])
+  // watch([() => realCommand, () => virtualCommand, () => hovered, () => clicked], () => {
+  //   canvasContext.redraw();
+  // });
   // $effect(() => {
   //   if (realCommand || hovered || clicked || virtualCommand) {
-  //
+  //     canvasContext.redraw();
   //   }
-  // });
+  // })
 
   // Debug
 

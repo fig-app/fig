@@ -12,4 +12,6 @@ export type VectorContext = {
   isDragged: (part: VectorPart) => boolean | null;
 
   strokeGeometriesCommands: PathCommand[][];
+
+  updateVector: () => void;
 };

@@ -46,7 +46,7 @@ export class EditPointSvelte {
       cursorPosition,
       arc: {
         centerPosition: this.states.centerPoint,
-        radius: RADIUS_DEFAULT,
+        radius: RADIUS_DEFAULT + 1,
       },
     });
 

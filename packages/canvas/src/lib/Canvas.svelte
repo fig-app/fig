@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {onMount} from "svelte";
+  import {onMount, tick, untrack} from "svelte";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
@@ -38,10 +38,18 @@
 
   const ZOOM_AMOUNT: number = .2;
 
+  updateCanvas(() => [windowWidth, windowHeight, keys.combo, canvasClick.clickPoint]);
+  // watch([() => navigation.offsetX, () => navigation.offsetY], () => {
+  //   draw();
+  // })
+  // $effect(() => {
+  // })
+
   // Set canvas context
   setCanvasContext({
     register,
     unregister,
+    updateCanvas,
     redraw: draw
   });
 
@@ -51,7 +59,7 @@
     // Update loop
     function loop(timestamp: number) {
       update(timestamp);
-      draw();
+      // draw();
       frameId = requestAnimationFrame(loop);
     }
 
@@ -69,6 +77,22 @@
   });
 
   // Functions
+  function updateCanvas(depts: () => any[]) {
+    let scheduled = false;
+    $effect(() => {
+      depts();
+      return untrack(() => {
+        if (scheduled) return;
+        scheduled = true;
+        tick().then(() => {
+          console.log("Update canvas")
+          scheduled = false;
+        });
+        return draw();
+      });
+    });
+  }
+
   function register(node: CanvasNode) {
     onMount(() => {
       pipeline.add(node);
