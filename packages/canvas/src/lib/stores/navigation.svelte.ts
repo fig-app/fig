@@ -78,6 +78,13 @@ class NavigationSvelte {
     };
   }
 
+  toRealPoint(point: Vector) {
+    return {
+      x: this.toRealX(point.x),
+      y: this.toRealY(point.y),
+    }
+  }
+
   toVirtualX(xReal: number): number {
     return (xReal + this.offsetX) * this.scale;
   }

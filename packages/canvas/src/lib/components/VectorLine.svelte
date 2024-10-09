@@ -121,7 +121,7 @@
       let x = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
       let y = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
       canvasClick.setClickPoint(cursorPosition.pos);
-      
+
       realStartCommand.endPoint.x += x;
       realStartCommand.endPoint.y += y;
 
@@ -147,7 +147,7 @@
       context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
         type: "L",
         relative: false,
-        endPoint: center
+        endPoint: navigation.toRealPoint(center),
       });
       context.updateVector();
     }
