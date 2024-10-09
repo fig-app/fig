@@ -11,6 +11,7 @@
   } from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
   import {EditPoint} from "$lib/components/EditPoint.svelte";
+  import {Timer} from "$lib/stores/canvasTime.svelte";
 
   type Props = {
     geometryIndex: number;
@@ -20,9 +21,9 @@
   let {geometryIndex, pointIndex}: Props = $props();
 
   let point = new EditPoint();
-  let hovered = $state(false);
-  let clicked = $state(false);
   let dragged = $state(false);
+
+  let loadTimer = new Timer(10, "Once");
 
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
@@ -38,14 +39,12 @@
 
   registerVectorPart(part);
 
-  // Point virtualCommand
+  // Real and virtual commands
   let realCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][pointIndex] as MLTPathCommand);
   let virtualCommand = $state({...realCommand});
 
-  // Force update when this variables change (trigger the redraw)
+  // Update canvas when this variables change (trigger the redraw)
   canvasContext.updateCanvas(() => [realCommand, part.selected, point.hovered, point.clicked])
-
-  // Debug
 
   // Update selected state
   $effect(() => {
@@ -67,14 +66,16 @@
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
+    if (!loadTimer.finished()) return;
+
     if (dragged && vectorContext.isDragged(part)) {
       point.drawSelected(ctx);
-    } else if (hovered && part.selected) {
+    } else if (point.hovered && part.selected) {
       point.drawHovered(ctx);
     } else if (part.selected) {
       point.drawSelected(ctx);
-    } else if (hovered && vectorContext.isDragged(part) === null) {
-      if (clicked) {
+    } else if (point.hovered && vectorContext.isDragged(part) === null) {
+      if (point.clicked) {
         point.drawSelected(ctx);
       } else {
         point.drawHovered(ctx);
@@ -90,10 +91,7 @@
     point.updateCenterPoint(virtualCommand.endPoint)
     point.update()
 
-    hovered = point.hovered;
-
-    clicked = point.clicked;
-    dragged = (dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !vectorContext.isDragged(part));
+    dragged = (dragged && canvasClick.pressed) || (point.hovered && canvasClick.pressed && !vectorContext.isDragged(part));
 
     if (dragged && vectorContext.isDragged(part)) {
       let x = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;

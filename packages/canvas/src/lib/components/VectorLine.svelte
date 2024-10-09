@@ -31,6 +31,7 @@
   let centerPoint = new EditPoint();
 
   let keyTimer = new Timer(100, "Repeating");
+  let loadTimer = new Timer(10, "Once");
 
   let canvasContext = getCanvasContext();
   let context = getVectorContext();
@@ -77,6 +78,8 @@
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
+    if (!loadTimer.finished()) return;
+
     if (dragged && context.isDragged(part)) {
       drawSelected(ctx);
     } else if (hovered && part.selected) {

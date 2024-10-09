@@ -62,10 +62,7 @@ class NavigationSvelte {
           break;
         }
         case "Z": {
-          to_ret.push({
-            type: command.type,
-            relative: command.relative,
-          });
+          to_ret.push(command);
           break;
         }
       }
