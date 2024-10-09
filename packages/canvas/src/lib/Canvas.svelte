@@ -64,7 +64,10 @@
       width = windowWidth;
       height = windowHeight;
     }
-    drawBackground();
+
+    setTimeout(() => {
+      draw();
+    }, 100)
 
     return () => {
       cancelAnimationFrame(frameId);
@@ -101,6 +104,11 @@
 
   function draw() {
     drawBackground();
+
+    if (navigation.percentScale > 800) {
+      drawGrid();
+    }
+
     drawNodes();
   }
 
@@ -126,6 +134,41 @@
     }
   }
 
+  function drawGrid() {
+    if (ctx) {
+      ctx.strokeStyle = "rgb(62, 62, 62)";
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+
+      let cellSize = 1;
+      for (
+        /* Start the first line based on offsetX and scale */
+        let x = (navigation.offsetX % cellSize) * navigation.scale;
+        x <= width;
+        /* Cell size based on scale amount */
+        x += cellSize * navigation.scale
+      ) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+      }
+
+      /* Horizontal lines spanning the full height */
+      for (
+        /* Start the first line based on offsetY and scale */
+        let y = (navigation.offsetY % cellSize) * navigation.scale;
+        y <= height;
+        /* Cell size based on scale amount */
+        y += cellSize * navigation.scale
+      ) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+      }
+
+      ctx.stroke();
+    }
+  }
+
   function update(timestamp: number) {
     canvasTime.updateTimestamp(timestamp);
     canvasTime.updateTimers();
@@ -142,9 +185,10 @@
   function handleWindowResize() {
     if (fullscreen) {
       clearTimeout(resizeTimeout);
+      width = windowWidth;
+      height = windowHeight;
+
       resizeTimeout = setTimeout(() => {
-        width = windowWidth;
-        height = windowHeight;
         draw();
       }, 100);
     }
@@ -165,7 +209,7 @@
     // zooming considering the position of the cursor
     if (event.deltaY > 0) {
       navigation.scale /= ZOOM_AMOUNT;
-    } else if (event.deltaY < 0) {
+    } else if (event.deltaY < 0 && navigation.scale <= 525) {
       navigation.scale *= ZOOM_AMOUNT;
     }
     let zoomRatio = (navigation.scale / oldScale);

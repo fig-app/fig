@@ -12,7 +12,7 @@
             type: "vector",
             data: {
               strokes: [{color: {r: 105, g: 86, b: 214, a: 1}}],
-              strokeWeight: 10,
+              strokeWeight: 2,
               strokeGeometry: [{path: "M 600,30 L 640,30 L 640,100 L 610,100 Z", windingRule: "", overrideId: 1}, {path: "M 100,100 L 150,100 L 100,200 L 200,100 L 100,300 L 500,300 Z", windingRule: "", overrideId: 1}]
             }
           }

@@ -12,25 +12,6 @@ type RectArgs = {
   radius: number | number[];
 };
 
-type FillRectArgs = {
-  ctx: CanvasRenderingContext2D;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  color: string;
-};
-
-type StrokeRectArgs = {
-  ctx: CanvasRenderingContext2D;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  color: string;
-  strokeWidth: number;
-};
-
 export function rect({
   ctx,
   x,
@@ -81,6 +62,15 @@ export function rect({
   ctx.restore();
 }
 
+type FillRectArgs = {
+  ctx: CanvasRenderingContext2D;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+};
+
 export function fillRect({ ctx, x, y, width, height, color }: FillRectArgs) {
   ctx.save();
   ctx.translate(x, y);
@@ -90,6 +80,16 @@ export function fillRect({ ctx, x, y, width, height, color }: FillRectArgs) {
 
   ctx.restore();
 }
+
+type StrokeRectArgs = {
+  ctx: CanvasRenderingContext2D;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+  strokeWidth: number;
+};
 
 export function strokeRect({
   ctx,
