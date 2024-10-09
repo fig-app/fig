@@ -35,6 +35,13 @@ export class Rect {
     return this.states.topLeft;
   }
 
+  get center(): Vector {
+    return {
+      x: this.x + this.width / 2,
+      y: this.y + this.height / 2,
+    };
+  }
+
   get width(): number {
     return this.states.width;
   }

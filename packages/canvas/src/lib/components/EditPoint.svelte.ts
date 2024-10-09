@@ -16,7 +16,7 @@ type EditPointStates = {
   centerPoint: Vector;
 };
 
-export class EditPointSvelte {
+export class EditPoint {
   private states: EditPointStates = $state({
     hovered: false,
     clicked: false,

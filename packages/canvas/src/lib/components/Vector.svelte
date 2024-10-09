@@ -95,8 +95,8 @@
     if (!editMode && hovered) {
       strokeRect({
         ctx,
-        x: rect.x + rect.width / 2,
-        y: rect.y + rect.height / 2,
+        x: rect.center.x,
+        y: rect.center.y,
         width: rect.width,
         height: rect.height,
         color: getPrimitiveBlue(),
@@ -144,6 +144,10 @@
     }
   }
 
+  function drawTransformCorner(ctx: CanvasRenderingContext2D) {
+
+  }
+
   function update() {
     updateRect();
     hovered = rect.hovered();
@@ -170,7 +174,7 @@
   }
 
   function updateRect() {
-    rect.update(navigation.toVirtualX(bbox.min.x), navigation.toVirtualY(bbox.min.y), (bbox.width + strokeWeight / 2) * navigation.scale, (bbox.height + strokeWeight / 2) * navigation.scale);
+    rect.update(navigation.toVirtualX(bbox.min.x), navigation.toVirtualY(bbox.min.y), (bbox.width) * navigation.scale, (bbox.height) * navigation.scale);
   }
 
   function register(part: VectorPart) {

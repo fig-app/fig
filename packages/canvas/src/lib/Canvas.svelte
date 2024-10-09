@@ -39,8 +39,6 @@
 
   const ZOOM_AMOUNT: number = 1.1;
 
-  $inspect(navigation.percentScale);
-
   updateCanvas(() => [navigation.scale, navigation.offsetX, navigation.offsetY, windowWidth, windowHeight, keys.combo, canvasClick.clickPoint]);
 
   // Set canvas context
@@ -207,7 +205,7 @@
     console.log("Zooming...");
     if (event.deltaY > 0 && navigation.scale >= 0.05) {
       navigation.scale /= ZOOM_AMOUNT;
-    } else if (event.deltaY < 0) {
+    } else if (event.deltaY < 0 && navigation.scale <= 525) {
       navigation.scale *= ZOOM_AMOUNT;
     }
   }
