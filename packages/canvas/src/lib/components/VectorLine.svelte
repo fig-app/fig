@@ -1,6 +1,4 @@
 <script lang="ts">
-  import {getContext, onDestroy} from "svelte";
-  import type {VectorContext} from "$lib/types/VectorContext";
   import type {VectorPart} from "$lib/types/VectorPart";
   import {line} from "$lib/primitive/line";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
@@ -12,6 +10,11 @@
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {EditPointSvelte} from "$lib/components/EditPoint.svelte";
   import {navigation} from "$lib/stores/navigation";
+  import {
+    getVectorContext,
+    registerVectorPart
+  } from "$lib/context/vectorContext";
+  import {getCanvasContext} from "$lib/context/canvasContext";
 
   type Props = {
     geometryIndex: number;
@@ -29,38 +32,41 @@
 
   let keyTimer = new Timer(100, "Repeating");
 
-  // Register and unregister part
-  let part: VectorPart = {
+  let canvasContext = getCanvasContext();
+  let context = getVectorContext();
+
+  // Register line part
+  let part: VectorPart = $state({
     id: useId(),
     type: "line",
     draw,
     update,
     selected: false
-  };
-
-  let context = getContext<VectorContext>("vector");
-  context.register(part);
-  onDestroy(() => {
-    context.unregister(part);
-  })
-
-  // Line commands
-  let realStartCommand = context.stroke_geometries_commands[geometryIndex][startIndex] as MLTPathCommand;
-  let realEndCommand = context.stroke_geometries_commands[geometryIndex][endIndex] as MLTPathCommand;
-  let virtualStartCommand = {...realStartCommand};
-  let virtualEndCommand = {...realEndCommand};
-
-  let center = centerOfSegment({
-    start: virtualStartCommand.endPoint,
-    end: virtualEndCommand.endPoint
   });
 
-  // Force update when this variables change (trigger the redraw)
-  // $effect(() => {
-  // virtualStartCommand || virtualEndCommand || hovered || clicked;
-  // });
+  registerVectorPart(part);
 
-  // Debug
+  // Line commands
+  let realStartCommand = $state(context.strokeGeometriesCommands[geometryIndex][startIndex] as MLTPathCommand);
+  let realEndCommand = $state(context.strokeGeometriesCommands[geometryIndex][endIndex] as MLTPathCommand);
+  let virtualStartCommand = $state({...realStartCommand});
+  let virtualEndCommand = $state({...realEndCommand});
+
+  let center = $derived(centerOfSegment({
+    start: virtualStartCommand.endPoint,
+    end: virtualEndCommand.endPoint
+  }));
+
+  // Force update when this variables change (trigger the redraw)
+  canvasContext.updateCanvas(() => [realStartCommand, realEndCommand, hovered, clicked, part.selected]);
+  // watch([() => virtualStartCommand, () => virtualEndCommand, () => hovered, () => clicked], () => {
+  //   canvasContext.redraw();
+  // });
+  // $effect(() => {
+  //   if (virtualStartCommand || virtualEndCommand || hovered || clicked) {
+  //     canvasContext.redraw();
+  //   }
+  // });
 
   // Update selected state
   $effect(() => {
@@ -113,11 +119,6 @@
     clicked = hovered && canvasClick.single;
     dragged = (dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part));
 
-    center = centerOfSegment({
-      start: virtualStartCommand.endPoint,
-      end: virtualEndCommand.endPoint
-    });
-
     // Move with cursor
     if (dragged && context.isDragged(part)) {
       let x = cursorPosition.x - canvasClick.clickPoint.x;
@@ -137,22 +138,22 @@
       let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
       let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
 
-      virtualStartCommand.endPoint.x += xShift;
-      virtualStartCommand.endPoint.y += yShift;
+      realStartCommand.endPoint.x += xShift;
+      realStartCommand.endPoint.y += yShift;
 
-      virtualEndCommand.endPoint.x += xShift;
-      virtualEndCommand.endPoint.y += yShift;
+      realEndCommand.endPoint.x += xShift;
+      realEndCommand.endPoint.y += yShift;
     }
-  }
 
-  // Add a new point when clicking on the center point
-  if (centerPoint.clicked && context.isDragged(part) === null) {
-    context.stroke_geometries_commands[geometryIndex].splice(startIndex + 1, 0, {
-      type: "L",
-      relative: false,
-      endPoint: center
-    });
-    context.updateVector();
+    // Add a new point when clicking on the center point
+    if (centerPoint.clicked && context.isDragged(part) === null) {
+      context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
+        type: "L",
+        relative: false,
+        endPoint: center
+      });
+      context.updateVector();
+    }
   }
 
   // Draw functions

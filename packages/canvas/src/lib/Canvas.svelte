@@ -1,6 +1,5 @@
 <script lang="ts">
-  import {onMount, setContext} from "svelte";
-  import type {CanvasContext} from "./types/CanvasContext";
+  import {onMount, tick, untrack} from "svelte";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
@@ -8,6 +7,7 @@
   import {canvasTime} from "$lib/stores/canvasTime.svelte";
   import {keys} from "./stores/keys.svelte";
   import {navigation} from "$lib/stores/navigation";
+  import {setCanvasContext} from "$lib/context/canvasContext";
 
   type Props = {
     width: number;
@@ -38,13 +38,28 @@
 
   const ZOOM_AMOUNT: number = .2;
 
+  updateCanvas(() => [windowWidth, windowHeight, keys.combo, canvasClick.clickPoint]);
+  // watch([() => navigation.offsetX, () => navigation.offsetY], () => {
+  //   draw();
+  // })
+  // $effect(() => {
+  // })
+
+  // Set canvas context
+  setCanvasContext({
+    register,
+    unregister,
+    updateCanvas,
+    redraw: draw
+  });
+
   onMount(() => {
     ctx = canvas.getContext("2d");
 
     // Update loop
     function loop(timestamp: number) {
       update(timestamp);
-      draw();
+      // draw();
       frameId = requestAnimationFrame(loop);
     }
 
@@ -61,13 +76,23 @@
     }
   });
 
-  setContext<CanvasContext>("canvas", {
-    register,
-    unregister,
-    redraw: draw
-  });
-
   // Functions
+  function updateCanvas(depts: () => any[]) {
+    let scheduled = false;
+    $effect(() => {
+      depts();
+      return untrack(() => {
+        if (scheduled) return;
+        scheduled = true;
+        tick().then(() => {
+          console.log("Update canvas")
+          scheduled = false;
+        });
+        return draw();
+      });
+    });
+  }
+
   function register(node: CanvasNode) {
     onMount(() => {
       pipeline.add(node);
