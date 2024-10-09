@@ -33,7 +33,6 @@
   let windowWidth = $state(0);
   let windowHeight = $state(0);
   let resizeTimeout: NodeJS.Timeout;
-  // let firstDraw = $state(false);
 
   let clickTimeout: NodeJS.Timeout;
 
@@ -66,7 +65,9 @@
       height = windowHeight;
     }
 
-    draw();
+    setTimeout(() => {
+      draw();
+    }, 100)
 
     return () => {
       cancelAnimationFrame(frameId);
@@ -184,9 +185,10 @@
   function handleWindowResize() {
     if (fullscreen) {
       clearTimeout(resizeTimeout);
+      width = windowWidth;
+      height = windowHeight;
+
       resizeTimeout = setTimeout(() => {
-        width = windowWidth;
-        height = windowHeight;
         draw();
       }, 100);
     }

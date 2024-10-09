@@ -8,11 +8,7 @@
   import VectorPoint from "$lib/components/VectorPoint.svelte";
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
-  import {
-    colorToString,
-    getPrimitiveBlue,
-    getPrimitiveWhite
-  } from "@fig/functions/color";
+  import {colorToString, getPrimitiveBlue} from "@fig/functions/color";
   import type {PathCommand} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
@@ -27,6 +23,7 @@
     registerCanvasNode
   } from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
+  import TransformCorners from "$lib/components/TransformCorners.svelte";
 
   let {node}: { node: Node } = $props();
 
@@ -35,16 +32,18 @@
   let strokeGeometriesCommands: PathCommand[][] = $state([]);
 
   let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
-  let rect = new Rect(0, 0, 0, 0);
+  let rect = new Rect({});
 
   let hovered = $state(false);
   let dblclick = $state(false);
   let selected = $state(false);
   let editMode = $state(false);
   let triggerUpdate = $state(false);
+  let transformCorner;
 
   let editTimer = new Timer(100, "Once");
 
+  // Used for parts
   let selectedPart: VectorPart | null = $state(null);
   let draggedPart: VectorPart | null = $state(null);
 
@@ -80,11 +79,12 @@
   }
 
   // Register vector node
-  let canvasNode: CanvasNode = {
+  let canvasNode: CanvasNode = $state({
     draw,
     update,
-    node: node
-  };
+    node: node,
+    selected: false
+  });
 
   registerCanvasNode(canvasNode);
 
@@ -128,7 +128,7 @@
           drawPath({
             ctx,
             path,
-            colors: {stroke: getPrimitiveWhite()}
+            colors: {stroke: getPrimitiveBlue()}
           });
         }
       }
@@ -142,10 +142,6 @@
     } else {
       console.error(`${node.name} isn't a vector.`);
     }
-  }
-
-  function drawTransformCorner(ctx: CanvasRenderingContext2D) {
-
   }
 
   function update() {
@@ -174,7 +170,12 @@
   }
 
   function updateRect() {
-    rect.update(navigation.toVirtualX(bbox.min.x), navigation.toVirtualY(bbox.min.y), (bbox.width) * navigation.scale, (bbox.height) * navigation.scale);
+    rect.update(
+      navigation.toVirtualX(bbox.min.x),
+      navigation.toVirtualY(bbox.min.y),
+      (bbox.width) * navigation.scale,
+      (bbox.height) * navigation.scale
+    );
   }
 
   function register(part: VectorPart) {
@@ -232,6 +233,10 @@
   }
 
 </script>
+
+{#if (selected)}
+  <TransformCorners {rect} bind:this={transformCorner}/>
+{/if}
 
 {#if (editMode)}
   {#key triggerUpdate}

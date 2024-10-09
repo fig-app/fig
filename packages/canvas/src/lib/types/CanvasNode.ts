@@ -5,4 +5,5 @@ export type CanvasNode = {
   draw: CanvasDrawFunction;
   update: () => void;
   node: Node;
+  selected: boolean;
 };

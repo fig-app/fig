@@ -46,7 +46,7 @@ export class EditPoint {
       cursorPosition,
       arc: {
         centerPosition: this.states.centerPoint,
-        radius: RADIUS_DEFAULT + 1,
+        radius: RADIUS_DEFAULT + 2,
       },
     });
 
