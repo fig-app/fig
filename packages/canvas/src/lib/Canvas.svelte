@@ -1,27 +1,37 @@
 <script lang="ts">
-  import {afterUpdate, onMount, setContext, tick} from "svelte";
+  import {onMount, setContext} from "svelte";
   import type {CanvasContext} from "./types/CanvasContext";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
-  import {cursorPosition} from "$lib/stores/cursorPosition";
-  import {canvasClick} from "$lib/stores/canvasClick";
-  import {canvasTime} from "$lib/stores/canvasTime";
-  import {keys} from "$lib/stores/keys";
+  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte";
+  import {canvasTime} from "$lib/stores/canvasTime.svelte";
+  import {keys} from "./stores/keys.svelte";
   import {navigation} from "$lib/stores/navigation";
 
-  // Exports
-  export let width = 100;
-  export let height = 100;
-  export let fullscreen = false;
-  export let pipeline: Set<CanvasNode> = new Set();
-  export let backgroundColor = "rgba(30, 30, 30, 1)";
+  type Props = {
+    width: number;
+    height: number;
+    fullscreen: boolean;
+    backgroundColor: string;
+  }
 
-  let canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D | null;
-  let scheduled = false;
+  // Exports
+  let {
+    width = 100,
+    height = 100,
+    fullscreen = false,
+    backgroundColor = "rgba(30, 30, 30, 1)"
+  }: Props = $props();
+
+  let pipeline: Set<CanvasNode> = $state(new Set());
+
+  let canvas: HTMLCanvasElement;
+  let ctx: CanvasRenderingContext2D | null = null;
   let frameId: number;
 
-  let windowWidth = 0;
-  let windowHeight = 0;
+  let windowWidth = $state(0);
+  let windowHeight = $state(0);
   let resizeTimeout: NodeJS.Timeout;
 
   let clickTimeout: NodeJS.Timeout;
@@ -34,6 +44,7 @@
     // Update loop
     function loop(timestamp: number) {
       update(timestamp);
+      draw();
       frameId = requestAnimationFrame(loop);
     }
 
@@ -50,49 +61,17 @@
     }
   });
 
-
-  afterUpdate(async () => {
-    if (scheduled) return;
-
-    // await canvas update
-
-    scheduled = true;
-    await tick();
-    scheduled = false;
-
-    // canvas is updated
-    // so redraw the canvas background
-    draw();
-  });
-
   setContext<CanvasContext>("canvas", {
     register,
     unregister,
     redraw: draw
   });
 
-
   // Functions
   function register(node: CanvasNode) {
     onMount(() => {
       pipeline.add(node);
       return () => pipeline.delete(node);
-    });
-
-    // This function is not in 'register' anymore to avoid the repetition of calls to afterUpdate
-    afterUpdate(async () => {
-      if (scheduled) return;
-
-      // await component update
-      scheduled = true;
-      await tick();
-      scheduled = false;
-
-      console.log("Update")
-
-      // component is updated
-      // so redraw the component
-      draw();
     });
   }
 
@@ -178,7 +157,7 @@
 
 <canvas on:wheel|preventDefault={handleWheel} bind:this={canvas} {width}
         {height}
-        on:mousemove|preventDefault={(e) => cursorPosition.setPos({x: e.clientX, y: e.clientY})}
+        on:mousemove|preventDefault={(e) => cursorPosition.pos = {x: e.clientX, y: e.clientY}}
         on:click={(e) => {
     canvasClick.setSingleClick(true, {x: e.clientX, y: e.clientY});
 

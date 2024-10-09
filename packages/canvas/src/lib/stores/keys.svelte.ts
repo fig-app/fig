@@ -1,5 +1,4 @@
-import { get, writable, type Writable } from "svelte/store";
-import type { KeyboardKey } from "@fig/types/KeyboardKey";
+import type { KeyboardKey } from "@fig/types/KeyboardKey.ts";
 
 type KeysStore = {
   currentKey: KeyboardKey | null;
@@ -7,14 +6,12 @@ type KeysStore = {
 };
 
 class Keys {
-  store: Writable<KeysStore>;
+  private states: KeysStore = $state({
+    currentKey: null,
+    combo: [],
+  });
 
   constructor() {
-    this.store = writable({
-      currentKey: null,
-      combo: [],
-    });
-
     if (typeof window !== "undefined") {
       window.addEventListener("keydown", this.handleKeyDown.bind(this));
       window.addEventListener("keyup", this.handleKeyUp.bind(this));
@@ -25,14 +22,10 @@ class Keys {
     e.preventDefault();
 
     let key = e.key;
-    // console.log("Key", e.key, "is pressed");
-    this.store.update((store) => {
-      store.currentKey = key;
-      if (!store.combo.includes(key)) {
-        store.combo = [...store.combo, key];
-      }
-      return store;
-    });
+    this.states.currentKey = key;
+    if (!this.states.combo.includes(key)) {
+      this.states.combo = [...this.states.combo, key];
+    }
   }
 
   private handleKeyUp(e: KeyboardEvent) {
@@ -40,27 +33,23 @@ class Keys {
 
     let isCommand = e.ctrlKey || e.altKey || e.shiftKey || e.metaKey;
 
-    this.store.update((store) => {
-      store.currentKey = null;
+    this.states.currentKey = null;
 
-      if (!isCommand) {
-        store.combo = [];
-      } else {
-        if (this.containCommandsKey()) {
-          store.combo = store.combo.slice(0, 1);
-        }
+    if (!isCommand) {
+      this.states.combo = [];
+    } else {
+      if (this.containCommandsKey()) {
+        this.states.combo = this.states.combo.slice(0, 1);
       }
-
-      return store;
-    });
+    }
   }
 
   get currentKey(): KeyboardKey | null {
-    return get(this.store).currentKey;
+    return this.states.currentKey;
   }
 
   get combo(): KeyboardKey[] {
-    return get(this.store).combo;
+    return this.states.combo;
   }
 
   isPressed(key: KeyboardKey): boolean {

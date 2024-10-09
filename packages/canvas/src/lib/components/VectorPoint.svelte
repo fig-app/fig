@@ -2,17 +2,21 @@
   import {getContext, onDestroy} from "svelte";
   import type {VectorContext} from "$lib/types/VectorContext";
   import type {VectorPart} from "$lib/types/VectorPart";
-  import {cursorPosition} from "$lib/stores/cursorPosition";
+  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {isCursorHoveringArc} from "@fig/functions/shape/arc";
-  import {canvasClick} from "$lib/stores/canvasClick";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {arc} from "$lib/primitive/arc";
   import {useId} from "@fig/functions/id";
   import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation";
 
-  export let geometryIndex: number;
-  export let pointIndex: number;
+  type Props = {
+    geometryIndex: number;
+    pointIndex: number;
+  }
+
+  let {geometryIndex, pointIndex}: Props = $props();
 
   // No need for radius variable, because this will be a const
   const RADIUS_DEFAULT: number = 4;
@@ -20,9 +24,9 @@
   const PRIMITIVE_BLUE: string = getPrimitiveBlue();
   const PRIMITIVE_WHITE: string = getPrimitiveWhite();
 
-  let hovered = false;
-  let clicked = false;
-  let dragged = false;
+  let hovered = $state(false);
+  let clicked = $state(false);
+  let dragged = $state(false);
 
   // Register and unregister part
   let part: VectorPart = {
@@ -40,28 +44,36 @@
   })
 
   // Point virtualCommand
-  let realCommand = context.stroke_geometries_commands[geometryIndex][pointIndex] as MLTPathCommand;
-  let virtualCommand = {...realCommand};
-  $: centerPoint = virtualCommand.endPoint;
+  let realCommand = $state(context.stroke_geometries_commands[geometryIndex][pointIndex] as MLTPathCommand);
+  let virtualCommand = $state({...realCommand});
+  let centerPoint = $derived(virtualCommand.endPoint);
 
   // Force update when this variables change (trigger the redraw)
-  $: realCommand || hovered || clicked || virtualCommand;
+  // $effect(() => {
+  //   if (realCommand || hovered || clicked || virtualCommand) {
+  //
+  //   }
+  // });
 
   // Debug
 
   // Update selected state
-  $: dragged && (() => {
-    context.setDraggedPart(part);
+  $effect(() => {
+    if (dragged) {
+      context.setDraggedPart(part);
 
-    if (dragged && !part.selected && context.isDragged(part)) {
-      part.selected = true;
-      context.setSelectedPart(part);
+      if (dragged && !part.selected && context.isDragged(part)) {
+        part.selected = true;
+        context.setSelectedPart(part);
+      }
     }
-  })();
+  })
 
-  $: !dragged && !canvasClick.pressed && (() => {
-    context.resetDraggedPart(part);
-  })();
+  $effect(() => {
+    if (!dragged && !canvasClick.pressed) {
+      context.resetDraggedPart(part);
+    }
+  })
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
