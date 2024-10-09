@@ -33,10 +33,13 @@
   let windowWidth = $state(0);
   let windowHeight = $state(0);
   let resizeTimeout: NodeJS.Timeout;
+  // let firstDraw = $state(false);
 
   let clickTimeout: NodeJS.Timeout;
 
   const ZOOM_AMOUNT: number = 1.1;
+
+  $inspect(navigation.percentScale);
 
   updateCanvas(() => [navigation.scale, navigation.offsetX, navigation.offsetY, windowWidth, windowHeight, keys.combo, canvasClick.clickPoint]);
 
@@ -64,7 +67,8 @@
       width = windowWidth;
       height = windowHeight;
     }
-    drawBackground();
+
+    draw();
 
     return () => {
       cancelAnimationFrame(frameId);
@@ -101,6 +105,11 @@
 
   function draw() {
     drawBackground();
+
+    if (navigation.percentScale > 800) {
+      drawGrid();
+    }
+
     drawNodes();
   }
 
@@ -123,6 +132,41 @@
       for (const node of pipeline) {
         node.draw(ctx);
       }
+    }
+  }
+
+  function drawGrid() {
+    if (ctx) {
+      ctx.strokeStyle = "rgb(62, 62, 62)";
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+
+      let cellSize = 1;
+      for (
+        /* Start the first line based on offsetX and scale */
+        let x = (navigation.offsetX % cellSize) * navigation.scale;
+        x <= width;
+        /* Cell size based on scale amount */
+        x += cellSize * navigation.scale
+      ) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+      }
+
+      /* Horizontal lines spanning the full height */
+      for (
+        /* Start the first line based on offsetY and scale */
+        let y = (navigation.offsetY % cellSize) * navigation.scale;
+        y <= height;
+        /* Cell size based on scale amount */
+        y += cellSize * navigation.scale
+      ) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+      }
+
+      ctx.stroke();
     }
   }
 
@@ -161,7 +205,7 @@
 
   function handleZoom(event: WheelEvent) {
     console.log("Zooming...");
-    if (event.deltaY > 0) {
+    if (event.deltaY > 0 && navigation.scale >= 0.05) {
       navigation.scale /= ZOOM_AMOUNT;
     } else if (event.deltaY < 0) {
       navigation.scale *= ZOOM_AMOUNT;

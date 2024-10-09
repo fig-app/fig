@@ -8,7 +8,11 @@
   import VectorPoint from "$lib/components/VectorPoint.svelte";
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
-  import {colorToString, getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
+  import {
+    colorToString,
+    getPrimitiveBlue,
+    getPrimitiveWhite
+  } from "@fig/functions/color";
   import type {PathCommand} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
@@ -18,7 +22,10 @@
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {keys} from "$lib/stores/keys.svelte";
-  import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
+  import {
+    getCanvasContext,
+    registerCanvasNode
+  } from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
 
   let {node}: { node: Node } = $props();
@@ -32,6 +39,7 @@
 
   let hovered = $state(false);
   let dblclick = $state(false);
+  let selected = $state(false);
   let editMode = $state(false);
   let triggerUpdate = $state(false);
 
@@ -41,33 +49,13 @@
   let draggedPart: VectorPart | null = $state(null);
 
   let strokeColor = colorToString(node.node.data.strokes[0].color);
-  let strokeWeight = node.node.data.strokeWeight;
+  let strokeWeight = $derived(node.node.data.strokeWeight * navigation.scale);
 
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
 
-  $inspect(strokeGeometriesCommands).with((type, values) => {
-    let i = 0;
-    for (let geometry of values) {
-      i++;
-      let a = [];
-      for (let command of geometry) {
-        a.push(command.type);
-      }
-    }
-  })
-
   // Force update when this variables change (trigger the redraw)
   canvasContext.updateCanvas(() => [hovered, bbox])
-  // watch([() => hovered, () => bbox], () => {
-  //   canvasContext.redraw();
-  // });
-  //
-  // $effect(() => {
-  //   if (bbox) {
-  //     canvasContext.redraw();
-  //   }
-  // })
 
   // Create vector context
   setVectorContext({
@@ -107,10 +95,10 @@
     if (!editMode && hovered) {
       strokeRect({
         ctx,
-        x: navigation.toVirtualX(bbox.center.x),
-        y: navigation.toVirtualY(bbox.center.y),
-        width: bbox.width + strokeWeight + 2,
-        height: bbox.height + strokeWeight + 2,
+        x: rect.x + rect.width / 2,
+        y: rect.y + rect.height / 2,
+        width: rect.width,
+        height: rect.height,
         color: getPrimitiveBlue(),
         strokeWidth: 2,
       })
@@ -182,8 +170,7 @@
   }
 
   function updateRect() {
-    // bbox = getGeometryBbox(strokeGeometriesCommands);
-    rect.update(navigation.toVirtualX(bbox.min.x), navigation.toVirtualY(bbox.min.y), bbox.width + strokeWeight / 2, bbox.height + strokeWeight / 2);
+    rect.update(navigation.toVirtualX(bbox.min.x), navigation.toVirtualY(bbox.min.y), (bbox.width + strokeWeight / 2) * navigation.scale, (bbox.height + strokeWeight / 2) * navigation.scale);
   }
 
   function register(part: VectorPart) {

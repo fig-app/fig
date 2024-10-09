@@ -23,6 +23,26 @@ export class Rect {
     this.states.height = height;
   }
 
+  get x(): number {
+    return this.states.topLeft.x;
+  }
+
+  get y(): number {
+    return this.states.topLeft.y;
+  }
+
+  get topLeft(): Vector {
+    return this.states.topLeft;
+  }
+
+  get width(): number {
+    return this.states.width;
+  }
+
+  get height(): number {
+    return this.states.height;
+  }
+
   hovered(): boolean {
     return hoverRect(
       cursorPosition,

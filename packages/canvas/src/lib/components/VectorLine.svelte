@@ -10,7 +10,10 @@
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {EditPointSvelte} from "$lib/components/EditPoint.svelte";
   import {navigation} from "$lib/stores/navigation.svelte";
-  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
+  import {
+    getVectorContext,
+    registerVectorPart
+  } from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
 
   type Props = {
