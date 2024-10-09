@@ -1,6 +1,4 @@
 <script lang="ts">
-  import {getContext, onDestroy} from "svelte";
-  import type {VectorContext} from "$lib/types/VectorContext";
   import type {VectorPart} from "$lib/types/VectorPart";
   import {line} from "$lib/primitive/line";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
@@ -12,6 +10,10 @@
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {EditPointSvelte} from "$lib/components/EditPoint.svelte";
   import {navigation} from "$lib/stores/navigation";
+  import {
+    getVectorContext,
+    registerVectorPart
+  } from "$lib/context/vectorContext";
 
   type Props = {
     geometryIndex: number;
@@ -29,7 +31,9 @@
 
   let keyTimer = new Timer(100, "Repeating");
 
-  // Register and unregister part
+  let context = getVectorContext();
+
+  // Register line part
   let part: VectorPart = {
     id: useId(),
     type: "line",
@@ -38,15 +42,11 @@
     selected: false
   };
 
-  let context = getContext<VectorContext>("vector");
-  context.register(part);
-  onDestroy(() => {
-    context.unregister(part);
-  })
+  registerVectorPart(part);
 
   // Line commands
-  let realStartCommand = context.stroke_geometries_commands[geometryIndex][startIndex] as MLTPathCommand;
-  let realEndCommand = context.stroke_geometries_commands[geometryIndex][endIndex] as MLTPathCommand;
+  let realStartCommand = context.strokeGeometriesCommands[geometryIndex][startIndex] as MLTPathCommand;
+  let realEndCommand = context.strokeGeometriesCommands[geometryIndex][endIndex] as MLTPathCommand;
   let virtualStartCommand = {...realStartCommand};
   let virtualEndCommand = {...realEndCommand};
 
@@ -143,17 +143,17 @@
       virtualEndCommand.endPoint.x += xShift;
       virtualEndCommand.endPoint.y += yShift;
     }
+
+    // Add a new point when clicking on the center point
+    if (centerPoint.clicked && context.isDragged(part) === null) {
+      context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
+        type: "L",
+        relative: false,
+        endPoint: centerPoint.centerPoint
+      });
+    }
   }
 
-  // Add a new point when clicking on the center point
-  if (centerPoint.clicked && context.isDragged(part) === null) {
-    context.stroke_geometries_commands[geometryIndex].splice(startIndex + 1, 0, {
-      type: "L",
-      relative: false,
-      endPoint: center
-    });
-    context.updateVector();
-  }
 
   // Draw functions
   function drawDefault(ctx: CanvasRenderingContext2D) {

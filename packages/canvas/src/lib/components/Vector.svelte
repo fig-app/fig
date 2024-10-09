@@ -1,9 +1,7 @@
 <script lang="ts">
   import type {CanvasNode} from "$lib/types/CanvasNode";
-  import {getContext, onDestroy, onMount, setContext} from "svelte";
-  import type {CanvasContext} from "$lib/types/CanvasContext";
+  import {onMount} from "svelte";
   import type {VectorPart} from "$lib/types/VectorPart";
-  import type {VectorContext} from "$lib/types/VectorContext";
   import {parsePathString} from "@fig/functions/path/index";
   import VectorLine from "$lib/components/VectorLine.svelte";
   import {normalize} from "@fig/functions/path/normalize";
@@ -24,6 +22,8 @@
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {keys} from "$lib/stores/keys.svelte";
+  import {registerCanvasNode} from "$lib/context/canvasContext";
+  import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
 
   let {node}: { node: Node } = $props();
 
@@ -46,21 +46,35 @@
   let strokeColor = colorToString(node.node.data.strokes[0].color);
   let strokeWeight = node.node.data.strokeWeight;
 
+  let vectorContext = getVectorContext();
+
+  $inspect(strokeGeometriesCommands).with((type, values) => {
+    let i = 0;
+    for (let geometry of values) {
+      i++;
+      let a = [];
+      for (let command of geometry) {
+        a.push(command.type);
+      }
+      console.log(i, a)
+    }
+  })
+
   // $effect(() => {
-  // if (hovered || bbox) {
+  //   if (hovered || bbox) {
   //
-  // }
+  //   }
   // })
 
   // Create vector context
-  setContext<VectorContext>("vector", {
+  setVectorContext({
     register,
     unregister,
     setSelectedPart,
     setDraggedPart,
     resetDraggedPart,
     isDragged,
-    stroke_geometries_commands: strokeGeometriesCommands,
+    strokeGeometriesCommands: strokeGeometriesCommands,
   });
 
   // Parse all geometries path to an array of PathCommand
@@ -73,18 +87,14 @@
     console.error(`${node.name} isn't an vector.`);
   }
 
-  // Register and unregister vector node
+  // Register vector node
   let canvasNode: CanvasNode = {
     draw,
     update,
     node: node
   };
 
-  let context = getContext<CanvasContext>("canvas");
-  context.register(canvasNode);
-  onDestroy(() => {
-    context.unregister(canvasNode);
-  });
+  registerCanvasNode(canvasNode);
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
@@ -176,15 +186,6 @@
     onMount(() => {
       parts.add(part);
     });
-
-    // $effect(() => {
-    //   if (scheduled) return;
-    //
-    //   scheduled = true;
-    //   scheduled = false;
-    //
-    //   context.redraw();
-    // });
   }
 
   function unregister(part: VectorPart) {
@@ -208,8 +209,13 @@
     }
   }
 
+  /**
+   * Resets the dragged part if the provided part
+   * matches the currently dragged part.
+   *
+   * @param {VectorPart} from - The part to check against the currently dragged part.
+   */
   function resetDraggedPart(from: VectorPart) {
-    // only the drag part can be reset the draggedPart
     if (draggedPart && from && draggedPart.id === from.id) {
       draggedPart = null;
     }
@@ -229,22 +235,24 @@
 </script>
 
 {#if (editMode)}
-  {#each strokeGeometriesCommands as path_commands, gi}
-    {#each path_commands as command, i}
+  {#key strokeGeometriesCommands}
+    {#each strokeGeometriesCommands as path_commands, gi}
+      {#each path_commands as command, i}
 
-      <!-- Draw lines -->
-      {#if (command.type === "Z")}
-        <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
-      {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
-        {#if path_commands[i + 1]?.endPoint}
-          <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
+        <!-- Draw lines -->
+        {#if (command.type === "Z")}
+          <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
+        {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
+          {#if path_commands[i + 1]?.endPoint}
+            <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
+          {/if}
         {/if}
-      {/if}
 
-      <!-- Draw points -->
-      {#if ((command.type === "M" || command.type === "L"))}
-        <VectorPoint geometryIndex={gi} pointIndex={i}/>
-      {/if}
+        <!-- Draw points -->
+        {#if ((command.type === "M" || command.type === "L"))}
+          <VectorPoint geometryIndex={gi} pointIndex={i}/>
+        {/if}
+      {/each}
     {/each}
-  {/each}
+  {/key}
 {/if}

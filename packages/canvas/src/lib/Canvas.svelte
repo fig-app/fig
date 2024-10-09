@@ -1,6 +1,5 @@
 <script lang="ts">
-  import {onMount, setContext} from "svelte";
-  import type {CanvasContext} from "./types/CanvasContext";
+  import {onMount} from "svelte";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
@@ -8,6 +7,7 @@
   import {canvasTime} from "$lib/stores/canvasTime.svelte";
   import {keys} from "./stores/keys.svelte";
   import {navigation} from "$lib/stores/navigation";
+  import {setCanvasContext} from "$lib/context/canvasContext";
 
   type Props = {
     width: number;
@@ -38,6 +38,13 @@
 
   const ZOOM_AMOUNT: number = .2;
 
+  // Set canvas context
+  setCanvasContext({
+    register,
+    unregister,
+    redraw: draw
+  });
+
   onMount(() => {
     ctx = canvas.getContext("2d");
 
@@ -59,12 +66,6 @@
     return () => {
       cancelAnimationFrame(frameId);
     }
-  });
-
-  setContext<CanvasContext>("canvas", {
-    register,
-    unregister,
-    redraw: draw
   });
 
   // Functions

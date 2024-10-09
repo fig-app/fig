@@ -1,6 +1,4 @@
 <script lang="ts">
-  import {getContext, onDestroy} from "svelte";
-  import type {VectorContext} from "$lib/types/VectorContext";
   import type {VectorPart} from "$lib/types/VectorPart";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {isCursorHoveringArc} from "@fig/functions/shape/arc";
@@ -10,6 +8,10 @@
   import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation";
+  import {
+    getVectorContext,
+    registerVectorPart
+  } from "$lib/context/vectorContext";
 
   type Props = {
     geometryIndex: number;
@@ -28,7 +30,9 @@
   let clicked = $state(false);
   let dragged = $state(false);
 
-  // Register and unregister part
+  let context = getVectorContext();
+
+  // Register point part
   let part: VectorPart = {
     id: useId(),
     type: "point",
@@ -37,14 +41,10 @@
     selected: false
   };
 
-  let context = getContext<VectorContext>("vector");
-  context.register(part);
-  onDestroy(() => {
-    context.unregister(part);
-  })
+  registerVectorPart(part);
 
   // Point virtualCommand
-  let realCommand = $state(context.stroke_geometries_commands[geometryIndex][pointIndex] as MLTPathCommand);
+  let realCommand = $state(context.strokeGeometriesCommands[geometryIndex][pointIndex] as MLTPathCommand);
   let virtualCommand = $state({...realCommand});
   let centerPoint = $derived(virtualCommand.endPoint);
 
