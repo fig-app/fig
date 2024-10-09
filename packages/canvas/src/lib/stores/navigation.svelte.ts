@@ -1,6 +1,5 @@
-import { get, writable, type Writable } from "svelte/store";
-import type { Vector } from "@fig/types/properties/Vector";
-import type { PathCommand } from "@fig/functions/path/PathCommand";
+import type {Vector} from "@fig/types/properties/Vector";
+import type {PathCommand} from "@fig/functions/path/PathCommand";
 
 type OffsetStore = {
   offsetX: number;
@@ -9,49 +8,39 @@ type OffsetStore = {
   cellSize: number;
 };
 
-class Navigation {
-  store: Writable<OffsetStore>;
+class NavigationSvelte {
+  private states: OffsetStore = $state({
+    offsetX: 0,
+    offsetY: 0,
+    scale: 1,
+    cellSize: 10,
+  });
 
   constructor() {
-    this.store = writable({
-      offsetX: 0,
-      offsetY: 0,
-      scale: 1,
-      cellSize: 10,
-    });
   }
 
   get scale(): number {
-    return get(this.store).scale;
+    return this.states.scale;
   }
 
   set scale(value: number) {
-    this.store.update((store) => {
-      store.scale = value;
-      return store;
-    });
+    this.states.scale = value;
   }
 
   get offsetX(): number {
-    return get(this.store).offsetX;
+    return this.states.offsetX;
   }
 
   set offsetX(value: number) {
-    this.store.update((store) => {
-      store.offsetX = value;
-      return store;
-    });
+    this.states.offsetX = value;
   }
 
   get offsetY(): number {
-    return get(this.store).offsetY;
+    return this.states.offsetY;
   }
 
   set offsetY(value: number) {
-    this.store.update((store) => {
-      store.offsetY = value;
-      return store;
-    });
+    this.states.offsetY = value;
   }
 
   toVirtualGeometryCommand(geometryCommands: PathCommand[]): PathCommand[] {
@@ -106,4 +95,4 @@ class Navigation {
   }
 }
 
-export const navigation = new Navigation();
+export const navigation = new NavigationSvelte();

@@ -6,7 +6,7 @@
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {canvasTime} from "$lib/stores/canvasTime.svelte";
   import {keys} from "./stores/keys.svelte";
-  import {navigation} from "$lib/stores/navigation";
+  import {navigation} from "$lib/stores/navigation.svelte";
   import {setCanvasContext} from "$lib/context/canvasContext";
 
   type Props = {
@@ -36,7 +36,7 @@
 
   let clickTimeout: NodeJS.Timeout;
 
-  const ZOOM_AMOUNT: number = .2;
+  const ZOOM_AMOUNT: number = 1.1;
 
   updateCanvas(() => [windowWidth, windowHeight, keys.combo, canvasClick.clickPoint]);
   // watch([() => navigation.offsetX, () => navigation.offsetY], () => {
@@ -160,8 +160,11 @@
   }
 
   function handleZoom(event: WheelEvent) {
-    if (navigation.scale > 0) {
-      navigation.scale += event.deltaY / 100 / navigation.scale;
+    console.log("Zooming...");
+    if (event.deltaY > 0) {
+      navigation.scale /= ZOOM_AMOUNT;
+    } else if (event.deltaY < 0) {
+      navigation.scale *= ZOOM_AMOUNT;
     }
   }
 
