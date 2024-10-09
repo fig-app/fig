@@ -9,11 +9,8 @@
   import {keys} from "../stores/keys.svelte";
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {EditPointSvelte} from "$lib/components/EditPoint.svelte";
-  import {navigation} from "$lib/stores/navigation";
-  import {
-    getVectorContext,
-    registerVectorPart
-  } from "$lib/context/vectorContext";
+  import {navigation} from "$lib/stores/navigation.svelte";
+  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
 
   type Props = {
@@ -121,9 +118,9 @@
 
     // Move with cursor
     if (dragged && context.isDragged(part)) {
-      let x = cursorPosition.x - canvasClick.clickPoint.x;
-      let y = cursorPosition.y - canvasClick.clickPoint.y;
-      canvasClick.setClickPoint(cursorPosition.pos)
+      let x = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
+      let y = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
+      canvasClick.setClickPoint(cursorPosition.pos);
 
       realStartCommand.endPoint.x += x;
       realStartCommand.endPoint.y += y;
@@ -150,7 +147,7 @@
       context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
         type: "L",
         relative: false,
-        endPoint: center
+        endPoint: navigation.toRealPoint(center),
       });
       context.updateVector();
     }

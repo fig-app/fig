@@ -8,13 +8,9 @@
   import VectorPoint from "$lib/components/VectorPoint.svelte";
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
-  import {
-    colorToString,
-    getPrimitiveBlue,
-    getPrimitiveWhite
-  } from "@fig/functions/color";
+  import {colorToString, getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
   import type {PathCommand} from "@fig/functions/path/PathCommand";
-  import {navigation} from "$lib/stores/navigation";
+  import {navigation} from "$lib/stores/navigation.svelte";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
   import {Rect} from "$lib/Rect.svelte";
   import {strokeRect} from "$lib/primitive/rect";
@@ -22,10 +18,7 @@
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {keys} from "$lib/stores/keys.svelte";
-  import {
-    getCanvasContext,
-    registerCanvasNode
-  } from "$lib/context/canvasContext";
+  import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
 
   let {node}: { node: Node } = $props();
@@ -61,7 +54,6 @@
       for (let command of geometry) {
         a.push(command.type);
       }
-      console.log(i, a)
     }
   })
 

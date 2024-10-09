@@ -7,11 +7,8 @@
   import {useId} from "@fig/functions/id";
   import {getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
-  import {navigation} from "$lib/stores/navigation";
-  import {
-    getVectorContext,
-    registerVectorPart
-  } from "$lib/context/vectorContext";
+  import {navigation} from "$lib/stores/navigation.svelte";
+  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
 
   type Props = {
@@ -115,9 +112,9 @@
     dragged = (dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part));
 
     if (dragged && context.isDragged(part)) {
-      let x = cursorPosition.x - canvasClick.clickPoint.x;
-      let y = cursorPosition.y - canvasClick.clickPoint.y;
-      canvasClick.setClickPoint(cursorPosition.pos)
+      let x = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
+      let y = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
+      canvasClick.setClickPoint(cursorPosition.pos);
 
       realCommand.endPoint.x += x;
       realCommand.endPoint.y += y;
