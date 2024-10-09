@@ -2,12 +2,12 @@
   import {onMount, tick, untrack} from "svelte";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
-  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {canvasTime} from "$lib/stores/canvasTime.svelte";
   import {keys} from "./stores/keys.svelte";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {setCanvasContext} from "$lib/context/canvasContext";
+  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
 
   type Props = {
     width: number;
@@ -38,12 +38,7 @@
 
   const ZOOM_AMOUNT: number = 1.1;
 
-  updateCanvas(() => [windowWidth, windowHeight, keys.combo, canvasClick.clickPoint]);
-  // watch([() => navigation.offsetX, () => navigation.offsetY], () => {
-  //   draw();
-  // })
-  // $effect(() => {
-  // })
+  updateCanvas(() => [navigation.scale, navigation.offsetX, navigation.offsetY, windowWidth, windowHeight, keys.combo, canvasClick.clickPoint]);
 
   // Set canvas context
   setCanvasContext({
@@ -140,6 +135,10 @@
     }
   }
 
+  function updateCursorPosition(e: MouseEvent) {
+    cursorPosition.pos = {x: e.clientX, y: e.clientY}
+  }
+
   function handleWindowResize() {
     if (fullscreen) {
       clearTimeout(resizeTimeout);
@@ -152,6 +151,7 @@
   }
 
   function handleWheel(event: WheelEvent) {
+    event.preventDefault();
     if (keys.containKey("Control")) {
       handleZoom(event);
     } else {
@@ -183,10 +183,10 @@
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
                on:resize={handleWindowResize}/>
 
-<canvas on:wheel|preventDefault={handleWheel} bind:this={canvas} {width}
+<canvas onwheel={handleWheel} bind:this={canvas} {width}
         {height}
-        on:mousemove|preventDefault={(e) => cursorPosition.pos = {x: e.clientX, y: e.clientY}}
-        on:click={(e) => {
+        onmousemove={updateCursorPosition}
+        onclick={(e) => {
     canvasClick.setSingleClick(true, {x: e.clientX, y: e.clientY});
 
     clearTimeout(clickTimeout);
@@ -194,12 +194,12 @@
         canvasClick.resetClick()
     }, 100)
 }}
-        on:dblclick={(e) => {
+        ondblclick={(e) => {
     canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
 }}
-        on:mousedown={(e) => {
+        onmousedown={(e) => {
     canvasClick.setPress(true, {x: e.clientX, y: e.clientY})
 }}
-        on:mouseup={(_) => canvasClick.resetClick()}>
+        onmouseup={(_) => canvasClick.resetClick()}>
   <slot {width} {height}></slot>
 </canvas>
