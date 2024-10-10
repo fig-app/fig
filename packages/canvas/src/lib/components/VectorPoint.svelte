@@ -5,13 +5,10 @@
   import {useId} from "@fig/functions/id";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
-  import {
-    getVectorContext,
-    registerVectorPart
-  } from "$lib/context/vectorContext";
+  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
   import {EditPoint} from "$lib/components/EditPoint.svelte";
-  import {Timer} from "$lib/stores/canvasTime.svelte";
+  import {Timer} from "$lib/stores/canvasTime.svelte"
 
   type Props = {
     geometryIndex: number;
