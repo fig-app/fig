@@ -5,42 +5,39 @@ import { getPrimitiveBlue } from "@fig/functions/color";
 import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
 import { canvasClick } from "$lib/stores/canvasClick.svelte";
 
-type SelectorStates = {
-  mode: "node" | "vector";
-  disabled: boolean;
-  nodes: CanvasNode[];
-  parts: VectorPart[];
-};
-
 class Selector {
-  states: SelectorStates = $state({
-    mode: "node",
-    disabled: false,
-    nodes: [],
-    parts: [],
-  });
+  mode: "node" | "vector" = $state("node");
+  nodes: CanvasNode[] = $state([]);
+  parts: VectorPart[] = $state([]);
+
+  // If true, the selector will only select point
+  // of vector (and also lines between two points)
+  pointMode: boolean = $state(false);
+
+  disabled: boolean = $state(false);
   inSelection: boolean = $state(false);
   rect: Rect | null = $state(null);
 
   constructor() {}
 
   draw(ctx: CanvasRenderingContext2D) {
-    if (this.states.disabled) return;
+    if (this.disabled) return;
 
     if (this.rect) {
       this.rect.drawTopLeft({
         ctx,
         colors: { stroke: getPrimitiveBlue() },
-        strokeWeight: 2,
+        strokeWeight: 1,
       });
     }
   }
 
   update() {
-    if (this.states.disabled) return;
+    if (this.disabled) return;
 
     // Create a rect
     if (canvasClick.pressed && !this.rect) {
+      this.unselectAllParts();
       this.inSelection = true;
       this.rect = new Rect({
         x: cursorPosition.x,
@@ -64,11 +61,11 @@ class Selector {
   }
 
   disable() {
-    this.states.disabled = true;
+    this.disabled = true;
   }
 
   enable() {
-    this.states.disabled = false;
+    this.disabled = false;
   }
 
   // Nodes
@@ -76,26 +73,26 @@ class Selector {
   select(node: CanvasNode) {
     if (!this.nodeIsSelected(node)) {
       node.selected = true;
-      this.states.nodes.push(node);
+      this.nodes.push(node);
     }
   }
 
   unselect(node: CanvasNode) {
     if (this.nodeIsSelected(node)) {
       node.selected = false;
-      this.states.nodes.splice(this.states.nodes.indexOf(node), 1);
+      this.nodes.splice(this.nodes.indexOf(node), 1);
     }
   }
 
   unselectAll() {
-    for (const node of this.states.nodes) {
+    for (const node of this.nodes) {
       node.selected = false;
     }
-    this.states.nodes = [];
+    this.nodes = [];
   }
 
   nodeIsSelected(node: CanvasNode) {
-    return this.states.nodes.includes(node);
+    return this.nodes.includes(node);
   }
 
   // Vector parts
@@ -107,27 +104,41 @@ class Selector {
 
   selectPart(part: VectorPart) {
     if (!this.partIsSelected(part)) {
+      if (part.type === "point") {
+        this.pointMode = true;
+      }
       part.selected = true;
-      this.states.parts.push(part);
+      this.parts.push(part);
     }
   }
 
   unselectPart(part: VectorPart) {
-    if (this.states.parts.includes(part)) {
+    if (this.parts.includes(part)) {
       part.selected = false;
-      this.states.parts.splice(this.states.parts.indexOf(part), 1);
+      this.parts.splice(this.parts.indexOf(part), 1);
+
+      // check if a point in the selection to update point mode
+      if (part.type === "point") {
+        let hasPoint =
+          this.parts.filter((part) => part.type === "point").length > 0;
+
+        if (!hasPoint) {
+          this.pointMode = false;
+        }
+      }
     }
   }
 
   unselectAllParts() {
-    for (const part of this.states.parts) {
+    for (const part of this.parts) {
       part.selected = false;
     }
-    this.states.parts = [];
+    this.parts = [];
+    this.pointMode = false;
   }
 
   partIsSelected(part: VectorPart) {
-    return this.states.parts.includes(part);
+    return this.parts.includes(part);
   }
 }
 

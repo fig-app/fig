@@ -61,7 +61,6 @@
 
   $effect(() => {
     if (!dragged && !canvasClick.pressed) {
-      selector.enable();
       vectorContext.resetDraggedPart(part);
     }
   })
@@ -102,6 +101,14 @@
     point.update()
 
     dragged = ((dragged && canvasClick.pressed) || (point.hovered && canvasClick.pressed && !vectorContext.isDragged(part))) && !selector.inSelection;
+
+    if (selector.rect) {
+      if (selector.rect.containPoint(virtualCommand.endPoint)) {
+        selector.selectPart(part);
+      } else {
+        selector.unselectPart(part);
+      }
+    }
 
     if (dragged && vectorContext.isDragged(part)) {
       let x = (cursorPosition.x - canvasClick.realClickPoint.x) / navigation.scale;

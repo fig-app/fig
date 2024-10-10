@@ -24,10 +24,10 @@
   } from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
   import {TransformCorners} from "$lib/components/TransformCorners.svelte";
+  import {vectorParts} from "$lib/stores/canvasContent.svelte";
 
   let {node}: { node: Node } = $props();
 
-  let parts: Set<VectorPart> = $state(new Set());
   let strokePathsSynchronization: Path2D[] = $state([]);
   let strokeGeometriesCommands: PathCommand[][] = $state([]);
 
@@ -37,14 +37,11 @@
 
   let hovered = $state(false);
   let dblclick = $state(false);
-  let selected = $state(false);
   let editMode = $state(false);
   let triggerUpdate = $state(false);
 
   let editTimer = new Timer(100, "Once");
 
-  // Used for parts
-  let selectedPart: VectorPart | null = $state(null);
   let draggedPart: VectorPart | null = $state(null);
 
   let strokeColor = colorToString(node.node.data.strokes[0].color);
@@ -54,7 +51,7 @@
   let vectorContext = getVectorContext();
 
   // Force update when this variables change (trigger the redraw)
-  canvasContext.updateCanvas(() => [hovered, bbox])
+  canvasContext.updateCanvas(() => [hovered, bbox, strokeGeometriesCommands])
 
   // Create vector context
   setVectorContext({
@@ -134,7 +131,7 @@
 
       // draw all parts
       if (editMode) {
-        for (const part of parts) {
+        for (const part of vectorParts) {
           part.draw(ctx);
         }
       }
@@ -163,7 +160,7 @@
     }
 
     // Update parts
-    for (const part of parts) {
+    for (const part of vectorParts) {
       part.update();
     }
   }
@@ -179,12 +176,12 @@
 
   function register(part: VectorPart) {
     onMount(() => {
-      parts.add(part);
+      vectorParts.add(part);
     });
   }
 
   function unregister(part: VectorPart) {
-    parts.delete(part);
+    vectorParts.delete(part);
   }
 
   function setDraggedPart(part: VectorPart) {
@@ -217,6 +214,7 @@
   }
 
   function updateVector() {
+    console.log("Update vector");
     triggerUpdate = !triggerUpdate;
   }
 

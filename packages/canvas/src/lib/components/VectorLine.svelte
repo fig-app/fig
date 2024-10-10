@@ -1,6 +1,5 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
-  import {line} from "$lib/primitive/line";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
   import {centerOfSegment, hoverLine} from "@fig/functions/shape/line";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
@@ -16,6 +15,7 @@
   } from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
   import {selector} from "$lib/components/Selector.svelte";
+  import {line} from "$lib/primitive/line";
 
   type Props = {
     geometryIndex: number;
@@ -76,7 +76,6 @@
 
   $effect(() => {
     if (!dragged && !canvasClick.pressed) {
-      selector.enable();
       context.resetDraggedPart(part);
     }
   })
@@ -85,6 +84,18 @@
     if (hovered && !selector.inSelection) {
       selector.disable();
     } else if (!hovered && !dragged) {
+      selector.enable();
+    }
+
+    if (centerPoint.hovered) {
+      selector.disable();
+    }
+  })
+
+  $effect(() => {
+    if (centerPoint.hovered && !selector.inSelection) {
+      selector.disable();
+    } else {
       selector.enable();
     }
   })
@@ -123,9 +134,30 @@
         start: virtualStartCommand.endPoint,
         end: virtualEndCommand.endPoint
       }, cursorPosition
-    });
+    }) && !selector.inSelection;
     clicked = hovered && canvasClick.single;
     dragged = ((dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part))) && !selector.inSelection;
+
+    if (selector.rect) {
+      let virtualLine = {
+        start: virtualStartCommand.endPoint,
+        end: virtualEndCommand.endPoint
+      };
+
+      if (selector.pointMode) {
+        if (selector.rect.containLine(virtualLine)) {
+          selector.selectPart(part);
+        } else {
+          selector.unselectPart(part);
+        }
+      } else {
+        if (selector.rect.collideLine(virtualLine)) {
+          selector.selectPart(part);
+        } else {
+          selector.unselectPart(part);
+        }
+      }
+    }
 
     // Move with cursor
     if (dragged && context.isDragged(part)) {
@@ -141,8 +173,8 @@
     }
 
     // Move with arrow keys
-    if (keyTimer.finished() && part.selected && keys.currentKey) {
-      let shiftMultiplier = keys.containKey("Shift") ? 10 : 1;
+    if (keyTimer.finished() && part.selected && keys.anyPressed) {
+      let shiftMultiplier = keys.shiftPressed() ? 10 : 1;
       let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
       let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
 
@@ -170,6 +202,7 @@
       ctx,
       start: virtualStartCommand.endPoint,
       end: virtualEndCommand.endPoint,
+      color: "rgb(163, 163, 163)"
     });
   }
 

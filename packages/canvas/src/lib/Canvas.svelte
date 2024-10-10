@@ -39,9 +39,15 @@
 
   const ZOOM_AMOUNT: number = 1.1;
 
-  $inspect(selector.states.parts).with((type, values) => {
-    console.log("Parts", values)
+  // $inspect(selector.parts).with((type, values) => {
+  //   console.log("Parts", values)
+  // })
+  $inspect(selector.disabled).with((type, values) => {
+    console.log("Disabled", values)
   })
+  // $inspect(keys.keyPressed).with((type, values) => {
+  //   console.log("Keys", values)
+  // })
 
   updateCanvas(() => [
     navigation.scale,
@@ -49,7 +55,7 @@
     navigation.offsetY,
     windowWidth,
     windowHeight,
-    keys.combo,
+    keys.keyPressed,
     canvasClick.realClickPoint,
     selector.rect?.width,
     selector.rect?.height,
@@ -225,7 +231,7 @@
 
   function handleWheel(event: WheelEvent) {
     event.preventDefault();
-    if (keys.containKey("Control")) {
+    if (keys.ctrlPressed()) {
       handleZoom(event);
     } else {
       handleScroll(event);
