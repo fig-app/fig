@@ -1,7 +1,11 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
-  import {centerOfSegment, hoverLine} from "@fig/functions/shape/line";
+  import {
+    centerOfSegment,
+    getLineLength,
+    hoverLine
+  } from "@fig/functions/shape/line";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {useId} from "@fig/functions/id";
@@ -59,10 +63,17 @@
     end: virtualEndCommand.endPoint
   });
 
+  let lineLength = $derived(getLineLength({
+    start: virtualStartCommand.endPoint,
+    end: virtualEndCommand.endPoint
+  }))
+
   let center = $derived(centerOfSegment({
     start: virtualStartCommand.endPoint,
     end: virtualEndCommand.endPoint
   }));
+
+  let showCenterPoint = $derived(lineLength > 40);
 
   // Force update when this variables change (trigger the redraw)
   canvasContext.updateCanvas(() => [context.strokeGeometriesCommands[geometryIndex][startIndex], realStartCommand, realEndCommand, hovered, clicked, part.selected, centerPoint.hovered]);
@@ -129,11 +140,7 @@
   function update() {
     virtualStartCommand.endPoint = navigation.toVirtualPoint(realStartCommand.endPoint);
     virtualEndCommand.endPoint = navigation.toVirtualPoint(realEndCommand.endPoint);
-
-    // Update center point
-    centerPoint.updateCenterPoint(center);
-    centerPoint.update();
-
+    
     hovered = hoverLine({
       line: {
         start: virtualStartCommand.endPoint,
@@ -185,15 +192,22 @@
       realEndCommand.endPoint.y += yShift;
     }
 
-    // Add a new point when clicking on the center point
-    if (centerPoint.clicked && context.isDragged(part) === null && !selector.inSelection) {
-      context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
-        type: "L",
-        relative: false,
-        endPoint: navigation.toRealPoint(center),
-      });
-      context.updateVector();
+    if (showCenterPoint) {
+      // Update center point
+      centerPoint.updateCenterPoint(center);
+      centerPoint.update();
+
+      // Add a new point when clicking on the center point
+      if (centerPoint.clicked && context.isDragged(part) === null && !selector.inSelection) {
+        context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
+          type: "L",
+          relative: false,
+          endPoint: navigation.toRealPoint(center),
+        });
+        context.updateVector();
+      }
     }
+
   }
 
   // Draw functions
@@ -214,7 +228,9 @@
       weight: 2
     });
 
-    centerPoint.draw(ctx);
+    if (showCenterPoint) {
+      centerPoint.draw(ctx);
+    }
   }
 
   function drawSelected(ctx: CanvasRenderingContext2D) {

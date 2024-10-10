@@ -142,3 +142,13 @@ export function linesIntersection(line1: Line, line2: Line) {
 
   return r >= 0 && r <= 1 && s >= 0 && s <= 1;
 }
+
+export function getLineLength(line: Line): number {
+  const { x: x1, y: y1 } = line.start;
+  const { x: x2, y: y2 } = line.end;
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  return Math.sqrt(dx * dx + dy * dy);
+}
