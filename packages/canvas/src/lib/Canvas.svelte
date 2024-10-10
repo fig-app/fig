@@ -42,9 +42,9 @@
   // $inspect(selector.parts).with((type, values) => {
   //   console.log("Parts", values)
   // })
-  $inspect(selector.disabled).with((type, values) => {
-    console.log("Disabled", values)
-  })
+  // $inspect(selector.disabled).with((type, values) => {
+  //   console.log("Disabled", values)
+  // })
   // $inspect(keys.keyPressed).with((type, values) => {
   //   console.log("Keys", values)
   // })
@@ -134,15 +134,7 @@
 
     if (ctx) {
       selector.draw(ctx);
-      // cross({
-      //   ctx,
-      //   x: cursorPosition.pos.x,
-      //   y: cursorPosition.pos.y,
-      //   color: "rgba(255, 255, 255, 0.5)"
-      // })
     }
-
-    // cross for the cursor
   }
 
   function drawBackground() {

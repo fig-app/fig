@@ -160,8 +160,10 @@
     }
 
     // Update parts
-    for (const part of vectorParts) {
-      part.update();
+    if (editMode) {
+      for (const part of vectorParts) {
+        part.update();
+      }
     }
   }
 
@@ -214,14 +216,14 @@
   }
 
   function updateVector() {
-    console.log("Update vector");
+    vectorParts.clear();
     triggerUpdate = !triggerUpdate;
   }
 
 </script>
 
 {#if (editMode)}
-  {#key triggerUpdate}
+  {#key (triggerUpdate)}
     {#each strokeGeometriesCommands as path_commands, gi}
       {#each path_commands as command, i}
 

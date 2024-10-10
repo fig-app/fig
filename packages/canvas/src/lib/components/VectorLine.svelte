@@ -54,13 +54,18 @@
   let virtualStartCommand = $state({...realStartCommand});
   let virtualEndCommand = $state({...realEndCommand});
 
+  let virtualLine = $derived({
+    start: virtualStartCommand.endPoint,
+    end: virtualEndCommand.endPoint
+  });
+
   let center = $derived(centerOfSegment({
     start: virtualStartCommand.endPoint,
     end: virtualEndCommand.endPoint
   }));
 
   // Force update when this variables change (trigger the redraw)
-  canvasContext.updateCanvas(() => [realStartCommand, realEndCommand, hovered, clicked, part.selected, centerPoint.hovered]);
+  canvasContext.updateCanvas(() => [context.strokeGeometriesCommands[geometryIndex][startIndex], realStartCommand, realEndCommand, hovered, clicked, part.selected, centerPoint.hovered]);
 
   // Update selected state
   $effect(() => {
@@ -139,11 +144,6 @@
     dragged = ((dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part))) && !selector.inSelection;
 
     if (selector.rect) {
-      let virtualLine = {
-        start: virtualStartCommand.endPoint,
-        end: virtualEndCommand.endPoint
-      };
-
       if (selector.pointMode) {
         if (selector.rect.containLine(virtualLine)) {
           selector.selectPart(part);
@@ -174,7 +174,7 @@
 
     // Move with arrow keys
     if (keyTimer.finished() && part.selected && keys.anyPressed) {
-      let shiftMultiplier = keys.shiftPressed() ? 10 : 1;
+      let shiftMultiplier = keys.shiftPressed() ? 10 : 0.5;
       let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
       let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
 
