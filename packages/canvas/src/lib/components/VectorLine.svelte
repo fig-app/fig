@@ -15,6 +15,7 @@
     registerVectorPart
   } from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
+  import {selector} from "$lib/components/Selector.svelte";
 
   type Props = {
     geometryIndex: number;
@@ -64,17 +65,29 @@
   // Update selected state
   $effect(() => {
     if (!centerPoint.hovered && dragged) {
+      selector.disable();
       context.setDraggedPart(part);
 
       if (dragged && !part.selected && context.isDragged(part)) {
-        context.setSelectedPart(part);
+        selector.selectSinglePart(part);
       }
     }
+  });
 
+  $effect(() => {
     if (!dragged && !canvasClick.pressed) {
+      selector.enable();
       context.resetDraggedPart(part);
     }
-  });
+  })
+
+  $effect(() => {
+    if (hovered && !selector.inSelection) {
+      selector.disable();
+    } else if (!hovered && !dragged) {
+      selector.enable();
+    }
+  })
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
@@ -112,12 +125,12 @@
       }, cursorPosition
     });
     clicked = hovered && canvasClick.single;
-    dragged = (dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part));
+    dragged = ((dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part))) && !selector.inSelection;
 
     // Move with cursor
     if (dragged && context.isDragged(part)) {
-      let x = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
-      let y = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
+      let x = (cursorPosition.x - canvasClick.realClickPoint.x) / navigation.scale;
+      let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
       canvasClick.setClickPoint(cursorPosition.pos);
 
       realStartCommand.endPoint.x += x;
@@ -141,7 +154,7 @@
     }
 
     // Add a new point when clicking on the center point
-    if (centerPoint.clicked && context.isDragged(part) === null) {
+    if (centerPoint.clicked && context.isDragged(part) === null && !selector.inSelection) {
       context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
         type: "L",
         relative: false,

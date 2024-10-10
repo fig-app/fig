@@ -4,12 +4,6 @@ import { hoverRect } from "@fig/functions/shape/rect";
 import { canvasClick } from "$lib/stores/canvasClick.svelte";
 import { rect } from "$lib/primitive/rect";
 
-type RectStates = {
-  topLeft: Vector;
-  width: number;
-  height: number;
-};
-
 type RectConstructorArgs = {
   x?: number;
   y?: number;
@@ -20,36 +14,36 @@ type RectConstructorArgs = {
 type RectDrawArgs = {
   ctx: CanvasRenderingContext2D;
   colors: {
-    background: string | null;
-    stroke: string | null;
+    background?: string;
+    stroke?: string;
   };
   strokeWeight: number;
 };
 
 export class Rect {
-  private states: RectStates = $state({
-    topLeft: { x: 0, y: 0 },
-    width: 0,
-    height: 0,
-  });
+  topLeft: Vector = $state({ x: 0, y: 0 });
+  width = $state(0);
+  height = $state(0);
 
   constructor({ x = 0, y = 0, width = 0, height = 0 }: RectConstructorArgs) {
-    this.states.topLeft.x = x;
-    this.states.topLeft.y = y;
-    this.states.width = width;
-    this.states.height = height;
+    this.topLeft.x = x;
+    this.topLeft.y = y;
+    this.width = width;
+    this.height = height;
   }
 
+  static new() {
+    return new Rect({});
+  }
+
+  // Getter and setter
+
   get x(): number {
-    return this.states.topLeft.x;
+    return this.topLeft.x;
   }
 
   get y(): number {
-    return this.states.topLeft.y;
-  }
-
-  get topLeft(): Vector {
-    return this.states.topLeft;
+    return this.topLeft.y;
   }
 
   get center(): Vector {
@@ -80,21 +74,10 @@ export class Rect {
     ];
   }
 
-  get width(): number {
-    return this.states.width;
-  }
-
-  get height(): number {
-    return this.states.height;
-  }
+  // Functions
 
   hovered(): boolean {
-    return hoverRect(
-      cursorPosition,
-      this.states.topLeft,
-      this.states.width,
-      this.states.height,
-    );
+    return hoverRect(cursorPosition, this.topLeft, this.width, this.height);
   }
 
   clicked(): boolean {
@@ -114,10 +97,32 @@ export class Rect {
     });
   }
 
+  drawTopLeft({ ctx, colors, strokeWeight }: RectDrawArgs) {
+    rect({
+      ctx,
+      x: this.x + this.width / 2,
+      y: this.y + this.height / 2,
+      width: this.width,
+      height: this.height,
+      colors,
+      strokeWeight,
+      radius: 0,
+    });
+  }
+
   update(x: number, y: number, width: number, height: number) {
-    this.states.topLeft.x = x;
-    this.states.topLeft.y = y;
-    this.states.width = width;
-    this.states.height = height;
+    this.topLeft.x = x;
+    this.topLeft.y = y;
+    this.width = width;
+    this.height = height;
+  }
+
+  collide(rect: Rect): boolean {
+    return (
+      this.x < rect.x + rect.width &&
+      this.x + this.width > rect.x &&
+      this.y < rect.y + rect.height &&
+      this.y + this.height > rect.y
+    );
   }
 }

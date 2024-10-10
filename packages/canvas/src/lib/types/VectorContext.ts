@@ -5,8 +5,6 @@ export type VectorContext = {
   register: (part: VectorPart) => void;
   unregister: (part: VectorPart) => void;
 
-  setSelectedPart: (part: VectorPart | null) => void;
-
   setDraggedPart: (part: VectorPart) => void;
   resetDraggedPart: (from: VectorPart) => void;
   isDragged: (part: VectorPart) => boolean | null;

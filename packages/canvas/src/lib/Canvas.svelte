@@ -8,6 +8,7 @@
   import {navigation} from "$lib/stores/navigation.svelte";
   import {setCanvasContext} from "$lib/context/canvasContext";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
+  import {selector} from "$lib/components/Selector.svelte";
 
   type Props = {
     width: number;
@@ -38,7 +39,21 @@
 
   const ZOOM_AMOUNT: number = 1.1;
 
-  updateCanvas(() => [navigation.scale, navigation.offsetX, navigation.offsetY, windowWidth, windowHeight, keys.combo, canvasClick.clickPoint]);
+  $inspect(selector.states.parts).with((type, values) => {
+    console.log("Parts", values)
+  })
+
+  updateCanvas(() => [
+    navigation.scale,
+    navigation.offsetX,
+    navigation.offsetY,
+    windowWidth,
+    windowHeight,
+    keys.combo,
+    canvasClick.realClickPoint,
+    selector.rect?.width,
+    selector.rect?.height,
+  ]);
 
   // Set canvas context
   setCanvasContext({
@@ -110,6 +125,18 @@
     }
 
     drawNodes();
+
+    if (ctx) {
+      selector.draw(ctx);
+      // cross({
+      //   ctx,
+      //   x: cursorPosition.pos.x,
+      //   y: cursorPosition.pos.y,
+      //   color: "rgba(255, 255, 255, 0.5)"
+      // })
+    }
+
+    // cross for the cursor
   }
 
   function drawBackground() {
@@ -172,6 +199,8 @@
   function update(timestamp: number) {
     canvasTime.updateTimestamp(timestamp);
     canvasTime.updateTimers();
+
+    selector.update();
 
     for (const node of pipeline) {
       node.update();

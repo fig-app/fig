@@ -5,8 +5,8 @@ type RectArgs = {
   width: number;
   height: number;
   colors: {
-    background: string | null;
-    stroke: string | null;
+    background?: string;
+    stroke?: string;
   };
   strokeWeight: number;
   radius: number | number[];

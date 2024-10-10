@@ -23,7 +23,7 @@
     registerCanvasNode
   } from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
-  import TransformCorners from "$lib/components/TransformCorners.svelte";
+  import {TransformCorners} from "$lib/components/TransformCorners.svelte";
 
   let {node}: { node: Node } = $props();
 
@@ -32,14 +32,14 @@
   let strokeGeometriesCommands: PathCommand[][] = $state([]);
 
   let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
-  let rect = new Rect({});
+  let rect = Rect.new();
+  let transformCorner = new TransformCorners(rect);
 
   let hovered = $state(false);
   let dblclick = $state(false);
   let selected = $state(false);
   let editMode = $state(false);
   let triggerUpdate = $state(false);
-  let transformCorner;
 
   let editTimer = new Timer(100, "Once");
 
@@ -60,7 +60,6 @@
   setVectorContext({
     register,
     unregister,
-    setSelectedPart,
     setDraggedPart,
     resetDraggedPart,
     isDragged,
@@ -92,7 +91,7 @@
   function draw(ctx: CanvasRenderingContext2D) {
 
     // Draw bounding box
-    if (!editMode && hovered) {
+    if (!editMode && canvasNode.selected) {
       strokeRect({
         ctx,
         x: rect.center.x,
@@ -188,17 +187,6 @@
     parts.delete(part);
   }
 
-  function setSelectedPart(part: VectorPart | null) {
-    if (part) {
-      part.selected = true;
-    }
-
-    if (selectedPart) {
-      selectedPart.selected = false;
-    }
-    selectedPart = part;
-  }
-
   function setDraggedPart(part: VectorPart) {
     if (!draggedPart && part) {
       draggedPart = part;
@@ -233,10 +221,6 @@
   }
 
 </script>
-
-{#if (selected)}
-  <TransformCorners {rect} bind:this={transformCorner}/>
-{/if}
 
 {#if (editMode)}
   {#key triggerUpdate}
