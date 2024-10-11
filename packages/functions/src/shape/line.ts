@@ -13,7 +13,12 @@ type HoverLineArgs = {
  * Check if the cursor is on the mouse.
  */
 export function hoverLine({ line, cursorPosition }: HoverLineArgs): boolean {
-  return pointToSegmentDistance({ line: shortenLine(line, 10), point: cursorPosition }) < 6;
+  return (
+    pointToSegmentDistance({
+      line: shortenLine(line, 12),
+      point: cursorPosition,
+    }) < 6
+  );
 }
 
 type PointToLineDistanceArgs = {
@@ -105,16 +110,45 @@ export function shortenLine(line: Line, distance: number): Line {
   // Calculate the new start and end points
   const newStart: Vector = {
     x: line.start.x + normDirX * distance,
-    y: line.start.y + normDirY * distance
+    y: line.start.y + normDirY * distance,
   };
 
   const newEnd: Vector = {
     x: line.end.x - normDirX * distance,
-    y: line.end.y - normDirY * distance
+    y: line.end.y - normDirY * distance,
   };
 
   return {
     start: newStart,
-    end: newEnd
+    end: newEnd,
   };
+}
+
+export function linesIntersection(line1: Line, line2: Line) {
+  const { start: A, end: B } = line1;
+  const { start: C, end: D } = line2;
+
+  const denominator = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x);
+  if (denominator === 0) {
+    // The lines are parallel
+    return false;
+  }
+
+  const numerator1 = (A.y - C.y) * (D.x - C.x) - (A.x - C.x) * (D.y - C.y);
+  const numerator2 = (A.y - C.y) * (B.x - A.x) - (A.x - C.x) * (B.y - A.y);
+
+  const r = numerator1 / denominator;
+  const s = numerator2 / denominator;
+
+  return r >= 0 && r <= 1 && s >= 0 && s <= 1;
+}
+
+export function getLineLength(line: Line): number {
+  const { x: x1, y: y1 } = line.start;
+  const { x: x2, y: y2 } = line.end;
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  return Math.sqrt(dx * dx + dy * dy);
 }

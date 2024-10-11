@@ -1,8 +1,11 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
-  import {line} from "$lib/primitive/line";
   import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
-  import {centerOfSegment, hoverLine} from "@fig/functions/shape/line";
+  import {
+    centerOfSegment,
+    getLineLength,
+    hoverLine
+  } from "@fig/functions/shape/line";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {useId} from "@fig/functions/id";
@@ -15,6 +18,8 @@
     registerVectorPart
   } from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
+  import {selector} from "$lib/components/Selector.svelte";
+  import {line} from "$lib/primitive/line";
 
   type Props = {
     geometryIndex: number;
@@ -40,6 +45,7 @@
   let part: VectorPart = $state({
     id: useId(),
     type: "line",
+    commandsIndex: [startIndex, endIndex],
     draw,
     update,
     selected: false
@@ -53,10 +59,22 @@
   let virtualStartCommand = $state({...realStartCommand});
   let virtualEndCommand = $state({...realEndCommand});
 
+  let virtualLine = $derived({
+    start: virtualStartCommand.endPoint,
+    end: virtualEndCommand.endPoint
+  });
+
+  let lineLength = $derived(getLineLength({
+    start: virtualStartCommand.endPoint,
+    end: virtualEndCommand.endPoint
+  }))
+
   let center = $derived(centerOfSegment({
     start: virtualStartCommand.endPoint,
     end: virtualEndCommand.endPoint
   }));
+
+  let showCenterPoint = $derived(lineLength > 40);
 
   // Force update when this variables change (trigger the redraw)
   canvasContext.updateCanvas(() => [realStartCommand, realEndCommand, hovered, clicked, part.selected, centerPoint.hovered]);
@@ -64,17 +82,44 @@
   // Update selected state
   $effect(() => {
     if (!centerPoint.hovered && dragged) {
+      selector.disable();
       context.setDraggedPart(part);
 
       if (dragged && !part.selected && context.isDragged(part)) {
-        context.setSelectedPart(part);
+        if (keys.shiftPressed()) {
+          selector.selectPart(part);
+        } else {
+          selector.selectSinglePart(part);
+        }
       }
     }
+  });
 
+  $effect(() => {
     if (!dragged && !canvasClick.pressed) {
       context.resetDraggedPart(part);
     }
-  });
+  })
+
+  $effect(() => {
+    if (hovered && !selector.inSelection) {
+      selector.disable();
+    } else if (!hovered && !dragged) {
+      selector.enable();
+    }
+
+    if (centerPoint.hovered) {
+      selector.disable();
+    }
+  })
+
+  $effect(() => {
+    if (centerPoint.hovered && !selector.inSelection) {
+      selector.disable();
+    } else {
+      selector.enable();
+    }
+  })
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
@@ -101,53 +146,79 @@
     virtualStartCommand.endPoint = navigation.toVirtualPoint(realStartCommand.endPoint);
     virtualEndCommand.endPoint = navigation.toVirtualPoint(realEndCommand.endPoint);
 
-    // Update center point
-    centerPoint.updateCenterPoint(center);
-    centerPoint.update();
-
     hovered = hoverLine({
       line: {
         start: virtualStartCommand.endPoint,
         end: virtualEndCommand.endPoint
       }, cursorPosition
-    });
+    }) && !selector.inSelection;
     clicked = hovered && canvasClick.single;
-    dragged = (dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part));
+    dragged = ((dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part))) && !selector.inSelection;
+
+    if (selector.rect) {
+      if (selector.pointMode) {
+        if (selector.rect.containLine(virtualLine)) {
+          selector.selectPart(part);
+        } else {
+          selector.unselectPart(part);
+        }
+      } else {
+        if (selector.rect.collideLine(virtualLine)) {
+          selector.selectPart(part);
+        } else {
+          selector.unselectPart(part);
+        }
+      }
+    }
 
     // Move with cursor
     if (dragged && context.isDragged(part)) {
-      let x = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
-      let y = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
+      let x = (cursorPosition.x - canvasClick.realClickPoint.x) / navigation.scale;
+      let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
       canvasClick.setClickPoint(cursorPosition.pos);
 
-      realStartCommand.endPoint.x += x;
-      realStartCommand.endPoint.y += y;
+      let selectedCommands = selector.selectedPartsCommandsIndex();
 
-      realEndCommand.endPoint.x += x;
-      realEndCommand.endPoint.y += y;
+      for (const selectedCommand of selectedCommands) {
+        let command = context.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
+        command.endPoint.x += x;
+        command.endPoint.y += y;
+      }
     }
 
     // Move with arrow keys
-    if (keyTimer.finished() && part.selected && keys.currentKey) {
-      let shiftMultiplier = keys.containKey("Shift") ? 10 : 1;
+    if (keyTimer.finished() && part.selected && keys.anyPressed) {
+      let shiftMultiplier = keys.shiftPressed() ? 10 : 0.5;
       let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
       let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
 
-      realStartCommand.endPoint.x += xShift;
-      realStartCommand.endPoint.y += yShift;
+      let selectedCommands = selector.selectedPartsCommandsIndex();
 
-      realEndCommand.endPoint.x += xShift;
-      realEndCommand.endPoint.y += yShift;
+      for (const selectedCommand of selectedCommands) {
+        let command = context.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
+        command.endPoint.x += xShift;
+        command.endPoint.y += yShift;
+      }
     }
 
-    // Add a new point when clicking on the center point
-    if (centerPoint.clicked && context.isDragged(part) === null) {
-      context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
-        type: "L",
-        relative: false,
-        endPoint: navigation.toRealPoint(center),
-      });
-      context.updateVector();
+    if (part.selected && keys.shiftPressed()) {
+      canvasContext.redraw();
+    }
+
+    if (showCenterPoint) {
+      // Update center point
+      centerPoint.updateCenterPoint(center);
+      centerPoint.update();
+
+      // Add a new point when clicking on the center point
+      if (centerPoint.clicked && context.isDragged(part) === null && !selector.inSelection) {
+        context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
+          type: "L",
+          relative: false,
+          endPoint: navigation.toRealPoint(center),
+        });
+        context.updateVector();
+      }
     }
   }
 
@@ -157,6 +228,7 @@
       ctx,
       start: virtualStartCommand.endPoint,
       end: virtualEndCommand.endPoint,
+      color: "rgb(163, 163, 163)"
     });
   }
 
@@ -168,7 +240,9 @@
       weight: 2
     });
 
-    centerPoint.draw(ctx);
+    if (showCenterPoint) {
+      centerPoint.draw(ctx);
+    }
   }
 
   function drawSelected(ctx: CanvasRenderingContext2D) {

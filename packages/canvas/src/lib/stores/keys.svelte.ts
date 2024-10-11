@@ -1,15 +1,7 @@
-import type { KeyboardKey } from "@fig/types/KeyboardKey.ts";
-
-type KeysStore = {
-  currentKey: KeyboardKey | null;
-  combo: KeyboardKey[];
-};
+import type { KeyboardKey } from "@fig/types/KeyboardKey";
 
 class Keys {
-  private states: KeysStore = $state({
-    currentKey: null,
-    combo: [],
-  });
+  keyPressed: KeyboardKey[] = $state([]);
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -22,9 +14,8 @@ class Keys {
     e.preventDefault();
 
     let key = e.key;
-    this.states.currentKey = key;
-    if (!this.states.combo.includes(key)) {
-      this.states.combo = [...this.states.combo, key];
+    if (!this.keyPressed.includes(key)) {
+      this.keyPressed = [...this.keyPressed, key];
     }
   }
 
@@ -33,45 +24,51 @@ class Keys {
 
     let isCommand = e.ctrlKey || e.altKey || e.shiftKey || e.metaKey;
 
-    this.states.currentKey = null;
-
     if (!isCommand) {
-      this.states.combo = [];
+      this.keyPressed = [];
     } else {
       if (this.containCommandsKey()) {
-        this.states.combo = this.states.combo.slice(0, 1);
+        this.keyPressed = this.keyPressed.slice(0, 1);
       }
     }
   }
 
-  get currentKey(): KeyboardKey | null {
-    return this.states.currentKey;
+  get anyPressed(): boolean {
+    return this.keyPressed.length > 0;
   }
 
   get combo(): KeyboardKey[] {
-    return this.states.combo;
+    return this.keyPressed;
   }
 
   isPressed(key: KeyboardKey): boolean {
-    return this.currentKey === key;
+    return this.keyPressed.includes(key);
   }
 
   checkCombo(keys: KeyboardKey[]): boolean {
     return this.combo === keys;
   }
 
-  containKey(key: KeyboardKey): boolean {
-    return this.combo.includes(key);
-  }
-
   containCommandsKey(): boolean {
     let commands: KeyboardKey[] = ["Control", "Alt", "Shift", "Meta"];
     for (const key of commands) {
-      if (this.containKey(key)) {
+      if (this.isPressed(key)) {
         return true;
       }
     }
     return false;
+  }
+
+  shiftPressed(): boolean {
+    return this.isPressed("Shift");
+  }
+
+  ctrlPressed(): boolean {
+    return this.isPressed("Control");
+  }
+
+  altPressed(): boolean {
+    return this.isPressed("Alt");
   }
 
   destroy() {

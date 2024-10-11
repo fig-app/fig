@@ -1,14 +1,10 @@
 import type { Vector } from "@fig/types/properties/Vector";
+import type { Line } from "@fig/types/shapes/Line";
 import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
 import { hoverRect } from "@fig/functions/shape/rect";
 import { canvasClick } from "$lib/stores/canvasClick.svelte";
 import { rect } from "$lib/primitive/rect";
-
-type RectStates = {
-  topLeft: Vector;
-  width: number;
-  height: number;
-};
+import { linesIntersection } from "@fig/functions/shape/line";
 
 type RectConstructorArgs = {
   x?: number;
@@ -20,36 +16,36 @@ type RectConstructorArgs = {
 type RectDrawArgs = {
   ctx: CanvasRenderingContext2D;
   colors: {
-    background: string | null;
-    stroke: string | null;
+    background?: string;
+    stroke?: string;
   };
   strokeWeight: number;
 };
 
 export class Rect {
-  private states: RectStates = $state({
-    topLeft: { x: 0, y: 0 },
-    width: 0,
-    height: 0,
-  });
+  topLeft: Vector = $state({ x: 0, y: 0 });
+  width = $state(0);
+  height = $state(0);
 
   constructor({ x = 0, y = 0, width = 0, height = 0 }: RectConstructorArgs) {
-    this.states.topLeft.x = x;
-    this.states.topLeft.y = y;
-    this.states.width = width;
-    this.states.height = height;
+    this.topLeft.x = x;
+    this.topLeft.y = y;
+    this.width = width;
+    this.height = height;
   }
 
+  static new() {
+    return new Rect({});
+  }
+
+  // Getter and setter
+
   get x(): number {
-    return this.states.topLeft.x;
+    return this.topLeft.x;
   }
 
   get y(): number {
-    return this.states.topLeft.y;
-  }
-
-  get topLeft(): Vector {
-    return this.states.topLeft;
+    return this.topLeft.y;
   }
 
   get center(): Vector {
@@ -80,21 +76,10 @@ export class Rect {
     ];
   }
 
-  get width(): number {
-    return this.states.width;
-  }
-
-  get height(): number {
-    return this.states.height;
-  }
+  // Functions
 
   hovered(): boolean {
-    return hoverRect(
-      cursorPosition,
-      this.states.topLeft,
-      this.states.width,
-      this.states.height,
-    );
+    return hoverRect(cursorPosition, this.topLeft, this.width, this.height);
   }
 
   clicked(): boolean {
@@ -114,10 +99,76 @@ export class Rect {
     });
   }
 
+  drawTopLeft({ ctx, colors, strokeWeight }: RectDrawArgs) {
+    rect({
+      ctx,
+      x: this.x + this.width / 2,
+      y: this.y + this.height / 2,
+      width: this.width,
+      height: this.height,
+      colors,
+      strokeWeight,
+      radius: 0,
+    });
+  }
+
   update(x: number, y: number, width: number, height: number) {
-    this.states.topLeft.x = x;
-    this.states.topLeft.y = y;
-    this.states.width = width;
-    this.states.height = height;
+    this.topLeft.x = x;
+    this.topLeft.y = y;
+    this.width = width;
+    this.height = height;
+  }
+
+  collide(rect: Rect): boolean {
+    return (
+      this.x < rect.x + rect.width &&
+      this.x + this.width > rect.x &&
+      this.y < rect.y + rect.height &&
+      this.y + this.height > rect.y
+    );
+  }
+
+  collideLine(line: Line): boolean {
+    const { x: x1, y: y1 } = line.start;
+    const { x: x2, y: y2 } = line.end;
+
+    const corners = this.corners;
+
+    // Lines of the rectangle
+    const rectLines = [
+      { start: corners[0], end: corners[1] }, // Top edge
+      { start: corners[1], end: corners[2] }, // Right edge
+      { start: corners[2], end: corners[3] }, // Bottom edge
+      { start: corners[3], end: corners[0] }, // Left edge
+    ];
+
+    // Check if the line intersects with any side of the rectangle
+    for (const rectLine of rectLines) {
+      if (
+        linesIntersection(
+          { start: { x: x1, y: y1 }, end: { x: x2, y: y2 } },
+          rectLine,
+        )
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  containPoint(point: Vector) {
+    const minX = Math.min(this.x, this.x + this.width);
+    const maxX = Math.max(this.x, this.x + this.width);
+    const minY = Math.min(this.y, this.y + this.height);
+    const maxY = Math.max(this.y, this.y + this.height);
+
+    return (
+      minX <= point.x && minY <= point.y && maxX >= point.x && maxY >= point.y
+    );
+  }
+
+  containLine(line: Line) {
+    return this.containPoint(line.start) && this.containPoint(line.end);
   }
 }

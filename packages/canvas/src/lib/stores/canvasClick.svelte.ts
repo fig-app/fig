@@ -1,4 +1,5 @@
 import type { Vector } from "@fig/types/properties/Vector";
+import { navigation } from "$lib/stores/navigation.svelte";
 
 type CanvasClickStates = {
   single: boolean;
@@ -29,9 +30,16 @@ class CanvasClickSvelte {
     return this.states.pressed;
   }
 
-  get clickPoint() {
+  get realClickPoint() {
     let point = this.states.clickPoint;
     return point ? point : { x: 0, y: 0 };
+  }
+
+  get virtualClickPoint() {
+    let point = this.states.clickPoint
+      ? this.states.clickPoint
+      : { x: 0, y: 0 };
+    return navigation.toVirtualPoint(point);
   }
 
   public setClickPoint(point: Vector) {

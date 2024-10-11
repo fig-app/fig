@@ -23,28 +23,25 @@
     registerCanvasNode
   } from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
-  import TransformCorners from "$lib/components/TransformCorners.svelte";
+  import {TransformCorners} from "$lib/components/TransformCorners.svelte";
+  import {vectorParts} from "$lib/stores/canvasContent.svelte";
 
   let {node}: { node: Node } = $props();
 
-  let parts: Set<VectorPart> = $state(new Set());
   let strokePathsSynchronization: Path2D[] = $state([]);
   let strokeGeometriesCommands: PathCommand[][] = $state([]);
 
   let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
-  let rect = new Rect({});
+  let rect = Rect.new();
+  let transformCorner = new TransformCorners(rect);
 
   let hovered = $state(false);
   let dblclick = $state(false);
-  let selected = $state(false);
   let editMode = $state(false);
   let triggerUpdate = $state(false);
-  let transformCorner;
 
   let editTimer = new Timer(100, "Once");
 
-  // Used for parts
-  let selectedPart: VectorPart | null = $state(null);
   let draggedPart: VectorPart | null = $state(null);
 
   let strokeColor = colorToString(node.node.data.strokes[0].color);
@@ -54,13 +51,12 @@
   let vectorContext = getVectorContext();
 
   // Force update when this variables change (trigger the redraw)
-  canvasContext.updateCanvas(() => [hovered, bbox])
+  canvasContext.updateCanvas(() => [hovered, bbox, strokeGeometriesCommands])
 
   // Create vector context
   setVectorContext({
     register,
     unregister,
-    setSelectedPart,
     setDraggedPart,
     resetDraggedPart,
     isDragged,
@@ -92,7 +88,7 @@
   function draw(ctx: CanvasRenderingContext2D) {
 
     // Draw bounding box
-    if (!editMode && hovered) {
+    if (!editMode && canvasNode.selected) {
       strokeRect({
         ctx,
         x: rect.center.x,
@@ -135,7 +131,7 @@
 
       // draw all parts
       if (editMode) {
-        for (const part of parts) {
+        for (const part of vectorParts) {
           part.draw(ctx);
         }
       }
@@ -164,8 +160,10 @@
     }
 
     // Update parts
-    for (const part of parts) {
-      part.update();
+    if (editMode) {
+      for (const part of vectorParts) {
+        part.update();
+      }
     }
   }
 
@@ -180,23 +178,12 @@
 
   function register(part: VectorPart) {
     onMount(() => {
-      parts.add(part);
+      vectorParts.add(part);
     });
   }
 
   function unregister(part: VectorPart) {
-    parts.delete(part);
-  }
-
-  function setSelectedPart(part: VectorPart | null) {
-    if (part) {
-      part.selected = true;
-    }
-
-    if (selectedPart) {
-      selectedPart.selected = false;
-    }
-    selectedPart = part;
+    vectorParts.delete(part);
   }
 
   function setDraggedPart(part: VectorPart) {
@@ -229,17 +216,14 @@
   }
 
   function updateVector() {
+    vectorParts.clear();
     triggerUpdate = !triggerUpdate;
   }
 
 </script>
 
-{#if (selected)}
-  <TransformCorners {rect} bind:this={transformCorner}/>
-{/if}
-
 {#if (editMode)}
-  {#key triggerUpdate}
+  {#key (triggerUpdate)}
     {#each strokeGeometriesCommands as path_commands, gi}
       {#each path_commands as command, i}
 
