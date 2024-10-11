@@ -15,7 +15,7 @@ type HoverLineArgs = {
 export function hoverLine({ line, cursorPosition }: HoverLineArgs): boolean {
   return (
     pointToSegmentDistance({
-      line: shortenLine(line, 10),
+      line: shortenLine(line, 12),
       point: cursorPosition,
     }) < 6
   );

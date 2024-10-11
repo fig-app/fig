@@ -4,6 +4,7 @@ import { Rect } from "$lib/Rect.svelte";
 import { getPrimitiveBlue } from "@fig/functions/color";
 import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
 import { canvasClick } from "$lib/stores/canvasClick.svelte";
+import { removeDuplicates } from "@fig/functions/array";
 
 class Selector {
   mode: "node" | "vector" = $state("node");
@@ -139,6 +140,12 @@ class Selector {
 
   partIsSelected(part: VectorPart) {
     return this.parts.includes(part);
+  }
+
+  selectedPartsCommandsIndex(): number[] {
+    return removeDuplicates(
+      this.parts.map((part) => part.commandsIndex).flat(),
+    );
   }
 }
 

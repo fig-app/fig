@@ -45,6 +45,7 @@
   let part: VectorPart = $state({
     id: useId(),
     type: "line",
+    commandsIndex: [startIndex, endIndex],
     draw,
     update,
     selected: false
@@ -76,7 +77,7 @@
   let showCenterPoint = $derived(lineLength > 40);
 
   // Force update when this variables change (trigger the redraw)
-  canvasContext.updateCanvas(() => [context.strokeGeometriesCommands[geometryIndex][startIndex], realStartCommand, realEndCommand, hovered, clicked, part.selected, centerPoint.hovered]);
+  canvasContext.updateCanvas(() => [realStartCommand, realEndCommand, hovered, clicked, part.selected, centerPoint.hovered]);
 
   // Update selected state
   $effect(() => {
@@ -85,7 +86,11 @@
       context.setDraggedPart(part);
 
       if (dragged && !part.selected && context.isDragged(part)) {
-        selector.selectSinglePart(part);
+        if (keys.shiftPressed()) {
+          selector.selectPart(part);
+        } else {
+          selector.selectSinglePart(part);
+        }
       }
     }
   });
@@ -140,7 +145,7 @@
   function update() {
     virtualStartCommand.endPoint = navigation.toVirtualPoint(realStartCommand.endPoint);
     virtualEndCommand.endPoint = navigation.toVirtualPoint(realEndCommand.endPoint);
-    
+
     hovered = hoverLine({
       line: {
         start: virtualStartCommand.endPoint,
@@ -172,11 +177,13 @@
       let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
       canvasClick.setClickPoint(cursorPosition.pos);
 
-      realStartCommand.endPoint.x += x;
-      realStartCommand.endPoint.y += y;
+      let selectedCommands = selector.selectedPartsCommandsIndex();
 
-      realEndCommand.endPoint.x += x;
-      realEndCommand.endPoint.y += y;
+      for (const selectedCommand of selectedCommands) {
+        let command = context.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
+        command.endPoint.x += x;
+        command.endPoint.y += y;
+      }
     }
 
     // Move with arrow keys
@@ -185,11 +192,17 @@
       let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
       let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
 
-      realStartCommand.endPoint.x += xShift;
-      realStartCommand.endPoint.y += yShift;
+      let selectedCommands = selector.selectedPartsCommandsIndex();
 
-      realEndCommand.endPoint.x += xShift;
-      realEndCommand.endPoint.y += yShift;
+      for (const selectedCommand of selectedCommands) {
+        let command = context.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
+        command.endPoint.x += xShift;
+        command.endPoint.y += yShift;
+      }
+    }
+
+    if (part.selected && keys.shiftPressed()) {
+      canvasContext.redraw();
     }
 
     if (showCenterPoint) {
@@ -207,7 +220,6 @@
         context.updateVector();
       }
     }
-
   }
 
   // Draw functions

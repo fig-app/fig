@@ -13,6 +13,7 @@
   import {EditPoint} from "$lib/components/EditPoint.svelte";
   import {Timer} from "$lib/stores/canvasTime.svelte"
   import {selector} from "$lib/components/Selector.svelte";
+  import {keys} from "$lib/stores/keys.svelte";
 
   type Props = {
     geometryIndex: number;
@@ -24,6 +25,7 @@
   let point = new EditPoint();
   let dragged = $state(false);
 
+  let keyTimer = new Timer(100, "Repeating");
   let loadTimer = new Timer(10, "Once");
 
   let canvasContext = getCanvasContext();
@@ -33,6 +35,7 @@
   let part: VectorPart = $state({
     id: useId(),
     type: "point",
+    commandsIndex: [pointIndex],
     draw,
     update,
     selected: false
@@ -54,7 +57,11 @@
       vectorContext.setDraggedPart(part);
 
       if (dragged && !part.selected && vectorContext.isDragged(part)) {
-        selector.selectSinglePart(part);
+        if (keys.shiftPressed()) {
+          selector.selectPart(part);
+        } else {
+          selector.selectSinglePart(part);
+        }
       }
     }
   })
@@ -115,8 +122,32 @@
       let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
       canvasClick.setClickPoint(cursorPosition.pos);
 
-      realCommand.endPoint.x += x;
-      realCommand.endPoint.y += y;
+      let selectedCommands = selector.selectedPartsCommandsIndex();
+
+      for (const selectedCommand of selectedCommands) {
+        let command = vectorContext.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
+        command.endPoint.x += x;
+        command.endPoint.y += y;
+      }
+    }
+
+    // Move with arrow keys
+    if (keyTimer.finished() && part.selected && keys.anyPressed) {
+      let shiftMultiplier = keys.shiftPressed() ? 10 : 0.5;
+      let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
+      let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
+
+      let selectedCommands = selector.selectedPartsCommandsIndex();
+
+      for (const selectedCommand of selectedCommands) {
+        let command = vectorContext.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
+        command.endPoint.x += xShift;
+        command.endPoint.y += yShift;
+      }
+    }
+
+    if (part.selected && keys.shiftPressed()) {
+      canvasContext.redraw();
     }
   }
 
