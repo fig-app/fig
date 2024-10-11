@@ -18,10 +18,7 @@
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {keys} from "$lib/stores/keys.svelte";
-  import {
-    getCanvasContext,
-    registerCanvasNode
-  } from "$lib/context/canvasContext";
+  import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
   import {TransformCorners} from "$lib/components/TransformCorners.svelte";
   import {vectorParts} from "$lib/stores/canvasContent.svelte";
