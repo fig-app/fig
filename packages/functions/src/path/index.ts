@@ -103,10 +103,10 @@ export function parsePathString(d: string): PathCommand[] {
         sequence.push({
           type: command,
           relative,
-          endPoint: coords[0],
+          endPoint: coords[2],
           controlPoints: {
-            start: coords[1],
-            end: coords[2],
+            start: coords[0],
+            end: coords[1],
           },
         });
         break;

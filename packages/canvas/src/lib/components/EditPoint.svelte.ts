@@ -1,14 +1,14 @@
 import type { Vector } from "@fig/types/properties/Vector";
 import { arc } from "$lib/primitive/arc";
-import { getPrimitiveBlue, getPrimitiveWhite } from "@fig/functions/color";
 import { isCursorHoveringArc } from "@fig/functions/shape/arc";
 import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
 import { canvasClick } from "$lib/stores/canvasClick.svelte";
+import { canvasColors } from "$lib/stores/canvasColors";
 
 const RADIUS_DEFAULT: number = 4;
 const RADIUS_SELECTED: number = 5;
-const PRIMITIVE_BLUE: string = getPrimitiveBlue();
-const PRIMITIVE_WHITE: string = getPrimitiveWhite();
+const PRIMITIVE_BLUE: string = canvasColors.blue;
+const PRIMITIVE_WHITE: string = canvasColors.white;
 
 type EditPointStates = {
   hovered: boolean;

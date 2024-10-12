@@ -1,6 +1,6 @@
 import { Rect } from "$lib/Rect.svelte";
 import type { Vector } from "@fig/types/properties/Vector";
-import { getPrimitiveBlue, getPrimitiveWhite } from "@fig/functions/color";
+import { canvasColors } from "$lib/stores/canvasColors";
 
 const RECT_SIZE: number = 6;
 
@@ -32,8 +32,8 @@ export class EditRect {
     this.rect.draw({
       ctx,
       colors: {
-        background: getPrimitiveWhite(),
-        stroke: getPrimitiveBlue(),
+        background: canvasColors.white,
+        stroke: canvasColors.blue,
       },
       strokeWeight: 1,
     });
