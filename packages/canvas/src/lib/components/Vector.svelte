@@ -8,7 +8,7 @@
   import VectorPoint from "$lib/components/VectorPoint.svelte";
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
-  import {colorToString, getPrimitiveBlue} from "@fig/functions/color";
+  import {colorToString} from "@fig/functions/color";
   import type {PathCommand} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
@@ -19,18 +19,28 @@
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {keys} from "$lib/stores/keys.svelte";
   import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
-  import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
-  import {TransformCorners} from "$lib/components/TransformCorners.svelte";
-  import {vectorParts} from "$lib/stores/canvasContent.svelte";
+  import {setVectorContext} from "$lib/context/vectorContext";
+  import type {VectorNode} from "@fig/types/nodes/vector/VectorNode";
+  import type {EmptyData} from "@fig/types/nodes/vector/EmptyData";
+  import VectorCurve from "$lib/components/VectorCurve.svelte";
+  import {canvasColors} from "$lib/stores/canvasColors";
+  import {commandHasEndPoint} from "@fig/functions/path/typeCheck";
 
   let {node}: { node: Node } = $props();
+
+  if (node.node.type !== "vector") {
+    console.error(`${node.name} isn't a vector.`);
+  }
+
+  let data = node.node.data as VectorNode<EmptyData>
+
+  let parts: Set<VectorPart> = $state(new Set());
 
   let strokePathsSynchronization: Path2D[] = $state([]);
   let strokeGeometriesCommands: PathCommand[][] = $state([]);
 
   let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
   let rect = Rect.new();
-  let transformCorner = new TransformCorners(rect);
 
   let hovered = $state(false);
   let dblclick = $state(false);
@@ -41,11 +51,10 @@
 
   let draggedPart: VectorPart | null = $state(null);
 
-  let strokeColor = colorToString(node.node.data.strokes[0].color);
-  let strokeWeight = $derived(node.node.data.strokeWeight * navigation.scale);
+  let strokeColor = colorToString(data.strokes[0].color);
+  let strokeWeight = $derived(data.strokeWeight * navigation.scale);
 
   let canvasContext = getCanvasContext();
-  let vectorContext = getVectorContext();
 
   // Force update when this variables change (trigger the redraw)
   canvasContext.updateCanvas(() => [hovered, bbox, strokeGeometriesCommands])
@@ -62,13 +71,9 @@
   });
 
   // Parse all geometries path to an array of PathCommand
-  if (node.node.type === "vector") {
-    let strokeGeometry = node.node.data.strokeGeometry;
-    for (const geometry of strokeGeometry) {
-      strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
-    }
-  } else {
-    console.error(`${node.name} isn't an vector.`);
+  let strokeGeometry = data.strokeGeometry;
+  for (const geometry of strokeGeometry) {
+    strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
   }
 
   // Register vector node
@@ -82,6 +87,36 @@
   registerCanvasNode(canvasNode);
 
   // Functions
+  function getVectorPoints(): VectorPart[] {
+    let to_ret: VectorPart[] = [];
+    parts.forEach(part => {
+      if (part.type == "point") {
+        to_ret.push(part);
+      }
+    })
+    return to_ret;
+  }
+
+  function getVectorLines(): VectorPart[] {
+    let to_ret: VectorPart[] = [];
+    parts.forEach(part => {
+      if (part.type == "line") {
+        to_ret.push(part);
+      }
+    })
+    return to_ret;
+  }
+
+  function getVectorCurves(): VectorPart[] {
+    let to_ret: VectorPart[] = [];
+    parts.forEach(part => {
+      if (part.type == "curve") {
+        to_ret.push(part);
+      }
+    })
+    return to_ret;
+  }
+
   function draw(ctx: CanvasRenderingContext2D) {
 
     // Draw bounding box
@@ -92,7 +127,7 @@
         y: rect.center.y,
         width: rect.width,
         height: rect.height,
-        color: getPrimitiveBlue(),
+        color: canvasColors.blue,
         strokeWidth: 2,
       })
     }
@@ -104,36 +139,33 @@
       strokePathsSynchronization.push(path)
     }
 
-    if (node.node.type === "vector") {
-      // draw stylized vector
+    // draw stylized vector
+    for (let path of strokePathsSynchronization) {
+      drawPath({
+        ctx,
+        path,
+        colors: {stroke: strokeColor},
+        strokeWeight
+      });
+    }
+
+    // draw vector skeleton on hover
+    if (!editMode && hovered) {
       for (let path of strokePathsSynchronization) {
         drawPath({
           ctx,
           path,
-          colors: {stroke: strokeColor},
-          strokeWeight
+          colors: {stroke: canvasColors.blue},
+          strokeWeight: 2
         });
       }
+    }
 
-      // draw vector skeleton on hover
-      if (!editMode && hovered) {
-        for (let path of strokePathsSynchronization) {
-          drawPath({
-            ctx,
-            path,
-            colors: {stroke: getPrimitiveBlue()}
-          });
-        }
+    // draw all parts
+    if (editMode) {
+      for (const part of parts) {
+        part.draw(ctx);
       }
-
-      // draw all parts
-      if (editMode) {
-        for (const part of vectorParts) {
-          part.draw(ctx);
-        }
-      }
-    } else {
-      console.error(`${node.name} isn't a vector.`);
     }
   }
 
@@ -158,9 +190,16 @@
 
     // Update parts
     if (editMode) {
-      for (const part of vectorParts) {
+      // Update in this order to prioritize hover (points > lines)
+      getVectorPoints().forEach(part => {
         part.update();
-      }
+      });
+      getVectorCurves().forEach(part => {
+        part.update();
+      });
+      getVectorLines().forEach(part => {
+        part.update();
+      });
     }
   }
 
@@ -175,12 +214,12 @@
 
   function register(part: VectorPart) {
     onMount(() => {
-      vectorParts.add(part);
+      parts.add(part);
     });
   }
 
   function unregister(part: VectorPart) {
-    vectorParts.delete(part);
+    parts.delete(part);
   }
 
   function setDraggedPart(part: VectorPart) {
@@ -213,7 +252,6 @@
   }
 
   function updateVector() {
-    vectorParts.clear();
     triggerUpdate = !triggerUpdate;
   }
 
@@ -224,18 +262,21 @@
     {#each strokeGeometriesCommands as path_commands, gi}
       {#each path_commands as command, i}
 
+        <!-- Draw points -->
+        {#if (commandHasEndPoint(command))}
+          <VectorPoint geometryIndex={gi} pointIndex={i}/>
+        {/if}
+
         <!-- Draw lines -->
         {#if (command.type === "Z")}
           <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
-        {:else if (i < path_commands.length - 1 && (command.type === "M" || command.type === "L"))}
-          {#if path_commands[i + 1]?.endPoint}
-            <VectorLine geometryIndex={gi} startIndex={i} endIndex={i + 1}/>
-          {/if}
+        {:else if (command.type === "L")}
+          <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={i}/>
         {/if}
 
-        <!-- Draw points -->
-        {#if ((command.type === "M" || command.type === "L"))}
-          <VectorPoint geometryIndex={gi} pointIndex={i}/>
+        <!--  Draw cubic curves -->
+        {#if (command.type === "C")}
+          <VectorCurve geometryIndex={gi} startIndex={i - 1} endIndex={i}/>
         {/if}
       {/each}
     {/each}

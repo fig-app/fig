@@ -1,4 +1,4 @@
-import { getPrimitiveBlue, getPrimitiveWhite } from "@fig/functions/color";
+import { canvasColors } from "$lib/stores/canvasColors";
 
 const STROKE_DEFAULT: number = 1;
 
@@ -106,7 +106,10 @@ export function arc({
   startAngle = 0,
   endAngle = Math.PI,
   counterclockwise,
-  colors = { background: getPrimitiveWhite(), stroke: getPrimitiveBlue() },
+  colors = {
+    background: canvasColors.white,
+    stroke: canvasColors.blue,
+  },
   strokeWeight = STROKE_DEFAULT,
 }: ArcArgs) {
   ctx.save();

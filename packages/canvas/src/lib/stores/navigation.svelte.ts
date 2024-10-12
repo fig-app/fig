@@ -50,25 +50,41 @@ class NavigationSvelte {
     let to_ret: PathCommand[] = [];
 
     for (let command of geometryCommands) {
-      switch (command.type) {
-        case "T":
-        case "L":
-        case "M": {
-          to_ret.push({
-            type: command.type,
-            endPoint: this.toVirtualPoint(command.endPoint),
-            relative: command.relative,
-          });
-          break;
-        }
-        case "Z": {
-          to_ret.push(command);
-          break;
-        }
-      }
+      to_ret.push(this.toVirtualCommand(command));
     }
 
     return to_ret;
+  }
+
+  toVirtualCommand(command: PathCommand): PathCommand {
+    let c = command;
+    switch (command.type) {
+      case "T":
+      case "L":
+      case "M": {
+        c = {
+          type: command.type,
+          endPoint: this.toVirtualPoint(command.endPoint),
+          relative: command.relative,
+        };
+        break;
+      }
+      case "C":
+        c = {
+          type: command.type,
+          relative: command.relative,
+          controlPoints: {
+            start: this.toVirtualPoint(command.controlPoints.start),
+            end: this.toVirtualPoint(command.controlPoints.end),
+          },
+          endPoint: this.toVirtualPoint(command.endPoint),
+        };
+        break;
+      case "Z": {
+        break;
+      }
+    }
+    return c;
   }
 
   toVirtualPoint(point: Vector) {

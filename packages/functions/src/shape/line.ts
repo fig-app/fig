@@ -1,8 +1,8 @@
-import { Vector } from "@fig/types/properties/Vector";
-import { pointsDistance } from "./point";
-import { Line } from "@fig/types/shapes/Line";
+import {Vector} from "@fig/types/properties/Vector";
+import {pointsDistance} from "./point";
+import {Line} from "@fig/types/shapes/Line";
 
-const { abs, sqrt } = Math;
+const {abs, sqrt} = Math;
 
 type HoverLineArgs = {
   line: Line;
@@ -12,10 +12,10 @@ type HoverLineArgs = {
 /**
  * Check if the cursor is on the mouse.
  */
-export function hoverLine({ line, cursorPosition }: HoverLineArgs): boolean {
+export function hoverLine({line, cursorPosition}: HoverLineArgs): boolean {
   return (
     pointToSegmentDistance({
-      line: shortenLine(line, 12),
+      line: line,
       point: cursorPosition,
     }) < 6
   );
@@ -30,15 +30,15 @@ type PointToLineDistanceArgs = {
  * Calculate the distance from a point to a line.
  */
 export function pointToLineDistance({
-  line: { start, end },
-  point,
-}: PointToLineDistanceArgs) {
+                                      line: {start, end},
+                                      point,
+                                    }: PointToLineDistanceArgs) {
   return (
     abs(
       (end.y - start.y) * point.x -
-        (end.x - start.x) * point.y +
-        end.x * start.y -
-        end.y * start.x,
+      (end.x - start.x) * point.y +
+      end.x * start.y -
+      end.y * start.x,
     ) / pointsDistance(start, end)
   );
 }
@@ -49,9 +49,9 @@ export function pointToLineDistance({
  * Made with help of this [stackoverflow answer](https://stackoverflow.com/a/6853926)
  */
 export function pointToSegmentDistance({
-  line: { start, end },
-  point,
-}: PointToLineDistanceArgs) {
+                                         line: {start, end},
+                                         point,
+                                       }: PointToLineDistanceArgs) {
   let A = point.x - start.x;
   let B = point.y - start.y;
   let C = end.x - start.x;
@@ -125,8 +125,8 @@ export function shortenLine(line: Line, distance: number): Line {
 }
 
 export function linesIntersection(line1: Line, line2: Line) {
-  const { start: A, end: B } = line1;
-  const { start: C, end: D } = line2;
+  const {start: A, end: B} = line1;
+  const {start: C, end: D} = line2;
 
   const denominator = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x);
   if (denominator === 0) {
@@ -144,8 +144,8 @@ export function linesIntersection(line1: Line, line2: Line) {
 }
 
 export function getLineLength(line: Line): number {
-  const { x: x1, y: y1 } = line.start;
-  const { x: x2, y: y2 } = line.end;
+  const {x: x1, y: y1} = line.start;
+  const {x: x2, y: y2} = line.end;
 
   const dx = x2 - x1;
   const dy = y2 - y1;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {onMount, tick, untrack} from "svelte";
+  import {onMount, type Snippet, tick, untrack} from "svelte";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect} from "$lib/primitive/rect";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
@@ -9,13 +9,15 @@
   import {setCanvasContext} from "$lib/context/canvasContext";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {selector} from "$lib/components/Selector.svelte";
+  import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
   import type {Vector} from "@fig/types/properties/Vector";
 
   type Props = {
-    width: number;
-    height: number;
-    fullscreen: boolean;
-    backgroundColor: string;
+    width?: number;
+    height?: number;
+    fullscreen?: boolean;
+    backgroundColor?: string;
+    children: Snippet
   }
 
   // Exports
@@ -23,7 +25,8 @@
     width = 100,
     height = 100,
     fullscreen = false,
-    backgroundColor = "rgba(30, 30, 30, 1)"
+    backgroundColor = DEFAULT_BACKGROUND_COLOR,
+    children
   }: Props = $props();
 
   let pipeline: Set<CanvasNode> = $state(new Set());
@@ -47,17 +50,7 @@
     y: 0,
   }
 
-  const ZOOM_AMOUNT: number = 1.1;
-
-  // $inspect(selector.parts).with((type, values) => {
-  //   console.log("Parts", values)
-  // })
-  // $inspect(selector.disabled).with((type, values) => {
-  //   console.log("Disabled", values)
-  // })
-  // $inspect(keys.keyPressed).with((type, values) => {
-  //   console.log("Keys", values)
-  // })
+  const ZOOM_AMOUNT: number = 1.3;
 
   updateCanvas(() => [
     navigation.scale,
@@ -85,7 +78,6 @@
     // Update loop
     function loop(timestamp: number) {
       update(timestamp);
-      // draw();
       frameId = requestAnimationFrame(loop);
     }
 
@@ -171,7 +163,7 @@
 
   function drawGrid() {
     if (ctx) {
-      ctx.strokeStyle = "rgb(62, 62, 62)";
+      ctx.strokeStyle = DEFAULT_GRID_COLOR;
       ctx.lineWidth = 1;
 
       ctx.beginPath();
@@ -338,6 +330,5 @@
             canvas.style.cursor = "default";
         }}
 >
-
-  <slot {width} {height}></slot>
+  {@render children()}
 </canvas>
