@@ -55,6 +55,14 @@ export class Rect {
     };
   }
 
+  set centerX(value: number) {
+    this.topLeft.x = value - this.width;
+  }
+
+  set centerY(value: number) {
+    this.topLeft.y = value - this.height;
+  }
+
   /**
    * Corners : top left, top right, bottom right, bottom left.
    */

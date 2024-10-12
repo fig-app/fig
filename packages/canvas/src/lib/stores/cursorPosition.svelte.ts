@@ -29,6 +29,13 @@ class CursorPosition {
   set pos(value: Vector) {
     this.state = value;
   }
+
+  get virtualPos() {
+    return {
+      x: navigation.toVirtualX(this.state.x),
+      y: navigation.toVirtualY(this.state.y),
+    };
+  }
 }
 
 export let cursorPosition = new CursorPosition();

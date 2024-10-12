@@ -20,6 +20,7 @@
   import {getCanvasContext} from "$lib/context/canvasContext";
   import {selector} from "$lib/components/Selector.svelte";
   import {line} from "$lib/primitive/line";
+  import {canvasColors} from "$lib/stores/canvasColors";
 
   type Props = {
     geometryIndex: number;
@@ -39,7 +40,7 @@
   let loadTimer = new Timer(10, "Once");
 
   let canvasContext = getCanvasContext();
-  let context = getVectorContext();
+  let vectorContext = getVectorContext();
 
   // Register line part
   let part: VectorPart = $state({
@@ -54,8 +55,8 @@
   registerVectorPart(part);
 
   // Line commands
-  let realStartCommand = $state(context.strokeGeometriesCommands[geometryIndex][startIndex] as MLTPathCommand);
-  let realEndCommand = $state(context.strokeGeometriesCommands[geometryIndex][endIndex] as MLTPathCommand);
+  let realStartCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][startIndex] as MLTPathCommand);
+  let realEndCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][endIndex] as MLTPathCommand);
   let virtualStartCommand = $state({...realStartCommand});
   let virtualEndCommand = $state({...realEndCommand});
 
@@ -83,9 +84,9 @@
   $effect(() => {
     if (!centerPoint.hovered && dragged) {
       selector.disable();
-      context.setDraggedPart(part);
+      vectorContext.setDraggedPart(part);
 
-      if (dragged && !part.selected && context.isDragged(part)) {
+      if (dragged && !part.selected && vectorContext.isDragged(part)) {
         if (keys.shiftPressed()) {
           selector.selectPart(part);
         } else {
@@ -97,7 +98,7 @@
 
   $effect(() => {
     if (!dragged && !canvasClick.pressed) {
-      context.resetDraggedPart(part);
+      vectorContext.resetDraggedPart(part);
     }
   })
 
@@ -125,13 +126,13 @@
   function draw(ctx: CanvasRenderingContext2D) {
     if (!loadTimer.finished()) return;
 
-    if (dragged && context.isDragged(part)) {
+    if (dragged && vectorContext.isDragged(part)) {
       drawSelected(ctx);
     } else if (hovered && part.selected) {
       drawHovered(ctx);
     } else if (part.selected) {
       drawSelected(ctx);
-    } else if (hovered && context.isDragged(part) === null) {
+    } else if (hovered && vectorContext.isDragged(part) === null) {
       if (clicked) {
         drawSelected(ctx);
       } else {
@@ -153,7 +154,7 @@
       }, cursorPosition
     }) && !selector.inSelection;
     clicked = hovered && canvasClick.single;
-    dragged = ((dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !context.isDragged(part))) && !selector.inSelection;
+    dragged = ((dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !vectorContext.isDragged(part))) && !selector.inSelection;
 
     if (selector.rect) {
       if (selector.pointMode) {
@@ -172,7 +173,7 @@
     }
 
     // Move with cursor
-    if (dragged && context.isDragged(part)) {
+    if (dragged && vectorContext.isDragged(part)) {
       let x = (cursorPosition.x - canvasClick.realClickPoint.x) / navigation.scale;
       let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
       canvasClick.setClickPoint(cursorPosition.pos);
@@ -180,7 +181,7 @@
       let selectedCommands = selector.selectedPartsCommandsIndex();
 
       for (const selectedCommand of selectedCommands) {
-        let command = context.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
+        let command = vectorContext.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
         command.endPoint.x += x;
         command.endPoint.y += y;
       }
@@ -195,7 +196,7 @@
       let selectedCommands = selector.selectedPartsCommandsIndex();
 
       for (const selectedCommand of selectedCommands) {
-        let command = context.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
+        let command = vectorContext.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
         command.endPoint.x += xShift;
         command.endPoint.y += yShift;
       }
@@ -211,13 +212,13 @@
       centerPoint.update();
 
       // Add a new point when clicking on the center point
-      if (centerPoint.clicked && context.isDragged(part) === null && !selector.inSelection) {
-        context.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
+      if (centerPoint.clicked && vectorContext.isDragged(part) === null && !selector.inSelection) {
+        vectorContext.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
           type: "L",
           relative: false,
           endPoint: navigation.toRealPoint(center),
         });
-        context.updateVector();
+        vectorContext.updateVector();
       }
     }
   }
@@ -228,7 +229,7 @@
       ctx,
       start: virtualStartCommand.endPoint,
       end: virtualEndCommand.endPoint,
-      color: "rgb(163, 163, 163)"
+      color: canvasColors.gray
     });
   }
 
@@ -237,7 +238,8 @@
       ctx,
       start: virtualStartCommand.endPoint,
       end: virtualEndCommand.endPoint,
-      weight: 2
+      weight: 1,
+      color: canvasColors.lightBlue
     });
 
     if (showCenterPoint) {
@@ -250,7 +252,7 @@
       ctx,
       start: virtualStartCommand.endPoint,
       end: virtualEndCommand.endPoint,
-      color: "rgb(12, 140, 233)",
+      color: canvasColors.blue,
       weight: 2
     });
   }
