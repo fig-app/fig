@@ -1,4 +1,5 @@
 import type {CanvasDrawFunction} from "$lib/types/CanvasFunction";
+import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
 
 /**
  * Represents a part of a vector when it is in edit mode.
@@ -8,7 +9,7 @@ import type {CanvasDrawFunction} from "$lib/types/CanvasFunction";
 export type VectorPart = {
   id: string;
   type: "point" | "line" | "curve";
-  commandsIndex: number[];
+  commands: PathCommandWithEndPoint[];
 
   draw: CanvasDrawFunction;
   update: () => void;

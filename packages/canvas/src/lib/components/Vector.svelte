@@ -3,13 +3,11 @@
   import {onMount} from "svelte";
   import type {VectorPart} from "$lib/types/VectorPart";
   import {parsePathString} from "@fig/functions/path/index";
-  import VectorLine from "$lib/components/VectorLine.svelte";
   import {normalize} from "@fig/functions/path/normalize";
-  import VectorPoint from "$lib/components/VectorPoint.svelte";
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
   import {colorToString} from "@fig/functions/color";
-  import type {PathCommand} from "@fig/functions/path/PathCommand";
+  import type {PathCommand, PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
   import {Rect} from "$lib/Rect.svelte";
@@ -22,9 +20,12 @@
   import {setVectorContext} from "$lib/context/vectorContext";
   import type {VectorNode} from "@fig/types/nodes/vector/VectorNode";
   import type {EmptyData} from "@fig/types/nodes/vector/EmptyData";
-  import VectorCurve from "$lib/components/VectorCurve.svelte";
   import {canvasColors} from "$lib/stores/canvasColors";
   import {commandHasEndPoint} from "@fig/functions/path/typeCheck";
+  import {vectorToString} from "@fig/functions/vector";
+  import VectorLine from "$lib/components/VectorLine.svelte";
+  import VectorPoint from "$lib/components/VectorPoint.svelte";
+  import VectorCurve from "$lib/components/VectorCurve.svelte";
 
   let {node}: { node: Node } = $props();
 
@@ -76,6 +77,27 @@
     strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
   }
 
+  // Get all commands with end points, to prevent two vectorPoints to draw at the same coordinates
+  let allCommandsWithEndPoints: PathCommandWithEndPoint[] = [];
+  for (const geometry of strokeGeometriesCommands) {
+    for (const command of geometry) {
+      if (commandHasEndPoint(command)) {
+        allCommandsWithEndPoints.push(command);
+      }
+    }
+  }
+  // key : string of Vector to represent the coordinates
+  // value : array of MLT or C Path command, which are the only ones useful to have endpoints
+  let pointsAndCoordinates: { [key: string]: PathCommandWithEndPoint[] } = {};
+
+  allCommandsWithEndPoints.forEach(command => {
+    const key = vectorToString(command.endPoint);
+    if (!pointsAndCoordinates[key]) {
+      pointsAndCoordinates[key] = [];
+    }
+    pointsAndCoordinates[key].push(command);
+  });
+
   // Register vector node
   let canvasNode: CanvasNode = $state({
     draw,
@@ -86,35 +108,36 @@
 
   registerCanvasNode(canvasNode);
 
-  // Functions
+  // Several functions to get the different parts according to their type.
+  // It allows to render them in a specific order (to kind of handle z-index)
   function getVectorPoints(): VectorPart[] {
-    let to_ret: VectorPart[] = [];
+    let list: VectorPart[] = [];
     parts.forEach(part => {
       if (part.type == "point") {
-        to_ret.push(part);
+        list.push(part);
       }
     })
-    return to_ret;
+    return list;
   }
 
   function getVectorLines(): VectorPart[] {
-    let to_ret: VectorPart[] = [];
+    let list: VectorPart[] = [];
     parts.forEach(part => {
       if (part.type == "line") {
-        to_ret.push(part);
+        list.push(part);
       }
     })
-    return to_ret;
+    return list;
   }
 
   function getVectorCurves(): VectorPart[] {
-    let to_ret: VectorPart[] = [];
+    let list: VectorPart[] = [];
     parts.forEach(part => {
       if (part.type == "curve") {
-        to_ret.push(part);
+        list.push(part);
       }
     })
-    return to_ret;
+    return list;
   }
 
   function draw(ctx: CanvasRenderingContext2D) {
@@ -262,11 +285,6 @@
     {#each strokeGeometriesCommands as path_commands, gi}
       {#each path_commands as command, i}
 
-        <!-- Draw points -->
-        {#if (commandHasEndPoint(command))}
-          <VectorPoint geometryIndex={gi} pointIndex={i}/>
-        {/if}
-
         <!-- Draw lines -->
         {#if (command.type === "Z")}
           <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
@@ -279,6 +297,12 @@
           <VectorCurve geometryIndex={gi} startIndex={i - 1} endIndex={i}/>
         {/if}
       {/each}
+    {/each}
+
+    {#each Object.values(pointsAndCoordinates) as listOfCommands}
+      <VectorPoint
+        listOfCommands={listOfCommands}
+      />
     {/each}
   {/key}
 {/if}

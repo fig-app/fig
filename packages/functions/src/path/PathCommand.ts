@@ -47,6 +47,13 @@ export interface ZPathCommand {
   type: "Z";
 }
 
+export type PathCommandWithEndPoint = (
+  | CPathCommand
+  | APathCommand
+  | SQPathCommand
+  | MLTPathCommand
+  ) & { relative: boolean };
+
 export interface HasEndPoint {
   endPoint: Vector;
 }

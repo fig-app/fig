@@ -3,7 +3,7 @@
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {useId} from "@fig/functions/id";
-  import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
+  import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
@@ -14,11 +14,9 @@
   import {cursorHover} from "$lib/stores/cursorHover.svelte";
 
   type Props = {
-    geometryIndex: number;
-    pointIndex: number;
+    listOfCommands: Array<PathCommandWithEndPoint>
   }
-
-  let {geometryIndex, pointIndex}: Props = $props();
+  let {listOfCommands}: Props = $props();
 
   let point = new EditPoint();
   let dragged = $state(false);
@@ -29,25 +27,23 @@
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
 
+  // Real and virtual commands
+  // Vector point can have several virtual commands if it
+  let listOfVirtualCommands = $state({...listOfCommands});
+
   // Register point part
   let part: VectorPart = $state({
     id: useId(),
     type: "point",
-    commandsIndex: [pointIndex],
+    commands: listOfCommands,
     draw,
     update,
     selected: false
   });
-
   registerVectorPart(part);
 
-  // Real and virtual commands
-  // Vector point can have several virtual commands if it
-  let realCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][pointIndex] as MLTPathCommand);
-  let virtualCommand = $state({...realCommand});
-
   // Update canvas when this variables change (trigger the redraw)
-  canvasContext.updateCanvas(() => [realCommand, part.selected, point.hovered, point.clicked])
+  canvasContext.updateCanvas(() => [listOfCommands, part.selected, point.hovered, point.clicked])
 
   // Update selected state
   $effect(() => {
@@ -101,9 +97,12 @@
   }
 
   function update() {
-    virtualCommand.endPoint = navigation.toVirtualPoint(realCommand.endPoint);
+    // Updating each virtual command
+    for (let i = 0; i < listOfCommands.length; i++) {
+      listOfVirtualCommands[i].endPoint = navigation.toVirtualPoint(listOfCommands[i].endPoint);
+    }
 
-    point.updateCenterPoint(virtualCommand.endPoint)
+    point.updateCenterPoint(listOfVirtualCommands[0].endPoint)
     point.update()
     // Updating hoveredPart, canceling the others if that point is hovered
     if (point.hovered) {
@@ -115,24 +114,24 @@
     dragged = ((dragged && canvasClick.pressed) || (point.hovered && canvasClick.pressed && !vectorContext.isDragged(part))) && !selector.inSelection;
 
     if (selector.rect) {
-      if (selector.rect.containPoint(virtualCommand.endPoint)) {
+      if (selector.rect.containPoint(listOfVirtualCommands[0].endPoint)) {
         selector.selectPart(part);
       } else {
         selector.unselectPart(part);
       }
     }
 
+    // Move with natural drag
     if (dragged && vectorContext.isDragged(part)) {
       let x = (cursorPosition.x - canvasClick.realClickPoint.x) / navigation.scale;
       let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
       canvasClick.setClickPoint(cursorPosition.pos);
 
-      // Move the current point or all the points if several are selected
-      let selectedCommands = selector.selectedPartsCommandsIndex();
+      // Move the current point and all the other selected ones
+      let selectedCommands = selector.selectedPartsCommands();
       for (const selectedCommand of selectedCommands) {
-        let command = vectorContext.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
-        command.endPoint.x += x;
-        command.endPoint.y += y;
+        selectedCommand.endPoint.x += x;
+        selectedCommand.endPoint.y += y;
       }
     }
 
@@ -143,11 +142,10 @@
       let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
 
       // Move the current point or all the points if several are selected
-      let selectedCommands = selector.selectedPartsCommandsIndex();
+      let selectedCommands = selector.selectedPartsCommands();
       for (const selectedCommand of selectedCommands) {
-        let command = vectorContext.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
-        command.endPoint.x += xShift;
-        command.endPoint.y += yShift;
+        selectedCommand.endPoint.x += xShift;
+        selectedCommand.endPoint.y += yShift;
       }
     }
 
@@ -155,5 +153,4 @@
       canvasContext.redraw();
     }
   }
-
 </script>

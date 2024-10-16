@@ -43,7 +43,7 @@ export class EditPoint {
   }
 
   update() {
-    // Only condition to be hovered, nothing else, because the point has the highest priority on hovering
+    // Can be hovered only if not next to another point, already hovered
     this.states.hovered = (isCursorHoveringArc({
         cursorPosition,
         arc: {
@@ -52,7 +52,6 @@ export class EditPoint {
         },
       })
     );
-
 
     this.states.clicked = this.states.hovered && canvasClick.pressed;
   }

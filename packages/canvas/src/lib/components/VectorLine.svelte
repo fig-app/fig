@@ -1,6 +1,6 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
-  import type {MLTPathCommand} from "@fig/functions/path/PathCommand";
+  import type {MLTPathCommand, PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
   import {centerOfSegment, getLineLength, hoverLine} from "@fig/functions/shape/line";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
@@ -36,23 +36,22 @@
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
 
-  // Register line part
-  let part: VectorPart = $state({
-    id: useId(),
-    type: "line",
-    commandsIndex: [startIndex, endIndex],
-    draw,
-    update,
-    selected: false
-  });
-
-  registerVectorPart(part);
-
   // Line commands
   let realStartCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][startIndex] as MLTPathCommand);
   let realEndCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][endIndex] as MLTPathCommand);
   let virtualStartCommand = $state({...realStartCommand});
   let virtualEndCommand = $state({...realEndCommand});
+
+  // Register line part
+  let part: VectorPart = $state({
+    id: useId(),
+    type: "line",
+    commands: [realStartCommand as PathCommandWithEndPoint, realEndCommand as PathCommandWithEndPoint],
+    draw,
+    update,
+    selected: false
+  });
+  registerVectorPart(part);
 
   let virtualLine = $derived({
     start: virtualStartCommand.endPoint,
@@ -183,12 +182,11 @@
       let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
       canvasClick.setClickPoint(cursorPosition.pos);
 
-      let selectedCommands = selector.selectedPartsCommandsIndex();
-
+      // Move the current point and all the other selected ones
+      let selectedCommands = selector.selectedPartsCommands();
       for (const selectedCommand of selectedCommands) {
-        let command = vectorContext.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
-        command.endPoint.x += x;
-        command.endPoint.y += y;
+        selectedCommand.endPoint.x += x;
+        selectedCommand.endPoint.y += y;
       }
     }
 
@@ -198,12 +196,10 @@
       let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
       let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
 
-      let selectedCommands = selector.selectedPartsCommandsIndex();
-
+      let selectedCommands = selector.selectedPartsCommands();
       for (const selectedCommand of selectedCommands) {
-        let command = vectorContext.strokeGeometriesCommands[geometryIndex][selectedCommand] as MLTPathCommand;
-        command.endPoint.x += xShift;
-        command.endPoint.y += yShift;
+        selectedCommand.endPoint.x += xShift;
+        selectedCommand.endPoint.y += yShift;
       }
     }
 
