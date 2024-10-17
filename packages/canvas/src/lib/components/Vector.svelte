@@ -12,10 +12,8 @@
   import {getGeometryBbox} from "@fig/functions/path/bBox";
   import {Rect} from "$lib/Rect.svelte";
   import {strokeRect} from "$lib/primitive/rect";
-  import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
-  import {keys} from "$lib/stores/keys.svelte";
   import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
   import {setVectorContext} from "$lib/context/vectorContext";
   import type {VectorNode} from "@fig/types/nodes/vector/VectorNode";
@@ -26,6 +24,8 @@
   import VectorLine from "$lib/components/VectorLine.svelte";
   import VectorPoint from "$lib/components/VectorPoint.svelte";
   import VectorCurve from "$lib/components/VectorCurve.svelte";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte";
+  import {keys} from "$lib/stores/keys.svelte";
 
   let {node}: { node: Node } = $props();
 
@@ -86,6 +86,7 @@
       }
     }
   }
+
   // key : string of Vector to represent the coordinates
   // value : array of MLT or C Path command, which are the only ones useful to have endpoints
   let pointsAndCoordinates: { [key: string]: PathCommandWithEndPoint[] } = {};

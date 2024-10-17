@@ -97,13 +97,11 @@
   }
 
   function update() {
-    // Updating each virtual command
-    for (let i = 0; i < listOfCommands.length; i++) {
-      listOfVirtualCommands[i].endPoint = navigation.toVirtualPoint(listOfCommands[i].endPoint);
-    }
 
+    // Updating main visuals
     point.updateCenterPoint(listOfVirtualCommands[0].endPoint)
     point.update()
+
     // Updating hoveredPart, canceling the others if that point is hovered
     if (point.hovered) {
       cursorHover.hoveredPart = part;
