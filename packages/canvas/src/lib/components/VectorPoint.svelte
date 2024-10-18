@@ -14,6 +14,10 @@
   import {Timer} from "$lib/stores/canvasTime.svelte"
   import {selector} from "$lib/components/Selector.svelte";
   import {keys} from "$lib/stores/keys.svelte";
+  import {
+    handleVectorPartDrawing,
+    handleVectorPartSelection
+  } from "$lib/components/shared.svelte";
 
   type Props = {
     geometryIndex: number;
@@ -51,54 +55,25 @@
   canvasContext.updateCanvas(() => [realCommand, part.selected, point.hovered, point.clicked])
 
   // Update selected state
-  $effect(() => {
-    if (dragged) {
-      selector.disable();
-      vectorContext.setDraggedPart(part);
-
-      if (dragged && !part.selected && vectorContext.isDragged(part)) {
-        if (keys.shiftPressed()) {
-          selector.selectPart(part);
-        } else {
-          selector.selectSinglePart(part);
-        }
-      }
-    }
-  })
-
-  $effect(() => {
-    if (!dragged && !canvasClick.pressed) {
-      vectorContext.resetDraggedPart(part);
-    }
-  })
-
-  $effect(() => {
-    if (point.hovered && !selector.inSelection) {
-      selector.disable();
-    } else if (!point.hovered && !dragged) {
-      selector.enable();
-    }
-  })
+  handleVectorPartSelection(() => point.hovered, () => dragged, () => part);
 
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
     if (!loadTimer.finished()) return;
 
-    if (dragged && vectorContext.isDragged(part)) {
-      point.drawSelected(ctx);
-    } else if (point.hovered && part.selected) {
-      point.drawHovered(ctx);
-    } else if (part.selected) {
-      point.drawSelected(ctx);
-    } else if (point.hovered && vectorContext.isDragged(part) === null) {
-      if (point.clicked) {
-        point.drawSelected(ctx);
-      } else {
-        point.drawHovered(ctx);
-      }
-    } else {
-      point.drawDefault(ctx);
-    }
+    handleVectorPartDrawing(ctx, () => point.hovered, () => point.clicked, () => dragged, () => part, drawDefault, drawHovered, drawSelected, vectorContext);
+  }
+
+  function drawDefault(ctx: CanvasRenderingContext2D) {
+    point.drawDefault(ctx);
+  }
+
+  function drawHovered(ctx: CanvasRenderingContext2D) {
+    point.drawHovered(ctx);
+  }
+
+  function drawSelected(ctx: CanvasRenderingContext2D) {
+    point.drawSelected(ctx);
   }
 
   function update() {

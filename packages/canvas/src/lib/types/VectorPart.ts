@@ -7,7 +7,7 @@ import type {CanvasDrawFunction} from "$lib/types/CanvasFunction";
  */
 export type VectorPart = {
   id: string;
-  type: "point" | "line" | "curve";
+  type: "point" | "line" | "curve" | "controlPoint";
   commandsIndex: number[];
 
   draw: CanvasDrawFunction;

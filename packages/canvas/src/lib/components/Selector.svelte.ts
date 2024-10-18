@@ -5,6 +5,7 @@ import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
 import { canvasClick } from "$lib/stores/canvasClick.svelte";
 import { removeDuplicates } from "@fig/functions/array";
 import { canvasColors } from "$lib/stores/canvasColors";
+import { keys } from "$lib/stores/keys.svelte";
 
 class Selector {
   mode: "node" | "vector" = $state("node");
@@ -38,7 +39,9 @@ class Selector {
 
     // Create a rect
     if (canvasClick.pressed && !this.rect) {
-      this.unselectAllParts();
+      if (!keys.shiftPressed()) {
+        this.unselectAllParts();
+      }
       this.inSelection = true;
       this.rect = new Rect({
         x: cursorPosition.x,

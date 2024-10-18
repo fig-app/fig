@@ -79,9 +79,8 @@
   for (const geometry of strokeGeometry) {
     strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
   }
-  console.log(node.name, "Geometry", strokeGeometriesCommands)
 
-  $inspect(parts)
+  // $inspect(selector.disabled)
 
   // Register vector node
   let canvasNode: CanvasNode = $state({

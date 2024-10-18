@@ -8,14 +8,20 @@
   import {useId} from "@fig/functions/id";
   import {
     commandHasEndPoint,
-    isCPathCommand,
-    isMLTPathCommand
+    isCPathCommand
   } from "@fig/functions/path/typeCheck";
   import {cubicCurve} from "$lib/primitive/cubicCurve";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {Timer} from "$lib/stores/canvasTime.svelte";
-  import {EditControlPoint} from "$lib/components/EditControlPoint.svelte";
-  import {pointsDistance} from "@fig/functions/shape/point";
+  import {isCubicBezierHovered} from "@fig/functions/shape/curve/cubic";
+  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
+  import {canvasColors} from "$lib/stores/canvasColors";
+  import VectorControlPoint from "$lib/components/VectorControlPoint.svelte";
+  import {
+    handleVectorPartDrawing,
+    handleVectorPartSelection
+  } from "$lib/components/shared.svelte";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte";
 
   type Props = {
     geometryIndex: number;
@@ -24,6 +30,10 @@
   }
 
   let {geometryIndex, startIndex, endIndex}: Props = $props();
+
+  let hovered = $state(false);
+  let clicked = $state(false);
+  let dragged = $state(false);
 
   let loadTimer = new Timer(10, "Once");
 
@@ -51,24 +61,19 @@
   let virtualStartCommand = $state({...realStartCommand});
   let virtualEndCommand = $state({...realEndCommand});
 
-  // Curve control points
-  let startControlPoint = new EditControlPoint(pointsDistance(realStartCommand.endPoint, realEndCommand.controlPoints.start) > 5)
-  let endControlPoint = new EditControlPoint(pointsDistance(realEndCommand.endPoint, realEndCommand.controlPoints.end) > 5)
+  canvasContext.updateCanvas(() => [realStartCommand, realEndCommand, hovered])
 
-  canvasContext.updateCanvas(() => [realStartCommand, realEndCommand, startControlPoint.hovered, endControlPoint.hovered])
+  // Update selected state
+  handleVectorPartSelection(() => hovered, () => dragged, () => part);
 
+  // Functions
   function draw(ctx: CanvasRenderingContext2D) {
     if (!loadTimer.finished()) return;
 
-    startControlPoint.draw(ctx);
-    endControlPoint.draw(ctx);
+    handleVectorPartDrawing(ctx, () => hovered, () => clicked, () => dragged, () => part, drawDefault, drawHovered, drawSelected, vectorContext);
+  }
 
-    if (isMLTPathCommand(realStartCommand)) {
-
-    } else if (isCPathCommand(realStartCommand)) {
-
-    }
-
+  function drawDefault(ctx: CanvasRenderingContext2D) {
     if (isCPathCommand(virtualEndCommand) && commandHasEndPoint(virtualStartCommand)) {
       cubicCurve({
         ctx,
@@ -76,22 +81,81 @@
         startControlPoint: virtualEndCommand.controlPoints.start,
         endControlPoint: virtualEndCommand.controlPoints.end,
         endPoint: virtualEndCommand.endPoint,
-        color: "#ef1d1d",
+        color: canvasColors.gray,
+        weight: 1,
+      });
+    }
+  }
+
+  function drawHovered(ctx: CanvasRenderingContext2D) {
+    if (isCPathCommand(virtualEndCommand) && commandHasEndPoint(virtualStartCommand)) {
+      cubicCurve({
+        ctx,
+        startPoint: virtualStartCommand.endPoint,
+        startControlPoint: virtualEndCommand.controlPoints.start,
+        endControlPoint: virtualEndCommand.controlPoints.end,
+        endPoint: virtualEndCommand.endPoint,
+        color: canvasColors.lightBlue,
+        weight: 1,
+      });
+    }
+  }
+
+  function drawSelected(ctx: CanvasRenderingContext2D) {
+    if (isCPathCommand(virtualEndCommand) && commandHasEndPoint(virtualStartCommand)) {
+      cubicCurve({
+        ctx,
+        startPoint: virtualStartCommand.endPoint,
+        startControlPoint: virtualEndCommand.controlPoints.start,
+        endControlPoint: virtualEndCommand.controlPoints.end,
+        endPoint: virtualEndCommand.endPoint,
+        color: canvasColors.blue,
         weight: 2,
       });
     }
   }
 
   function update() {
+    // Update states
+    if (isCPathCommand(virtualEndCommand) && commandHasEndPoint(virtualStartCommand)) {
+      hovered = isCubicBezierHovered(
+        virtualStartCommand.endPoint,
+        virtualEndCommand.controlPoints.start,
+        virtualEndCommand.controlPoints.end,
+        virtualEndCommand.endPoint,
+        cursorPosition.pos,
+      );
+      clicked = hovered && canvasClick.pressed;
+      dragged = hovered && canvasClick.pressed && !vectorContext.isDragged(part);
+    }
+
+    // Update virtual commands
     if (commandHasEndPoint(virtualStartCommand) && commandHasEndPoint(realStartCommand)) {
       virtualStartCommand = navigation.toVirtualCommand(realStartCommand);
     }
     if (isCPathCommand(virtualEndCommand) && isCPathCommand(realEndCommand)) {
       virtualEndCommand = navigation.toVirtualCommand(realEndCommand);
-
-      startControlPoint.update(virtualEndCommand.controlPoints.start, virtualStartCommand.endPoint);
-      endControlPoint.update(virtualEndCommand.controlPoints.end, virtualEndCommand.endPoint);
     }
   }
 
 </script>
+
+<!--{#if (part.selected)}-->
+
+{#if (realStartCommand.type === "C")}
+  <VectorControlPoint
+    {geometryIndex}
+    type="start"
+    commandIndex={startIndex}
+  />
+{/if}
+
+{#if (realEndCommand.type === "C")}
+  <VectorControlPoint
+    {geometryIndex}
+    type="end"
+    commandIndex={endIndex}
+  />
+{/if}
+
+<!--{/if}-->
