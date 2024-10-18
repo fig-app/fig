@@ -21,6 +21,10 @@
   import {selector} from "$lib/components/Selector.svelte";
   import {line} from "$lib/primitive/line";
   import {canvasColors} from "$lib/stores/canvasColors";
+  import {
+    handleVectorPartDrawing,
+    handleVectorPartSelection
+  } from "$lib/components/shared.svelte";
 
   type Props = {
     geometryIndex: number;
@@ -81,40 +85,14 @@
   canvasContext.updateCanvas(() => [realStartCommand, realEndCommand, hovered, clicked, part.selected, centerPoint.hovered]);
 
   // Update selected state
+  handleVectorPartSelection(() => hovered, () => dragged, () => part);
+
+  // Special case for center point
   $effect(() => {
-    if (!centerPoint.hovered && dragged) {
-      selector.disable();
-      vectorContext.setDraggedPart(part);
-
-      if (dragged && !part.selected && vectorContext.isDragged(part)) {
-        if (keys.shiftPressed()) {
-          selector.selectPart(part);
-        } else {
-          selector.selectSinglePart(part);
-        }
-      }
-    }
-  });
-
-  $effect(() => {
-    if (!dragged && !canvasClick.pressed) {
-      vectorContext.resetDraggedPart(part);
-    }
-  })
-
-  $effect(() => {
-    if (hovered && !selector.inSelection) {
-      selector.disable();
-    } else if (!hovered && !dragged) {
-      selector.enable();
-    }
-
     if (centerPoint.hovered) {
       selector.disable();
     }
-  })
 
-  $effect(() => {
     if (centerPoint.hovered && !selector.inSelection) {
       selector.disable();
     } else {
@@ -126,21 +104,7 @@
   function draw(ctx: CanvasRenderingContext2D) {
     if (!loadTimer.finished()) return;
 
-    if (dragged && vectorContext.isDragged(part)) {
-      drawSelected(ctx);
-    } else if (hovered && part.selected) {
-      drawHovered(ctx);
-    } else if (part.selected) {
-      drawSelected(ctx);
-    } else if (hovered && vectorContext.isDragged(part) === null) {
-      if (clicked) {
-        drawSelected(ctx);
-      } else {
-        drawHovered(ctx);
-      }
-    } else {
-      drawDefault(ctx);
-    }
+    handleVectorPartDrawing(ctx, () => hovered, () => clicked, () => dragged, () => part, drawDefault, drawHovered, drawSelected, vectorContext);
   }
 
   function update() {

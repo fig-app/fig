@@ -35,7 +35,6 @@ describe("Test parsePathString function", () => {
 
   it("With cubic bezier curve", () => {
     let path = "C 20 20 40 40 50.40 30";
-    console.log(parsePathString(path));
     expect(parsePathString(path)).toStrictEqual([
       {
         type: "C",

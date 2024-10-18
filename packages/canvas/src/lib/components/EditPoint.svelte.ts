@@ -10,51 +10,31 @@ const RADIUS_SELECTED: number = 5;
 const PRIMITIVE_BLUE: string = canvasColors.blue;
 const PRIMITIVE_WHITE: string = canvasColors.white;
 
-type EditPointStates = {
-  hovered: boolean;
-  clicked: boolean;
-  centerPoint: Vector;
-};
-
 export class EditPoint {
-  private states: EditPointStates = $state({
-    hovered: false,
-    clicked: false,
-    centerPoint: { x: 0, y: 0 },
-  });
+  hovered: boolean = $state(false);
+  clicked: boolean = $state(false);
+  centerPoint: Vector = $state({ x: 0, y: 0 });
 
   constructor() {}
 
-  get hovered() {
-    return this.states.hovered;
-  }
-
-  get clicked() {
-    return this.states.clicked;
-  }
-
-  get centerPoint() {
-    return this.states.centerPoint;
-  }
-
   updateCenterPoint(centerPoint: Vector) {
-    this.states.centerPoint = centerPoint;
+    this.centerPoint = centerPoint;
   }
 
   update() {
-    this.states.hovered = isCursorHoveringArc({
+    this.hovered = isCursorHoveringArc({
       cursorPosition,
       arc: {
-        centerPosition: this.states.centerPoint,
+        centerPosition: this.centerPoint,
         radius: RADIUS_DEFAULT + 2,
       },
     });
 
-    this.states.clicked = this.states.hovered && canvasClick.pressed;
+    this.clicked = this.hovered && canvasClick.pressed;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    if (this.states.hovered) {
+    if (this.hovered) {
       this.drawHovered(ctx);
     } else {
       this.drawDefault(ctx);
@@ -64,8 +44,8 @@ export class EditPoint {
   drawDefault(ctx: CanvasRenderingContext2D) {
     arc({
       ctx,
-      x: this.states.centerPoint.x,
-      y: this.states.centerPoint.y,
+      x: this.centerPoint.x,
+      y: this.centerPoint.y,
       radius: RADIUS_DEFAULT,
     });
   }
@@ -73,8 +53,8 @@ export class EditPoint {
   drawHovered(ctx: CanvasRenderingContext2D) {
     arc({
       ctx,
-      x: this.states.centerPoint.x,
-      y: this.states.centerPoint.y,
+      x: this.centerPoint.x,
+      y: this.centerPoint.y,
       radius: RADIUS_DEFAULT,
       colors: {
         background: PRIMITIVE_WHITE,
@@ -86,8 +66,8 @@ export class EditPoint {
   drawSelected(ctx: CanvasRenderingContext2D) {
     arc({
       ctx,
-      x: this.states.centerPoint.x,
-      y: this.states.centerPoint.y,
+      x: this.centerPoint.x,
+      y: this.centerPoint.y,
       radius: RADIUS_SELECTED,
       colors: {
         background: PRIMITIVE_BLUE,
