@@ -79,36 +79,37 @@
   }
 
   // Get all commands with end points, a command is defined thanks to its geometryIdx and its owne idx in the geometry
-  let allCommandsWithEndPoints: [number, number][] = [];
 
-  function updateCommandsWithEndPoints() {
+  function getCommandsWithEndPoints() {
+    let to_ret: [number, number][] = [];
     for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
       for (const [i, command] of geometry.entries()) {
         if (commandHasEndPoint(command)) {
-          allCommandsWithEndPoints.push([gi, i]);
+          to_ret.push([gi, i]);
         }
       }
     }
+    return to_ret;
   }
 
-  updateCommandsWithEndPoints();
+  let allCommandsWithEndPoints: [number, number][] = getCommandsWithEndPoints();
 
   // key : string of Vector to represent the coordinates
   // value : array of MLT or C Path command, which are the only ones useful to have endpoints
-  let pointsAndCoordinates: { [key: string]: [number, number][] } = {};
-
-  function updatePointsAndCoordinates() {
+  function getPointsAndCoordinates() {
+    let to_ret: { [key: string]: [number, number][] } = {};
     allCommandsWithEndPoints.forEach(commandTuple => {
       let command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint;
       const key = vectorToString(command.endPoint);
-      if (!pointsAndCoordinates[key]) {
-        pointsAndCoordinates[key] = [];
+      if (!to_ret[key]) {
+        to_ret[key] = [];
       }
-      pointsAndCoordinates[key].push(commandTuple);
+      to_ret[key].push(commandTuple);
     });
+    return to_ret;
   }
 
-  updatePointsAndCoordinates();
+  let pointsAndCoordinates: { [key: string]: [number, number][] } = getPointsAndCoordinates();
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
@@ -287,8 +288,8 @@
   }
 
   function updateVector() {
-    updateCommandsWithEndPoints();
-    updatePointsAndCoordinates();
+    allCommandsWithEndPoints = getCommandsWithEndPoints();
+    pointsAndCoordinates = getPointsAndCoordinates();
     triggerUpdate = !triggerUpdate;
   }
 
