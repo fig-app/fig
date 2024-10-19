@@ -7,8 +7,10 @@ import type {CanvasDrawFunction} from "$lib/types/CanvasFunction";
  */
 export type VectorPart = {
   id: string;
+
+  listOfCommandTuples: [number, number][];
+
   type: "point" | "line" | "curve" | "controlPoint";
-  commandsIndex: number[];
 
   draw: CanvasDrawFunction;
   update: () => void;

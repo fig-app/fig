@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { parsePathString } from "../src/path";
-import { serializeCommands } from "../src/path/serialize";
+import {describe, expect, it} from "vitest";
+import {parsePathString} from "../src/path";
+import {serializeCommands} from "../src/path/serialize";
 
 describe("Test parsePathString function", () => {
   it("With empty path", () => {
@@ -14,7 +14,7 @@ describe("Test parsePathString function", () => {
       {
         type: "M",
         relative: false,
-        endPoint: { x: 15.2, y: 40 },
+        endPoint: {x: 15.2, y: 40},
       },
       {
         type: "v",
@@ -24,7 +24,7 @@ describe("Test parsePathString function", () => {
       {
         type: "M",
         relative: false,
-        endPoint: { x: 10, y: 5.4 },
+        endPoint: {x: 10, y: 5.4},
       },
       {
         type: "Z",
@@ -40,10 +40,10 @@ describe("Test parsePathString function", () => {
         type: "C",
         relative: false,
         controlPoints: {
-          start: { x: 20, y: 20 },
-          end: { x: 40, y: 40 },
+          start: {x: 20, y: 20},
+          end: {x: 40, y: 40},
         },
-        endPoint: { x: 50.4, y: 30 },
+        endPoint: {x: 50.4, y: 30},
       },
     ]);
   });
@@ -66,7 +66,7 @@ describe("Test serializeCommands", () => {
         {
           type: "M",
           relative: false,
-          endPoint: { x: 15.2, y: 40 },
+          endPoint: {x: 15.2, y: 40},
         },
         {
           type: "v",
@@ -76,7 +76,7 @@ describe("Test serializeCommands", () => {
         {
           type: "M",
           relative: false,
-          endPoint: { x: 10, y: 5.4 },
+          endPoint: {x: 10, y: 5.4},
         },
         {
           type: "Z",

@@ -1,4 +1,4 @@
-import type { Vector } from "@fig/types/properties/Vector";
+import type {Vector} from "@fig/types/properties/Vector";
 
 export type PathCommand = (
   | CPathCommand
@@ -7,7 +7,7 @@ export type PathCommand = (
   | MLTPathCommand
   | HVPathCommand
   | ZPathCommand
-) & { relative: boolean };
+  ) & { relative: boolean };
 
 export interface CPathCommand {
   type: "C" | "c";
@@ -46,6 +46,13 @@ export interface HVPathCommand {
 export interface ZPathCommand {
   type: "Z";
 }
+
+export type PathCommandWithEndPoint = (
+  | CPathCommand
+  | APathCommand
+  | SQPathCommand
+  | MLTPathCommand
+  ) & { relative: boolean };
 
 export interface HasEndPoint {
   endPoint: Vector;

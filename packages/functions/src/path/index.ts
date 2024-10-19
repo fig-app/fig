@@ -1,5 +1,5 @@
-import type { Vector } from "@fig/types/properties/Vector";
-import { PathCommand } from "./PathCommand";
+import type {Vector} from "@fig/types/properties/Vector";
+import {PathCommand} from "./PathCommand";
 
 type ArcDefinition = {
   radii: Vector;
@@ -40,7 +40,7 @@ export function parsePathString(d: string): PathCommand[] {
       if (x === null && !must) return null;
       get("comma");
       let y = get("number", true);
-      return { x: parseFloat(x as string), y: parseFloat(y as string) };
+      return {x: parseFloat(x as string), y: parseFloat(y as string)};
     },
     arc_definition: (must: boolean) => {
       let radii = matchers["coordinate_pair"](must);
@@ -161,7 +161,7 @@ export function parsePathString(d: string): PathCommand[] {
       // Close path
       case "z":
       case "Z":
-        sequence = [{ type: "Z", relative }];
+        sequence = [{type: "Z", relative}];
         break;
     }
 
@@ -180,13 +180,13 @@ export function parsePathString(d: string): PathCommand[] {
       if (!must) return null;
       throw new Error(
         "Expected " +
-          must +
-          " at position " +
-          index +
-          " " +
-          d.charAt(index - 1) +
-          d.charAt(index) +
-          d.charAt(index + 1),
+        must +
+        " at position " +
+        index +
+        " " +
+        d.charAt(index - 1) +
+        d.charAt(index) +
+        d.charAt(index + 1),
       );
     }
 

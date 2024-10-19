@@ -3,31 +3,29 @@
   import {onMount} from "svelte";
   import type {VectorPart} from "$lib/types/VectorPart";
   import {parsePathString} from "@fig/functions/path/index";
-  import VectorLine from "$lib/components/VectorLine.svelte";
   import {normalize} from "@fig/functions/path/normalize";
-  import VectorPoint from "$lib/components/VectorPoint.svelte";
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
   import {colorToString} from "@fig/functions/color";
-  import type {PathCommand} from "@fig/functions/path/PathCommand";
+  import type {PathCommand, PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
   import {Rect} from "$lib/Rect.svelte";
   import {strokeRect} from "$lib/primitive/rect";
-  import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
-  import {keys} from "$lib/stores/keys.svelte";
-  import {
-    getCanvasContext,
-    registerCanvasNode
-  } from "$lib/context/canvasContext";
+  import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
-  import {TransformCorners} from "$lib/components/TransformCorners.svelte";
   import type {VectorNode} from "@fig/types/nodes/vector/VectorNode";
   import type {EmptyData} from "@fig/types/nodes/vector/EmptyData";
-  import VectorCurve from "$lib/components/VectorCurve.svelte";
   import {canvasColors} from "$lib/stores/canvasColors";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte";
+  import {keys} from "$lib/stores/keys.svelte";
+  import {commandHasEndPoint} from "@fig/functions/path/typeCheck";
+  import {vectorToString} from "@fig/functions/vector";
+  import VectorPoint from "$lib/components/VectorPoint.svelte";
+  import VectorLine from "$lib/components/VectorLine.svelte";
+  import VectorCurve from "$lib/components/VectorCurve.svelte";
 
   let {node}: { node: Node } = $props();
 
@@ -38,12 +36,12 @@
   let data = node.node.data as VectorNode<EmptyData>
 
   let parts: Set<VectorPart> = $state(new Set());
+
   let strokePathsSynchronization: Path2D[] = $state([]);
   let strokeGeometriesCommands: PathCommand[][] = $state([]);
 
   let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
   let rect = Rect.new();
-  let transformCorner = new TransformCorners(rect);
 
   let hovered = $state(false);
   let dblclick = $state(false);
@@ -80,7 +78,38 @@
     strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
   }
 
-  // $inspect(selector.disabled)
+  // Get all commands with end points, a command is defined thanks to its geometryIdx and its owne idx in the geometry
+
+  function getCommandsWithEndPoints() {
+    let to_ret: [number, number][] = [];
+    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
+      for (const [i, command] of geometry.entries()) {
+        if (commandHasEndPoint(command)) {
+          to_ret.push([gi, i]);
+        }
+      }
+    }
+    return to_ret;
+  }
+
+  let allCommandsWithEndPoints: [number, number][] = getCommandsWithEndPoints();
+
+  // key : string of Vector to represent the coordinates
+  // value : array of MLT or C Path command, which are the only ones useful to have endpoints
+  function getPointsAndCoordinates() {
+    let to_ret: { [key: string]: [number, number][] } = {};
+    allCommandsWithEndPoints.forEach(commandTuple => {
+      let command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint;
+      const key = vectorToString(command.endPoint);
+      if (!to_ret[key]) {
+        to_ret[key] = [];
+      }
+      to_ret[key].push(commandTuple);
+    });
+    return to_ret;
+  }
+
+  let pointsAndCoordinates: { [key: string]: [number, number][] } = getPointsAndCoordinates();
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
@@ -92,7 +121,38 @@
 
   registerCanvasNode(canvasNode);
 
-  // Functions
+  // Several functions to get the different parts according to their type.
+  // It allows to render them in a specific order (to kind of handle z-index)
+  function getVectorPoints(): VectorPart[] {
+    let list: VectorPart[] = [];
+    parts.forEach(part => {
+      if (part.type == "point") {
+        list.push(part);
+      }
+    })
+    return list;
+  }
+
+  function getVectorLines(): VectorPart[] {
+    let list: VectorPart[] = [];
+    parts.forEach(part => {
+      if (part.type == "line") {
+        list.push(part);
+      }
+    })
+    return list;
+  }
+
+  function getVectorCurves(): VectorPart[] {
+    let list: VectorPart[] = [];
+    parts.forEach(part => {
+      if (part.type == "curve") {
+        list.push(part);
+      }
+    })
+    return list;
+  }
+
   function draw(ctx: CanvasRenderingContext2D) {
 
     // Draw bounding box
@@ -166,9 +226,16 @@
 
     // Update parts
     if (editMode) {
-      for (const part of parts) {
+      // Update in this order to prioritize hover (points > lines)
+      getVectorPoints().forEach(part => {
         part.update();
-      }
+      });
+      getVectorCurves().forEach(part => {
+        part.update();
+      });
+      getVectorLines().forEach(part => {
+        part.update();
+      });
     }
   }
 
@@ -221,26 +288,34 @@
   }
 
   function updateVector() {
+    allCommandsWithEndPoints = getCommandsWithEndPoints();
+    pointsAndCoordinates = getPointsAndCoordinates();
     triggerUpdate = !triggerUpdate;
+  }
+
+  function forceCommandWithEndPoint(command: PathCommand): PathCommandWithEndPoint {
+    return command as PathCommandWithEndPoint;
   }
 
 </script>
 
 {#if (editMode)}
   {#key (triggerUpdate)}
+
     {#each strokeGeometriesCommands as path_commands, gi}
       {#each path_commands as command, i}
 
         <!-- Draw lines -->
         {#if (command.type === "Z")}
-          <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
+          <VectorLine
+            listOfStartCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
+            listOfEndCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][0]).endPoint)]}
+            geometryIndex={gi} startIndex={i - 1}/>
         {:else if (command.type === "L")}
-          <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={i}/>
-        {/if}
-
-        <!-- Draw points -->
-        {#if ((command.type === "M" || command.type === "L" || command.type === "C"))}
-          <VectorPoint geometryIndex={gi} pointIndex={i}/>
+          <VectorLine
+            listOfStartCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
+            listOfEndCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i]).endPoint)]}
+            geometryIndex={gi} startIndex={i - 1}/>
         {/if}
 
         <!--  Draw cubic curves -->
@@ -249,5 +324,10 @@
         {/if}
       {/each}
     {/each}
+
+    {#each Object.values(pointsAndCoordinates) as listOfCommandTuples}
+      <VectorPoint listOfCommandTuples={listOfCommandTuples}/>
+    {/each}
+
   {/key}
 {/if}

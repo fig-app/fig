@@ -9,10 +9,8 @@
   import {setCanvasContext} from "$lib/context/canvasContext";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {selector} from "$lib/components/Selector.svelte";
-  import {
-    DEFAULT_BACKGROUND_COLOR,
-    DEFAULT_GRID_COLOR
-  } from "$lib/stores/canvasColors";
+  import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
+  import type {Vector} from "@fig/types/properties/Vector";
 
   type Props = {
     width?: number;
@@ -42,18 +40,17 @@
   let resizeTimeout: NodeJS.Timeout;
 
   let clickTimeout: NodeJS.Timeout;
+  let isPanning: boolean = false;
+  let startPanningPos: Vector = {
+    x: 0,
+    y: 0,
+  }
+  let lastPanningPos: Vector = {
+    x: 0,
+    y: 0,
+  }
 
-  const ZOOM_AMOUNT: number = 1.1;
-
-  // $inspect(selector.parts).with((type, values) => {
-  //   console.log("Parts", values)
-  // })
-  // $inspect(selector.disabled).with((type, values) => {
-  //   console.log("Disabled", values)
-  // })
-  // $inspect(keys.keyPressed).with((type, values) => {
-  //   console.log("Keys", values)
-  // })
+  const ZOOM_AMOUNT: number = 1.3;
 
   updateCanvas(() => [
     navigation.scale,
@@ -81,7 +78,6 @@
     // Update loop
     function loop(timestamp: number) {
       update(timestamp);
-      // draw();
       frameId = requestAnimationFrame(loop);
     }
 
@@ -211,8 +207,24 @@
     }
   }
 
-  function updateCursorPosition(e: MouseEvent) {
+  function handleMouseMove(e: MouseEvent) {
     cursorPosition.pos = {x: e.clientX, y: e.clientY}
+
+    if (isPanning) {
+      // move delta between last post and current pos
+      let delta: Vector = {
+        x: e.x - lastPanningPos.x,
+        y: e.y - lastPanningPos.y,
+      }
+      navigation.offsetX += delta.x / navigation.scale;
+      navigation.offsetY += delta.y / navigation.scale;
+
+      // For next move
+      lastPanningPos = {
+        x: e.x,
+        y: e.y,
+      }
+    }
   }
 
   function handleWindowResize() {
@@ -265,13 +277,20 @@
   }
 
   function handleScroll(event: WheelEvent) {
-    console.log("Scrolling...");
     // Pan = Absolute distance to move (raw amount of scroll)
     let panX = event.deltaX;
     let panY = event.deltaY;
     // Update offsets for virtual coordinates (check out for scale)
     navigation.offsetX -= panX / navigation.scale;
     navigation.offsetY -= (panY / navigation.scale) / 2;
+  }
+
+  function handleCanvasClick(event: MouseEvent) {
+    canvasClick.setSingleClick(true, {x: event.clientX, y: event.clientY});
+    clearTimeout(clickTimeout);
+    clickTimeout = setTimeout(() => {
+      canvasClick.resetClick()
+    }, 100)
   }
 
 </script>
@@ -281,21 +300,35 @@
 
 <canvas onwheel={handleWheel} bind:this={canvas} {width}
         {height}
-        onmousemove={updateCursorPosition}
-        onclick={(e) => {
-    canvasClick.setSingleClick(true, {x: e.clientX, y: e.clientY});
+        onmousemove={handleMouseMove}
+        onclick={handleCanvasClick}
 
-    clearTimeout(clickTimeout);
-    clickTimeout = setTimeout(() => {
-        canvasClick.resetClick()
-    }, 100)
-}}
-        ondblclick={(e) => {
-    canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
-}}
-        onmousedown={(e) => {
-    canvasClick.setPress(true, {x: e.clientX, y: e.clientY})
-}}
-        onmouseup={(_) => canvasClick.resetClick()}>
+        ondblclick={(e: MouseEvent) => {
+          if (e.button === 0) {
+            canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
+          }
+        }}
+        onmousedown={(e: MouseEvent) => {
+          if (e.button === 0) {
+            canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
+          } else if (e.button === 1) {
+            isPanning = true;
+            startPanningPos = {x: e.x, y: e.y};
+            lastPanningPos = {x: e.x, y: e.y};
+            canvas.style.cursor = 'grabbing';
+          }
+        }}
+        onmouseup={(e: MouseEvent) => {
+          canvasClick.resetClick();
+          if (e.button === 1) {
+            isPanning = false;
+            canvas.style.cursor = "default";
+          }
+        }}
+        onmouseleave={(_) => {
+          isPanning = false;
+            canvas.style.cursor = "default";
+        }}
+>
   {@render children()}
 </canvas>
