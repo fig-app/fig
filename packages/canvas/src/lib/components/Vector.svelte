@@ -15,17 +15,17 @@
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
-  import {setVectorContext} from "$lib/context/vectorContext";
+  import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
   import type {VectorNode} from "@fig/types/nodes/vector/VectorNode";
   import type {EmptyData} from "@fig/types/nodes/vector/EmptyData";
   import {canvasColors} from "$lib/stores/canvasColors";
-  import {commandHasEndPoint} from "@fig/functions/path/typeCheck";
-  import {vectorToString} from "@fig/functions/vector";
-  import VectorLine from "$lib/components/VectorLine.svelte";
-  import VectorPoint from "$lib/components/VectorPoint.svelte";
-  import VectorCurve from "$lib/components/VectorCurve.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {keys} from "$lib/stores/keys.svelte";
+  import {commandHasEndPoint} from "@fig/functions/path/typeCheck";
+  import {vectorToString} from "@fig/functions/vector";
+  import VectorPoint from "$lib/components/VectorPoint.svelte";
+  import VectorLine from "$lib/components/VectorLine.svelte";
+  import VectorCurve from "$lib/components/VectorCurve.svelte";
 
   let {node}: { node: Node } = $props();
 
@@ -56,6 +56,7 @@
   let strokeWeight = $derived(data.strokeWeight * navigation.scale);
 
   let canvasContext = getCanvasContext();
+  let vectorContext = getVectorContext();
 
   // Force update when this variables change (trigger the redraw)
   canvasContext.updateCanvas(() => [hovered, bbox, strokeGeometriesCommands])
@@ -77,27 +78,37 @@
     strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
   }
 
-  // Get all commands with end points, to prevent two vectorPoints to draw at the same coordinates
-  let allCommandsWithEndPoints: PathCommandWithEndPoint[] = [];
-  for (const geometry of strokeGeometriesCommands) {
-    for (const command of geometry) {
-      if (commandHasEndPoint(command)) {
-        allCommandsWithEndPoints.push(command);
+  // Get all commands with end points, a command is defined thanks to its geometryIdx and its owne idx in the geometry
+  let allCommandsWithEndPoints: [number, number][] = [];
+
+  function updateCommandsWithEndPoints() {
+    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
+      for (const [i, command] of geometry.entries()) {
+        if (commandHasEndPoint(command)) {
+          allCommandsWithEndPoints.push([gi, i]);
+        }
       }
     }
   }
 
+  updateCommandsWithEndPoints();
+
   // key : string of Vector to represent the coordinates
   // value : array of MLT or C Path command, which are the only ones useful to have endpoints
-  let pointsAndCoordinates: { [key: string]: PathCommandWithEndPoint[] } = {};
+  let pointsAndCoordinates: { [key: string]: [number, number][] } = {};
 
-  allCommandsWithEndPoints.forEach(command => {
-    const key = vectorToString(command.endPoint);
-    if (!pointsAndCoordinates[key]) {
-      pointsAndCoordinates[key] = [];
-    }
-    pointsAndCoordinates[key].push(command);
-  });
+  function updatePointsAndCoordinates() {
+    allCommandsWithEndPoints.forEach(commandTuple => {
+      let command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint;
+      const key = vectorToString(command.endPoint);
+      if (!pointsAndCoordinates[key]) {
+        pointsAndCoordinates[key] = [];
+      }
+      pointsAndCoordinates[key].push(commandTuple);
+    });
+  }
+
+  updatePointsAndCoordinates();
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
@@ -276,21 +287,34 @@
   }
 
   function updateVector() {
+    updateCommandsWithEndPoints();
+    updatePointsAndCoordinates();
     triggerUpdate = !triggerUpdate;
+  }
+
+  function forceCommandWithEndPoint(command: PathCommand): PathCommandWithEndPoint {
+    return command as PathCommandWithEndPoint;
   }
 
 </script>
 
 {#if (editMode)}
   {#key (triggerUpdate)}
+
     {#each strokeGeometriesCommands as path_commands, gi}
       {#each path_commands as command, i}
 
         <!-- Draw lines -->
         {#if (command.type === "Z")}
-          <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={0}/>
+          <VectorLine
+            listOfStartCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
+            listOfEndCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][0]).endPoint)]}
+            geometryIndex={gi} startIndex={i - 1}/>
         {:else if (command.type === "L")}
-          <VectorLine geometryIndex={gi} startIndex={i - 1} endIndex={i}/>
+          <VectorLine
+            listOfStartCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
+            listOfEndCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i]).endPoint)]}
+            geometryIndex={gi} startIndex={i - 1}/>
         {/if}
 
         <!--  Draw cubic curves -->
@@ -300,10 +324,9 @@
       {/each}
     {/each}
 
-    {#each Object.values(pointsAndCoordinates) as listOfCommands}
-      <VectorPoint
-        listOfCommands={listOfCommands}
-      />
+    {#each Object.values(pointsAndCoordinates) as listOfCommandTuples}
+      <VectorPoint listOfCommandTuples={listOfCommandTuples}/>
     {/each}
+
   {/key}
 {/if}
