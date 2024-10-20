@@ -43,10 +43,11 @@
   let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
   let rect = Rect.new();
 
-  let hovered = $state(false);
-  let dblclick = $state(false);
-  let editMode = $state(false);
-  let triggerUpdate = $state(false);
+  let hovered: boolean = $state(false);
+  let dblclick: boolean = $state(false);
+  let editMode: boolean = $state(false);
+  let fillMode: boolean = $state(false);
+  let triggerUpdate: boolean = $state(false);
 
   let editTimer = new Timer(100, "Once");
 
@@ -79,7 +80,6 @@
   }
 
   // Get all commands with end points, a command is defined thanks to its geometryIdx and its owne idx in the geometry
-
   function getCommandsWithEndPoints() {
     let to_ret: [number, number][] = [];
     for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
@@ -92,7 +92,7 @@
     return to_ret;
   }
 
-  let allCommandsWithEndPoints: [number, number][] = getCommandsWithEndPoints();
+  let allCommandsWithEndPoints: [number, number][] = $state([]);
 
   // key : string of Vector to represent the coordinates
   // value : array of MLT or C Path command, which are the only ones useful to have endpoints
@@ -109,7 +109,14 @@
     return to_ret;
   }
 
-  let pointsAndCoordinates: { [key: string]: [number, number][] } = getPointsAndCoordinates();
+  let pointsAndCoordinates: { [key: string]: [number, number][] } = $state({});
+
+  function updateCommands() {
+    allCommandsWithEndPoints = getCommandsWithEndPoints();
+    pointsAndCoordinates = getPointsAndCoordinates();
+  }
+
+  updateCommands();
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
@@ -210,6 +217,12 @@
     hovered = rect.hovered();
     dblclick = hovered && canvasClick.double;
 
+    // Toggle fill mode
+    if (keys.isPressed("B")) {
+      fillMode = true;
+      editTimer.reset();
+    }
+
     // Toggle edit mode when double click
     if (dblclick && !editMode && editTimer.finished()) {
       editMode = true;
@@ -222,6 +235,13 @@
     // Exit edit mode when pressing enter or escape
     if (editMode && keys.isPressed("Enter") || keys.isPressed("Escape")) {
       editMode = false;
+      fillMode = false;
+      updateCommands();
+    }
+
+    // Update subpaths
+    if (fillMode) {
+      console.log("bouboi !");
     }
 
     // Update parts
@@ -288,8 +308,7 @@
   }
 
   function updateVector() {
-    allCommandsWithEndPoints = getCommandsWithEndPoints();
-    pointsAndCoordinates = getPointsAndCoordinates();
+    updateCommands();
     triggerUpdate = !triggerUpdate;
   }
 
@@ -325,6 +344,7 @@
       {/each}
     {/each}
 
+    <!--  Draw points -->
     {#each Object.values(pointsAndCoordinates) as listOfCommandTuples}
       <VectorPoint listOfCommandTuples={listOfCommandTuples}/>
     {/each}
