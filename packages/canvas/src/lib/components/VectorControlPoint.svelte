@@ -50,14 +50,13 @@
 
   // End point of the control point
   let controlledPoint = $state(type === "start" ? navigation.toVirtualPoint(previousCommand.endPoint) : navigation.toVirtualPoint(controlledCurve.endPoint));
-
   let controlPoint = $state(navigation.toVirtualPoint(controlledCurve.controlPoints[type]));
 
   // Register control point part
   let part: VectorPart = $state({
     id: useId(),
     type: "controlPoint",
-    commandsIndex: [commandIndex],
+    commandTuplesList: [commandIndex],
     draw,
     update,
     selected: false

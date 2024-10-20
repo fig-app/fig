@@ -44,7 +44,7 @@
   let part: VectorPart = $state({
     id: useId(),
     type: "curve",
-    commandsIndex: [startIndex, endIndex],
+    commandTuplesList: [startIndex, endIndex],
     draw,
     update,
     selected: false

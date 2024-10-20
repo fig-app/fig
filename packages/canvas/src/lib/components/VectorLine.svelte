@@ -1,7 +1,11 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
   import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
-  import {centerOfSegment, getLineLength, hoverLine} from "@fig/functions/shape/line";
+  import {
+    centerOfSegment,
+    getLineLength,
+    hoverLine
+  } from "@fig/functions/shape/line";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {useId} from "@fig/functions/id";
@@ -9,23 +13,35 @@
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {EditPoint} from "$lib/components/EditPoint.svelte";
   import {navigation} from "$lib/stores/navigation.svelte";
-  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
+  import {
+    getVectorContext,
+    registerVectorPart
+  } from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
   import {selector} from "$lib/components/Selector.svelte";
   import {line} from "$lib/primitive/line";
   import {canvasColors} from "$lib/stores/canvasColors";
   import {cursorHover} from "$lib/stores/cursorHover.svelte";
-  import {handleVectorPartDrawing, handleVectorPartSelection} from "$lib/components/shared.svelte";
-  import {removeDuplicates} from "@fig/functions/array";
+  import {
+    handleVectorPartDragging,
+    handleVectorPartDrawing,
+    handleVectorPartSelection
+  } from "$lib/components/shared.svelte";
+  import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
 
   type Props = {
     geometryIndex: number;
     startIndex: number;
-    listOfStartCommandTuples: [number, number][];
-    listOfEndCommandTuples: [number, number][];
+    startCommandTuplesList: [number, number][];
+    endCommandTuplesList: [number, number][];
   }
 
-  let {geometryIndex, startIndex, listOfStartCommandTuples, listOfEndCommandTuples}: Props = $props();
+  let {
+    geometryIndex,
+    startIndex,
+    startCommandTuplesList,
+    endCommandTuplesList
+  }: Props = $props();
 
   let hovered = $state(false);
   let clicked = $state(false);
@@ -39,27 +55,29 @@
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
 
+  $inspect(startCommandTuplesList)
+
   // Line real and virtual commands calculated with command tuples (gi, i)[]
-  let listOfStartCommands: PathCommandWithEndPoint[] = [];
-  for (const commandTuple of listOfStartCommandTuples) {
-    listOfStartCommands.push(vectorContext.strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint);
+  let startCommandList: PathCommandWithEndPoint[] = [];
+  for (const commandTuple of startCommandTuplesList) {
+    startCommandList.push(vectorContext.strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint);
   }
-  let listOfVirtualStartCommands = $state<PathCommandWithEndPoint[]>([]);
+  let virtualStartCommandsList = $state<PathCommandWithEndPoint[]>([]);
   $effect(() => {
-    listOfVirtualStartCommands = listOfStartCommands.map((command) => {
+    virtualStartCommandsList = startCommandList.map((command) => {
       const virtualCommand = {...command};
       virtualCommand.endPoint = navigation.toVirtualPoint(virtualCommand.endPoint);
       return virtualCommand;
     })
   })
 
-  let listOfEndCommands: PathCommandWithEndPoint[] = [];
-  for (const commandTuple of listOfEndCommandTuples) {
-    listOfEndCommands.push(vectorContext.strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint);
+  let endCommandsList: PathCommandWithEndPoint[] = [];
+  for (const commandTuple of endCommandTuplesList) {
+    endCommandsList.push(vectorContext.strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint);
   }
-  let listOfVirtualEndCommands = $state<PathCommandWithEndPoint[]>([]);
+  let virtualEndCommandsList = $state<PathCommandWithEndPoint[]>([]);
   $effect(() => {
-    listOfVirtualEndCommands = listOfEndCommands.map((command) => {
+    virtualEndCommandsList = endCommandsList.map((command) => {
       const virtualCommand = {...command};
       virtualCommand.endPoint = navigation.toVirtualPoint(virtualCommand.endPoint);
       return virtualCommand;
@@ -70,7 +88,7 @@
   let part: VectorPart = $state({
     id: useId(),
     type: "line",
-    listOfCommandTuples: removeDuplicates(listOfStartCommandTuples.concat(listOfEndCommandTuples)),
+    commandTuplesList: removeArrayOfTupleDuplicates(startCommandTuplesList.concat(endCommandTuplesList)),
     draw,
     update,
     selected: false
@@ -78,18 +96,18 @@
   registerVectorPart(part);
 
   let virtualLine = $derived({
-    start: listOfVirtualStartCommands[0].endPoint,
-    end: listOfVirtualEndCommands[0].endPoint
+    start: virtualStartCommandsList[0].endPoint,
+    end: virtualEndCommandsList[0].endPoint
   });
 
   let lineLength = $derived(getLineLength({
-    start: listOfVirtualStartCommands[0].endPoint,
-    end: listOfVirtualEndCommands[0].endPoint
+    start: virtualStartCommandsList[0].endPoint,
+    end: virtualEndCommandsList[0].endPoint
   }))
 
   let center = $derived(centerOfSegment({
-    start: listOfVirtualStartCommands[0].endPoint,
-    end: listOfVirtualEndCommands[0].endPoint
+    start: virtualStartCommandsList[0].endPoint,
+    end: virtualEndCommandsList[0].endPoint
   }));
 
   let showCenterPoint = $derived(lineLength > 40);
@@ -124,8 +142,8 @@
     // Be hovered only if nothing but it is being hovered
     hovered = hoverLine({
       line: {
-        start: listOfVirtualStartCommands[0].endPoint,
-        end: listOfVirtualEndCommands[0].endPoint
+        start: virtualStartCommandsList[0].endPoint,
+        end: virtualEndCommandsList[0].endPoint
       }, cursorPosition
     }) && !selector.inSelection && (cursorHover.hoveredPart == null || cursorHover.hoveredPart == part);
     clicked = hovered && canvasClick.single;
@@ -156,17 +174,7 @@
 
     // Move with cursor
     if (dragged && vectorContext.isDragged(part)) {
-      let x = (cursorPosition.x - canvasClick.realClickPoint.x) / navigation.scale;
-      let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
-      canvasClick.setClickPoint(cursorPosition.pos);
-
-      // Move the current point or all the points if several are selected
-      let selectedCommandTuples = selector.selectedPartsCommandTuples();
-      for (const selectedCommandTuple of selectedCommandTuples) {
-        let selectedCommand = vectorContext.strokeGeometriesCommands[selectedCommandTuple[0]][selectedCommandTuple[1]] as PathCommandWithEndPoint;
-        selectedCommand.endPoint.x += x;
-        selectedCommand.endPoint.y += y;
-      }
+      handleVectorPartDragging(vectorContext);
     }
 
     // Move with arrow keys
@@ -209,8 +217,8 @@
   function drawDefault(ctx: CanvasRenderingContext2D) {
     line({
       ctx,
-      start: listOfVirtualStartCommands[0].endPoint,
-      end: listOfVirtualEndCommands[0].endPoint,
+      start: virtualStartCommandsList[0].endPoint,
+      end: virtualEndCommandsList[0].endPoint,
       color: canvasColors.gray
     });
   }
@@ -218,8 +226,8 @@
   function drawHovered(ctx: CanvasRenderingContext2D) {
     line({
       ctx,
-      start: listOfVirtualStartCommands[0].endPoint,
-      end: listOfVirtualEndCommands[0].endPoint,
+      start: virtualStartCommandsList[0].endPoint,
+      end: virtualEndCommandsList[0].endPoint,
       weight: 1,
       color: canvasColors.lightBlue
     });
@@ -232,8 +240,8 @@
   function drawSelected(ctx: CanvasRenderingContext2D) {
     line({
       ctx,
-      start: listOfVirtualStartCommands[0].endPoint,
-      end: listOfVirtualEndCommands[0].endPoint,
+      start: virtualStartCommandsList[0].endPoint,
+      end: virtualEndCommandsList[0].endPoint,
       color: canvasColors.blue,
       weight: 2
     });

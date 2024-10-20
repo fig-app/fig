@@ -7,14 +7,20 @@
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
   import {colorToString} from "@fig/functions/color";
-  import type {PathCommand, PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
+  import type {
+    PathCommand,
+    PathCommandWithEndPoint
+  } from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
   import {Rect} from "$lib/Rect.svelte";
   import {strokeRect} from "$lib/primitive/rect";
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
-  import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
+  import {
+    getCanvasContext,
+    registerCanvasNode
+  } from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
   import type {VectorNode} from "@fig/types/nodes/vector/VectorNode";
   import type {EmptyData} from "@fig/types/nodes/vector/EmptyData";
@@ -78,8 +84,8 @@
     strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
   }
 
-  // Get all commands with end points, a command is defined thanks to its geometryIdx and its owne idx in the geometry
-
+  // Get all commands with end points.
+  // Here a command is defined thanks to its geometryIdx and its own idx in the geometry
   function getCommandsWithEndPoints() {
     let to_ret: [number, number][] = [];
     for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
@@ -94,6 +100,7 @@
 
   let allCommandsWithEndPoints: [number, number][] = getCommandsWithEndPoints();
 
+  // Associate each end point to the list of [geometryIdx, commandIdx] that have this end point
   // key : string of Vector to represent the coordinates
   // value : array of MLT or C Path command, which are the only ones useful to have endpoints
   function getPointsAndCoordinates() {
@@ -109,7 +116,9 @@
     return to_ret;
   }
 
-  let pointsAndCoordinates: { [key: string]: [number, number][] } = getPointsAndCoordinates();
+  let pointsAndCoordinates: {
+    [key: string]: [number, number][]
+  } = $state(getPointsAndCoordinates());
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
@@ -169,13 +178,14 @@
     }
 
     // Update string paths commands of node
+    // This is necessary to update stylized and skeleton drawings
     strokePathsSynchronization = [];
     for (const geometriesCommand of strokeGeometriesCommands) {
       let path = new Path2D(serializeCommands(navigation.toVirtualGeometryCommand(geometriesCommand)));
       strokePathsSynchronization.push(path)
     }
 
-    // draw stylized vector
+    // Draw stylized vector
     for (let path of strokePathsSynchronization) {
       drawPath({
         ctx,
@@ -185,7 +195,7 @@
       });
     }
 
-    // draw vector skeleton on hover
+    // Draw vector skeleton on hover
     if (!editMode && hovered) {
       for (let path of strokePathsSynchronization) {
         drawPath({
@@ -197,7 +207,7 @@
       }
     }
 
-    // draw all parts
+    // Draw all parts
     if (editMode) {
       for (const part of parts) {
         part.draw(ctx);
@@ -308,13 +318,13 @@
         <!-- Draw lines -->
         {#if (command.type === "Z")}
           <VectorLine
-            listOfStartCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
-            listOfEndCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][0]).endPoint)]}
+            startCommandTuplesList={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
+            endCommandTuplesList={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][0]).endPoint)]}
             geometryIndex={gi} startIndex={i - 1}/>
         {:else if (command.type === "L")}
           <VectorLine
-            listOfStartCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
-            listOfEndCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i]).endPoint)]}
+            startCommandTuplesList={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
+            endCommandTuplesList={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i]).endPoint)]}
             geometryIndex={gi} startIndex={i - 1}/>
         {/if}
 
@@ -325,8 +335,8 @@
       {/each}
     {/each}
 
-    {#each Object.values(pointsAndCoordinates) as listOfCommandTuples}
-      <VectorPoint listOfCommandTuples={listOfCommandTuples}/>
+    {#each Object.values(pointsAndCoordinates) as commandTuplesList}
+      <VectorPoint {commandTuplesList}/>
     {/each}
 
   {/key}
