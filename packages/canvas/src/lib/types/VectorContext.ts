@@ -9,6 +9,7 @@ export type VectorContext = {
   resetDraggedPart: (from: VectorPart) => void;
   isDragged: (part: VectorPart) => boolean | null;
 
+  // Array of geometries that contains path commands
   strokeGeometriesCommands: PathCommand[][];
 
   updateVector: () => void;

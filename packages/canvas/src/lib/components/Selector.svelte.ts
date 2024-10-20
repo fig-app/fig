@@ -1,11 +1,11 @@
-import type {VectorPart} from "$lib/types/VectorPart";
-import type {CanvasNode} from "$lib/types/CanvasNode";
-import {Rect} from "$lib/Rect.svelte";
-import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
-import {canvasClick} from "$lib/stores/canvasClick.svelte";
-import {removeDuplicates} from "@fig/functions/array";
-import {canvasColors} from "$lib/stores/canvasColors";
-import {keys} from "$lib/stores/keys.svelte";
+import type { VectorPart } from "$lib/types/VectorPart";
+import type { CanvasNode } from "$lib/types/CanvasNode";
+import { Rect } from "$lib/Rect.svelte";
+import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
+import { canvasClick } from "$lib/stores/canvasClick.svelte";
+import { canvasColors } from "$lib/stores/canvasColors";
+import { keys } from "$lib/stores/keys.svelte";
+import { removeArrayOfTupleDuplicates } from "@fig/functions/array";
 
 class Selector {
   mode: "node" | "vector" = $state("node");
@@ -20,8 +20,7 @@ class Selector {
   inSelection: boolean = $state(false);
   rect: Rect | null = $state(null);
 
-  constructor() {
-  }
+  constructor() {}
 
   draw(ctx: CanvasRenderingContext2D) {
     if (this.disabled) return;
@@ -29,8 +28,8 @@ class Selector {
     if (this.rect) {
       this.rect.drawTopLeft({
         ctx,
-        colors: {stroke: canvasColors.blue},
-        strokeWeight: 1,
+        colors: { stroke: canvasColors.blue },
+        strokeWeight: 2,
       });
     }
   }
@@ -102,6 +101,10 @@ class Selector {
 
   // Vector parts
 
+  hasSelectedParts() {
+    return this.parts.length > 0;
+  }
+
   selectSinglePart(part: VectorPart) {
     this.unselectAllParts();
     this.selectPart(part);
@@ -146,9 +149,13 @@ class Selector {
     return this.parts.includes(part);
   }
 
+  /**
+   * This method returns a list of unique command tuples
+   * It is used to move all the selected parts
+   */
   selectedPartsCommandTuples(): [number, number][] {
-    return removeDuplicates(
-      this.parts.map((part) => part.listOfCommandTuples).flat(),
+    return removeArrayOfTupleDuplicates(
+      this.parts.map((part) => part.commandTuplesList).flat(),
     );
   }
 }

@@ -5,6 +5,9 @@ import {canvasClick} from "$lib/stores/canvasClick.svelte";
 import {selector} from "$lib/components/Selector.svelte";
 import type {CanvasDrawFunction} from "$lib/types/CanvasFunction";
 import type {VectorContext} from "$lib/types/VectorContext";
+import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
+import {navigation} from "$lib/stores/navigation.svelte";
+import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
 
 /**
  * Handle the selection of a vector part
@@ -78,5 +81,27 @@ export function handleVectorPartDrawing(
     }
   } else {
     drawDefault(ctx);
+  }
+}
+
+/**
+ * Handle the dragging of a vector part
+ */
+export function handleVectorPartDragging(vectorContext: VectorContext) {
+  let x = (cursorPosition.x - canvasClick.realClickPoint.x) / navigation.scale;
+  let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
+  canvasClick.setClickPoint(cursorPosition.pos);
+
+  // Move the current point and all the other selected ones
+  let selectedCommandTuples = selector.selectedPartsCommandTuples();
+  // console.log(selectedCommandTuples);
+  for (const selectedCommandTuple of selectedCommandTuples) {
+    let geometryIndex = selectedCommandTuple[0];
+    let commandIndex = selectedCommandTuple[1];
+    let selectedCommand = vectorContext.strokeGeometriesCommands[geometryIndex][
+      commandIndex
+    ] as PathCommandWithEndPoint;
+    selectedCommand.endPoint.x += x;
+    selectedCommand.endPoint.y += y;
   }
 }
