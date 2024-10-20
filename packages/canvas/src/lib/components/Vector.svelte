@@ -98,14 +98,12 @@
     return to_ret;
   }
 
-  let allCommandsWithEndPoints: [number, number][] = getCommandsWithEndPoints();
-
   // Associate each end point to the list of [geometryIdx, commandIdx] that have this end point
   // key : string of Vector to represent the coordinates
   // value : array of MLT or C Path command, which are the only ones useful to have endpoints
   function getPointsAndCoordinates() {
     let to_ret: { [key: string]: [number, number][] } = {};
-    allCommandsWithEndPoints.forEach(commandTuple => {
+    getCommandsWithEndPoints().forEach(commandTuple => {
       let command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint;
       const key = vectorToString(command.endPoint);
       if (!to_ret[key]) {
@@ -223,6 +221,7 @@
     // Toggle edit mode when double click
     if (dblclick && !editMode && editTimer.finished()) {
       editMode = true;
+      pointsAndCoordinates = getPointsAndCoordinates();
       editTimer.reset();
     } else if (canvasClick.double && editMode && editTimer.finished()) {
       editMode = false;
@@ -298,13 +297,16 @@
   }
 
   function updateVector() {
-    allCommandsWithEndPoints = getCommandsWithEndPoints();
     pointsAndCoordinates = getPointsAndCoordinates();
     triggerUpdate = !triggerUpdate;
   }
 
   function forceCommandWithEndPoint(command: PathCommand): PathCommandWithEndPoint {
     return command as PathCommandWithEndPoint;
+  }
+
+  function getCommandTuplesList(geometryIndex: number, commandIndex: number): [number, number][] {
+    return pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[geometryIndex][commandIndex]).endPoint)];
   }
 
 </script>
@@ -318,19 +320,25 @@
         <!-- Draw lines -->
         {#if (command.type === "Z")}
           <VectorLine
-            startCommandTuplesList={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
-            endCommandTuplesList={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][0]).endPoint)]}
-            geometryIndex={gi} startIndex={i - 1}/>
+            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+            endCommandTuplesList={getCommandTuplesList(gi, 0)}
+            geometryIndex={gi}
+            startIndex={i - 1}/>
         {:else if (command.type === "L")}
           <VectorLine
-            startCommandTuplesList={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
-            endCommandTuplesList={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i]).endPoint)]}
-            geometryIndex={gi} startIndex={i - 1}/>
+            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+            endCommandTuplesList={getCommandTuplesList(gi, i)}
+            geometryIndex={gi}
+            startIndex={i - 1}/>
         {/if}
 
         <!--  Draw cubic curves -->
         {#if (command.type === "C")}
-          <VectorCurve geometryIndex={gi} startIndex={i - 1} endIndex={i}/>
+          <VectorCurve
+            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+            endCommandTuplesList={getCommandTuplesList(gi, i)}
+            geometryIndex={gi} startIndex={i - 1}
+          />
         {/if}
       {/each}
     {/each}

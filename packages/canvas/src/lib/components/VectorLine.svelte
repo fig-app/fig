@@ -145,7 +145,7 @@
         start: virtualStartCommandsList[0].endPoint,
         end: virtualEndCommandsList[0].endPoint
       }, cursorPosition
-    }) && !selector.inSelection && (cursorHover.hoveredPart == null || cursorHover.hoveredPart == part);
+    }) && !selector.inSelection && (!cursorHover.hoveredPart || cursorHover.hoveredPart === part);
     clicked = hovered && canvasClick.single;
     dragged = ((dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !vectorContext.isDragged(part))) && !selector.inSelection;
 
@@ -219,7 +219,7 @@
       ctx,
       start: virtualStartCommandsList[0].endPoint,
       end: virtualEndCommandsList[0].endPoint,
-      color: canvasColors.gray
+      color: canvasColors.gray,
     });
   }
 
