@@ -29,7 +29,7 @@ class Selector {
       this.rect.drawTopLeft({
         ctx,
         colors: { stroke: canvasColors.blue },
-        strokeWeight: 1,
+        strokeWeight: 2,
       });
     }
   }
@@ -101,6 +101,10 @@ class Selector {
 
   // Vector parts
 
+  hasSelectedParts() {
+    return this.parts.length > 0;
+  }
+
   selectSinglePart(part: VectorPart) {
     this.unselectAllParts();
     this.selectPart(part);
@@ -145,6 +149,10 @@ class Selector {
     return this.parts.includes(part);
   }
 
+  /**
+   * This method returns a list of unique command tuples
+   * It is used to move all the selected parts
+   */
   selectedPartsCommandTuples(): [number, number][] {
     return removeArrayOfTupleDuplicates(
       this.parts.map((part) => part.commandTuplesList).flat(),

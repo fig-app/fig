@@ -49,7 +49,6 @@
 
   let centerPoint = new EditPoint();
 
-  let keyTimer = new Timer(100, "Repeating");
   let loadTimer = new Timer(10, "Once");
 
   let canvasContext = getCanvasContext();
@@ -175,21 +174,6 @@
     // Move with cursor
     if (dragged && vectorContext.isDragged(part)) {
       handleVectorPartDragging(vectorContext);
-    }
-
-    // Move with arrow keys
-    if (keyTimer.finished() && part.selected && keys.anyPressed) {
-      let shiftMultiplier = keys.shiftPressed() ? 10 : 0.5;
-      let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
-      let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
-
-      // Move the current point or all the points if several are selected
-      let selectedCommandTuples = selector.selectedPartsCommandTuples();
-      for (const selectedCommandTuple of selectedCommandTuples) {
-        let selectedCommand = vectorContext.strokeGeometriesCommands[selectedCommandTuple[0]][selectedCommandTuple[1]] as PathCommandWithEndPoint;
-        selectedCommand.endPoint.x += xShift;
-        selectedCommand.endPoint.y += yShift;
-      }
     }
 
     if (part.selected && keys.shiftPressed()) {
