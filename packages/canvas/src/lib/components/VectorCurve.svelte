@@ -16,20 +16,26 @@
   import {isCubicBezierHovered} from "@fig/functions/shape/curve/cubic";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {canvasColors} from "$lib/stores/canvasColors";
-  import VectorControlPoint from "$lib/components/VectorControlPoint.svelte";
   import {
     handleVectorPartDrawing,
     handleVectorPartSelection
   } from "$lib/components/shared.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
+  import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
 
   type Props = {
     geometryIndex: number;
     startIndex: number;
-    endIndex: number;
+    startCommandTuplesList: [number, number][];
+    endCommandTuplesList: [number, number][];
   }
 
-  let {geometryIndex, startIndex, endIndex}: Props = $props();
+  let {
+    geometryIndex,
+    startIndex,
+    startCommandTuplesList,
+    endCommandTuplesList
+  }: Props = $props();
 
   let hovered = $state(false);
   let clicked = $state(false);
@@ -44,7 +50,7 @@
   let part: VectorPart = $state({
     id: useId(),
     type: "curve",
-    commandsIndex: [startIndex, endIndex],
+    commandTuplesList: removeArrayOfTupleDuplicates(startCommandTuplesList.concat(endCommandTuplesList)),
     draw,
     update,
     selected: false
@@ -56,7 +62,7 @@
   // start command can be line or cubic command
   let realStartCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][startIndex]);
   // end command must be a cubic command
-  let realEndCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][endIndex]);
+  let realEndCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][startIndex + 1]);
 
   let virtualStartCommand = $state({...realStartCommand});
   let virtualEndCommand = $state({...realEndCommand});
@@ -82,7 +88,6 @@
         endControlPoint: virtualEndCommand.controlPoints.end,
         endPoint: virtualEndCommand.endPoint,
         color: canvasColors.gray,
-        weight: 1,
       });
     }
   }
@@ -142,20 +147,20 @@
 
 <!--{#if (part.selected)}-->
 
-{#if (realStartCommand.type === "C")}
-  <VectorControlPoint
-    {geometryIndex}
-    type="start"
-    commandIndex={startIndex}
-  />
-{/if}
+<!--{#if (realStartCommand.type === "C")}-->
+<!--  <VectorControlPoint-->
+<!--    {geometryIndex}-->
+<!--    type="start"-->
+<!--    commandIndex={startIndex}-->
+<!--  />-->
+<!--{/if}-->
 
-{#if (realEndCommand.type === "C")}
-  <VectorControlPoint
-    {geometryIndex}
-    type="end"
-    commandIndex={endIndex}
-  />
-{/if}
+<!--{#if (realEndCommand.type === "C")}-->
+<!--  <VectorControlPoint-->
+<!--    {geometryIndex}-->
+<!--    type="end"-->
+<!--    commandIndex={startIndex + 1}-->
+<!--  />-->
+<!--{/if}-->
 
 <!--{/if}-->
