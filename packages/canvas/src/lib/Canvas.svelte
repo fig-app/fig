@@ -249,7 +249,6 @@
   }
 
   function handleZoom(event: WheelEvent) {
-
     let oldScale = navigation.scale;
     // zooming considering the position of the cursor
     if (event.deltaY > 0) {

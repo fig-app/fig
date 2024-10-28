@@ -26,6 +26,8 @@
   import VectorPoint from "$lib/components/VectorPoint.svelte";
   import VectorLine from "$lib/components/VectorLine.svelte";
   import VectorCurve from "$lib/components/VectorCurve.svelte";
+  import {selector} from "$lib/components/Selector.svelte";
+  import type {Line} from "$lib/types/Line";
 
   let {node}: { node: Node } = $props();
 
@@ -50,6 +52,7 @@
   let triggerUpdate: boolean = $state(false);
 
   let editTimer = new Timer(100, "Once");
+  let keyTimer = new Timer(100, "Repeating");
 
   let draggedPart: VectorPart | null = $state(null);
 
@@ -79,26 +82,26 @@
     strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
   }
 
-  // Get all commands with end points, a command is defined thanks to its geometryIdx and its owne idx in the geometry
+  // Get all commands with end points.
+  // Here a command is defined thanks to its geometryIdx and its own idx in the geometry
   function getCommandsWithEndPoints() {
-    let to_ret: [number, number][] = [];
+    let listOfCommands: [number, number][] = [];
     for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
       for (const [i, command] of geometry.entries()) {
         if (commandHasEndPoint(command)) {
-          to_ret.push([gi, i]);
+          listOfCommands.push([gi, i]);
         }
       }
     }
-    return to_ret;
+    return listOfCommands;
   }
 
-  let allCommandsWithEndPoints: [number, number][] = $state([]);
-
-  // key : string of Vector to represent the coordinates
-  // value : array of MLT or C Path command, which are the only ones useful to have endpoints
+  // Associate each end point to the list of [geometryIdx, commandIdx] that have this end point
+  // key : string of {x, y} to represent the coordinates
+  // value : array of MLT or C Path commands, which are the only ones useful to have endpoints
   function getPointsAndCoordinates() {
     let to_ret: { [key: string]: [number, number][] } = {};
-    allCommandsWithEndPoints.forEach(commandTuple => {
+    getCommandsWithEndPoints().forEach(commandTuple => {
       let command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint;
       const key = vectorToString(command.endPoint);
       if (!to_ret[key]) {
@@ -112,11 +115,26 @@
   let pointsAndCoordinates: { [key: string]: [number, number][] } = $state({});
 
   function updateCommands() {
-    allCommandsWithEndPoints = getCommandsWithEndPoints();
     pointsAndCoordinates = getPointsAndCoordinates();
   }
 
   updateCommands();
+
+  // Get a representation of the vector through 'Lines', which are defined by : startCommand, endCommand, startControl, endControl
+  let allLines: Line[] = [];
+  for (const commandTuple of getCommandsWithEndPoints()) {
+    const command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]]
+    if (command.type == 'C') {
+      allLines.push({
+        startTuple: [commandTuple[0], commandTuple[1] - 1],
+        endTuple: [commandTuple[0], commandTuple[1]],
+        startControl: command.controlPoints.start,
+        endControl: command.controlPoints.end,
+      })
+    }
+  }
+
+  console.log(allLines);
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
@@ -176,13 +194,14 @@
     }
 
     // Update string paths commands of node
+    // This is necessary to update stylized and skeleton drawings
     strokePathsSynchronization = [];
     for (const geometriesCommand of strokeGeometriesCommands) {
       let path = new Path2D(serializeCommands(navigation.toVirtualGeometryCommand(geometriesCommand)));
       strokePathsSynchronization.push(path)
     }
 
-    // draw stylized vector
+    // Draw stylized vector
     for (let path of strokePathsSynchronization) {
       drawPath({
         ctx,
@@ -192,7 +211,7 @@
       });
     }
 
-    // draw vector skeleton on hover
+    // Draw vector skeleton on hover
     if (!editMode && hovered) {
       for (let path of strokePathsSynchronization) {
         drawPath({
@@ -204,11 +223,15 @@
       }
     }
 
-    // draw all parts
+    // Draw all parts
     if (editMode) {
       for (const part of parts) {
         part.draw(ctx);
       }
+    }
+
+    // Update all subpaths in case the shape of the vector has changed
+    {
     }
   }
 
@@ -217,31 +240,28 @@
     hovered = rect.hovered();
     dblclick = hovered && canvasClick.double;
 
-    // Toggle fill mode
-    if (keys.isPressed("B")) {
-      fillMode = true;
-      editTimer.reset();
-    }
-
     // Toggle edit mode when double click
     if (dblclick && !editMode && editTimer.finished()) {
       editMode = true;
+      pointsAndCoordinates = getPointsAndCoordinates();
       editTimer.reset();
     } else if (canvasClick.double && editMode && editTimer.finished()) {
       editMode = false;
       editTimer.reset();
     }
 
-    // Exit edit mode when pressing enter or escape
+    // Toggle fill mode
+    if (keys.isPressed("b") && editMode) {
+      fillMode = true;
+
+      // calculate subpaths once to initialize them...
+    }
+
+    // Exit edit & fill modes when pressing enter or escape
     if (editMode && keys.isPressed("Enter") || keys.isPressed("Escape")) {
       editMode = false;
       fillMode = false;
       updateCommands();
-    }
-
-    // Update subpaths
-    if (fillMode) {
-      console.log("bouboi !");
     }
 
     // Update parts
@@ -256,6 +276,21 @@
       getVectorLines().forEach(part => {
         part.update();
       });
+    }
+
+    // Move selected parts with arrow keys
+    if (editMode && keyTimer.finished() && selector.hasSelectedParts() && keys.anyPressed) {
+      let shiftMultiplier = keys.shiftPressed() ? 10 : 0.5;
+      let xShift = (keys.isPressed("ArrowLeft") ? -1 : keys.isPressed("ArrowRight") ? 1 : 0) * shiftMultiplier;
+      let yShift = (keys.isPressed("ArrowUp") ? -1 : keys.isPressed("ArrowDown") ? 1 : 0) * shiftMultiplier;
+
+      // Move the current point or all the points if several are selected
+      let selectedCommandTuples = selector.selectedPartsCommandTuples();
+      for (const selectedCommandTuple of selectedCommandTuples) {
+        let selectedCommand = strokeGeometriesCommands[selectedCommandTuple[0]][selectedCommandTuple[1]] as PathCommandWithEndPoint;
+        selectedCommand.endPoint.x += xShift;
+        selectedCommand.endPoint.y += yShift;
+      }
     }
   }
 
@@ -316,6 +351,10 @@
     return command as PathCommandWithEndPoint;
   }
 
+  function getCommandTuplesList(geometryIndex: number, commandIndex: number): [number, number][] {
+    return pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[geometryIndex][commandIndex]).endPoint)];
+  }
+
 </script>
 
 {#if (editMode)}
@@ -327,26 +366,32 @@
         <!-- Draw lines -->
         {#if (command.type === "Z")}
           <VectorLine
-            listOfStartCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
-            listOfEndCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][0]).endPoint)]}
-            geometryIndex={gi} startIndex={i - 1}/>
+            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+            endCommandTuplesList={getCommandTuplesList(gi, 0)}
+            geometryIndex={gi}
+            startIndex={i - 1}/>
         {:else if (command.type === "L")}
           <VectorLine
-            listOfStartCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i-1]).endPoint)]}
-            listOfEndCommandTuples={pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[gi][i]).endPoint)]}
-            geometryIndex={gi} startIndex={i - 1}/>
+            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+            endCommandTuplesList={getCommandTuplesList(gi, i)}
+            geometryIndex={gi}
+            startIndex={i - 1}/>
         {/if}
 
         <!--  Draw cubic curves -->
         {#if (command.type === "C")}
-          <VectorCurve geometryIndex={gi} startIndex={i - 1} endIndex={i}/>
+          <VectorCurve
+            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+            endCommandTuplesList={getCommandTuplesList(gi, i)}
+            geometryIndex={gi} startIndex={i - 1}
+          />
         {/if}
       {/each}
     {/each}
 
     <!--  Draw points -->
-    {#each Object.values(pointsAndCoordinates) as listOfCommandTuples}
-      <VectorPoint listOfCommandTuples={listOfCommandTuples}/>
+    {#each Object.values(pointsAndCoordinates) as commandTuplesList}
+      <VectorPoint {commandTuplesList}/>
     {/each}
 
   {/key}
