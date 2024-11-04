@@ -9,7 +9,10 @@
   import {setCanvasContext} from "$lib/context/canvasContext";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {selector} from "$lib/components/Selector.svelte";
-  import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
+  import {
+    DEFAULT_BACKGROUND_COLOR,
+    DEFAULT_GRID_COLOR
+  } from "$lib/stores/canvasColors";
   import type {Vector} from "@fig/types/properties/Vector";
 
   type Props = {
@@ -38,6 +41,7 @@
   let windowWidth = $state(0);
   let windowHeight = $state(0);
   let resizeTimeout: NodeJS.Timeout;
+  let drawTimeout: NodeJS.Timeout;
 
   let clickTimeout: NodeJS.Timeout;
   let isPanning: boolean = false;
@@ -230,10 +234,15 @@
   function handleWindowResize() {
     if (fullscreen) {
       clearTimeout(resizeTimeout);
-      width = windowWidth;
-      height = windowHeight;
-
       resizeTimeout = setTimeout(() => {
+        width = windowWidth;
+        height = windowHeight;
+
+        console.log(`Resizing canvas to ${width}x${height}`);
+      }, 100);
+
+      clearTimeout(drawTimeout);
+      drawTimeout = setTimeout(() => {
         draw();
       }, 100);
     }
@@ -298,11 +307,12 @@
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
                on:resize={handleWindowResize}/>
 
-<canvas onwheel={handleWheel} bind:this={canvas} {width}
+<canvas bind:this={canvas}
+        {width}
         {height}
+        onwheel={handleWheel}
         onmousemove={handleMouseMove}
         onclick={handleCanvasClick}
-
         ondblclick={(e: MouseEvent) => {
           if (e.button === 0) {
             canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
@@ -327,7 +337,7 @@
         }}
         onmouseleave={(_) => {
           isPanning = false;
-            canvas.style.cursor = "default";
+          canvas.style.cursor = "default";
         }}
 >
   {@render children()}

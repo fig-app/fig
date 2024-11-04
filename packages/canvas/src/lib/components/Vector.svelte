@@ -162,6 +162,16 @@
     return list;
   }
 
+  function getVectorControlPoint(): VectorPart[] {
+    let list: VectorPart[] = [];
+    parts.forEach(part => {
+      if (part.type == "controlPoint") {
+        list.push(part);
+      }
+    })
+    return list;
+  }
+
   function draw(ctx: CanvasRenderingContext2D) {
 
     // Draw bounding box
@@ -241,10 +251,13 @@
       getVectorPoints().forEach(part => {
         part.update();
       });
-      getVectorCurves().forEach(part => {
+      getVectorControlPoint().forEach(part => {
         part.update();
       });
       getVectorLines().forEach(part => {
+        part.update();
+      });
+      getVectorCurves().forEach(part => {
         part.update();
       });
     }

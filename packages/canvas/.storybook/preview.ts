@@ -1,7 +1,5 @@
 import type { Preview } from "@storybook/svelte";
 
-import "../src/app.css";
-
 const preview: Preview = {
   parameters: {
     controls: {
@@ -11,7 +9,6 @@ const preview: Preview = {
       },
     },
   },
-  tags: ["autodocs"],
 };
 
 export default preview;

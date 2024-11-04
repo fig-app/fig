@@ -52,7 +52,9 @@ export function isCubicBezierHovered(
   samples: number = 100, // Default number of samples along the curve
 ): boolean {
   for (let i = 0; i <= samples; i++) {
-    const t = i / samples;
+    const tStart = 0.1;
+    const tEnd = 0.9;
+    const t = tStart + (tEnd - tStart) * (i / samples);
     const point = cubicBezierPoint(pstart, cp1, cp2, pend, t);
 
     // Calculate the distance between the mouse position and the point on the curve

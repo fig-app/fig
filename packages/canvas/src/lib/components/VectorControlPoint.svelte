@@ -25,7 +25,7 @@
   type Props = {
     type: "start" | "end",
     geometryIndex: number;
-    commandIndex: number
+    commandIndex: number;
   }
 
   let {type, geometryIndex, commandIndex}: Props = $props();
@@ -52,11 +52,13 @@
   let controlledPoint = $state(type === "start" ? navigation.toVirtualPoint(previousCommand.endPoint) : navigation.toVirtualPoint(controlledCurve.endPoint));
   let controlPoint = $state(navigation.toVirtualPoint(controlledCurve.controlPoints[type]));
 
+  canvasContext.updateCanvas(() => [controlPoint, controlledCurve, hovered])
+
   // Register control point part
   let part: VectorPart = $state({
     id: useId(),
     type: "controlPoint",
-    commandTuplesList: [commandIndex],
+    commandTuplesList: [],
     draw,
     update,
     selected: false
@@ -158,16 +160,15 @@
   }
 
   function update() {
+    controlPoint = navigation.toVirtualPoint(controlledCurve.controlPoints[type]);
     rect.centerX = controlPoint.x;
     rect.centerY = controlPoint.y;
-    controlPoint = navigation.toVirtualPoint(controlledCurve.controlPoints[type]);
     controlledPoint = type === "start" ? navigation.toVirtualPoint(previousCommand.endPoint) : navigation.toVirtualPoint(controlledCurve.endPoint);
 
     hovered = rect.hovered();
     clicked = hovered && canvasClick.pressed;
 
     if (hovered && canvasClick.pressed && clickTimer.finished()) {
-      // toggleSelect();
     }
   }
 
