@@ -1,4 +1,4 @@
-import {dirname, join} from "path";
+import { join, dirname } from "path";
 
 /**
  * This function is used to resolve the absolute path of a package.
@@ -11,21 +11,15 @@ function getAbsolutePath(value) {
 /** @type { import('@storybook/sveltekit').StorybookConfig } */
 const config = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|ts|svelte)"],
-
   addons: [
     getAbsolutePath("@storybook/addon-svelte-csf"),
     getAbsolutePath("@storybook/addon-essentials"),
     getAbsolutePath("@chromatic-com/storybook"),
     getAbsolutePath("@storybook/addon-interactions"),
-    getAbsolutePath("@storybook/addon-mdx-gfm"),
-    getAbsolutePath("@storybook/addon-mdx-gfm")
   ],
-
   framework: {
     name: getAbsolutePath("@storybook/sveltekit"),
     options: {},
   },
-
-  docs: {}
 };
 export default config;

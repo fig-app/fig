@@ -1,8 +1,5 @@
-import type { Preview } from "@storybook/svelte";
-
-import "../src/app.css";
-
-const preview: Preview = {
+/** @type { import('@storybook/svelte').Preview } */
+const preview = {
   parameters: {
     controls: {
       matchers: {
@@ -11,7 +8,6 @@ const preview: Preview = {
       },
     },
   },
-  tags: ["autodocs", "autodocs", "autodocs"],
 };
 
 export default preview;
