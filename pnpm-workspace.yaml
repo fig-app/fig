@@ -3,11 +3,21 @@ packages:
   - 'packages/*'
 
 catalog:
-  vite: '^5.0.3'
+  vite: '^5.0.11'
 catalogs:
   svelte:
-    svelte: '^5.0.0-next.1'
+    svelte: '^5.0.0'
     '@sveltejs/kit': '^2.0.0'
     svelte-check: '^4.0.0'
-    '@sveltejs/vite-plugin-svelte': '^4.0.0-next.6'
+    '@sveltejs/vite-plugin-svelte': '^4.0.0'
     '@sveltejs/adapter-static': '^3.0.5'
+  storybook:
+    "@chromatic-com/storybook": "^1.9.0"
+    "@storybook/addon-essentials": "^8.3.6"
+    "@storybook/addon-interactions": "^8.3.6"
+    "@storybook/addon-links": "^8.3.6"
+    "@storybook/addon-svelte-csf": "^5.0.0-next.5"
+    "@storybook/blocks": "^8.3.6"
+    "@storybook/svelte": "^8.3.6"
+    "@storybook/sveltekit": "^8.3.6"
+    "@storybook/test": "^8.3.6"

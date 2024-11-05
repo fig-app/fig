@@ -22,6 +22,7 @@
   } from "$lib/components/shared.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
+  import VectorControlPoint from "$lib/components/VectorControlPoint.svelte";
 
   type Props = {
     geometryIndex: number;
@@ -145,22 +146,22 @@
 
 </script>
 
-<!--{#if (part.selected)}-->
+{#if (part.selected)}
 
-<!--{#if (realStartCommand.type === "C")}-->
-<!--  <VectorControlPoint-->
-<!--    {geometryIndex}-->
-<!--    type="start"-->
-<!--    commandIndex={startIndex}-->
-<!--  />-->
-<!--{/if}-->
+  {#if (realStartCommand.type === "C")}
+    <VectorControlPoint
+      {geometryIndex}
+      type="start"
+      commandIndex={startIndex}
+    />
+  {/if}
 
-<!--{#if (realEndCommand.type === "C")}-->
-<!--  <VectorControlPoint-->
-<!--    {geometryIndex}-->
-<!--    type="end"-->
-<!--    commandIndex={startIndex + 1}-->
-<!--  />-->
-<!--{/if}-->
+  {#if (realEndCommand.type === "C")}
+    <VectorControlPoint
+      {geometryIndex}
+      type="end"
+      commandIndex={startIndex + 1}
+    />
+  {/if}
 
-<!--{/if}-->
+{/if}
