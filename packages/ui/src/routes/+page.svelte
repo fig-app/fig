@@ -1,13 +1,38 @@
 <script lang="ts">
   import {Button, Input} from "$lib";
-  import {Hash, Percent, Ruler} from "lucide-svelte";
+  import * as Select from "$lib/components/ui/select";
+  import {
+    Component,
+    Crop,
+    Hash,
+    Percent,
+    Ruler,
+    Square,
+    VenetianMask
+  } from "lucide-svelte";
+  import {Option, OptionContainer} from "$lib/components/ui/options/index.js";
 
   function toggleTheme() {
     document.documentElement.classList.toggle("dark");
   }
+
+  // For select
+  const fruits = [
+    {value: "apple", label: "Apple"},
+    {value: "banana", label: "Banana"},
+    {value: "blueberry", label: "Blueberry"},
+    {value: "grapes", label: "Grapes"},
+    {value: "pineapple", label: "Pineapple"}
+  ];
+
+  let value = $state("");
+
+  const triggerContent = $derived(
+    fruits.find((f) => f.value === value)?.label ?? "Select a fruit"
+  );
 </script>
 
-<div class="container py-4">
+<div class="container py-10">
   <Button onclick={toggleTheme}>
     Toggle theme
   </Button>
@@ -17,7 +42,6 @@
   <p>Storybook is <a
     href="https://github.com/frequency-chain/style-guide/issues/37">not yet
     compatible</a> with Svelte 5.</p>
-
 
   <!-- Buttons -->
 
@@ -34,11 +58,11 @@
         Click me
       </Button>
 
-      <Button size="lg" variant="outline">
+      <Button size="lg" variant="secondary">
         Click me
       </Button>
 
-      <Button size="lg" variant="secondary">
+      <Button size="lg" variant="outline">
         Click me
       </Button>
 
@@ -56,11 +80,11 @@
         Click me
       </Button>
 
-      <Button variant="outline">
+      <Button variant="secondary">
         Click me
       </Button>
 
-      <Button variant="secondary">
+      <Button variant="outline">
         Click me
       </Button>
 
@@ -78,11 +102,11 @@
         Click me
       </Button>
 
-      <Button size="sm" variant="outline">
+      <Button size="sm" variant="secondary">
         Click me
       </Button>
 
-      <Button size="sm" variant="secondary">
+      <Button size="sm" variant="outline">
         Click me
       </Button>
 
@@ -100,16 +124,42 @@
         Click me
       </Button>
 
-      <Button disabled variant="outline">
+      <Button disabled variant="secondary">
         Click me
       </Button>
 
-      <Button disabled variant="secondary">
+      <Button disabled variant="outline">
         Click me
       </Button>
 
       <Button disabled variant="ghost">
         Click me
+      </Button>
+    </div>
+    <div class="flex gap-2">
+      <Button size="icon">
+        <Ruler/>
+      </Button>
+      <Button size="icon-sm">
+        <Ruler/>
+      </Button>
+    </div>
+
+    <div class="flex gap-2">
+      <Button size="icon-sm">
+        <Ruler/>
+      </Button>
+      <Button size="icon-sm" variant="destructive">
+        <Ruler/>
+      </Button>
+      <Button size="icon-sm" variant="secondary">
+        <Ruler/>
+      </Button>
+      <Button size="icon-sm" variant="outline">
+        <Ruler/>
+      </Button>
+      <Button size="icon-sm" variant="ghost">
+        <Ruler/>
       </Button>
     </div>
   </div>
@@ -153,5 +203,43 @@
         {/snippet}
       </Input>
     </div>
+  </div>
+
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Options</h2>
+
+  <OptionContainer class="w-[180px]">
+    <Option>
+      <Crop/>
+      Crop image
+    </Option>
+    <Option>
+      <Component/>
+      Create component
+    </Option>
+    <Option>
+      <Square/>
+      Edit object
+    </Option>
+    <Option>
+      <VenetianMask/>
+      Use as mask
+    </Option>
+  </OptionContainer>
+
+  <!-- Select -->
+
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Select</h2>
+
+  <div class="flex flex-col gap-2">
+    <Select.Root type="single" name="favoriteFruit" bind:value>
+      <Select.Trigger class="w-[180px]">
+        {triggerContent}
+      </Select.Trigger>
+      <Select.Content>
+        {#each fruits as fruit}
+          <Select.Item value={fruit.value} label={fruit.label}/>
+        {/each}
+      </Select.Content>
+    </Select.Root>
   </div>
 </div>

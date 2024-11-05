@@ -59,6 +59,10 @@ const config: Config = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        option: {
+          DEFAULT: "hsl(var(--option) / <alpha-value>)",
+          foreground: "hsl(var(--option-foreground) / <alpha-value>)",
+        },
       },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",
