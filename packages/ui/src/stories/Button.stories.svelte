@@ -1,29 +1,12 @@
-<script lang="ts" context="module">
-    import {Button, buttonVariants} from "$lib/button/index";
-    import type { Meta } from '@storybook/svelte'
-
-    export const meta: Meta<Button> = {
-        title: "Button",
-        component: Button,
-        argTypes: {
-            variant: {
-                control: "select",
-                options: Object.keys(buttonVariants['variants']['variant'])
-            },
-            size: {
-                control: "select",
-                options: Object.keys(buttonVariants['variants']['size'])
-            }
-        }
-    }
-</script>
-
 <script lang="ts">
-    import {Story, Template} from "@storybook/addon-svelte-csf";
+  import {Meta, Story, Template} from "@storybook/addon-svelte-csf";
+  import Button from "$lib/components/ui/button/button.svelte";
 </script>
+
+<Meta title="Button" component={Button}/>
 
 <Template let:args>
-    <Button {...args}>Button</Button>
+  <Button {...args}>Hello</Button>
 </Template>
 
-<Story name="Primary Button" />
+<Story name="Default button"/>

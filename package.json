@@ -10,7 +10,9 @@
     "dev:internal-tauri": "turbo watch --filter @fig/app dev",
     "format": "turbo format",
     "build:internal-tauri": "pnpm --filter @fig/app build",
-    "all:package": "turbo package"
+    "all:package": "turbo package",
+    "storybook:ui": "pnpm --filter @fig/ui storybook",
+    "storybook:canvas": "pnpm --filter @fig/canvas storybook"
   },
   "keywords": [],
   "author": "",
