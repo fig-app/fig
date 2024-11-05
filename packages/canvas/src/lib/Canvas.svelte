@@ -247,7 +247,6 @@
 
   function handleWheel(event: WheelEvent) {
     event.preventDefault();
-    console.log(keys.ctrlPressed());
     if (keys.ctrlPressed()) {
       handleZoom(event);
     } else {
@@ -298,7 +297,6 @@
       canvasClick.resetClick()
     }, 100)
   }
-
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
@@ -316,9 +314,12 @@
           }
         }}
         onmousedown={(e: MouseEvent) => {
+          // Left click
           if (e.button === 0) {
             canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
-          } else if (e.button === 1) {
+          }
+          // Middle click -> panning
+          else if (e.button === 1) {
             isPanning = true;
             startPanningPos = {x: e.x, y: e.y};
             lastPanningPos = {x: e.x, y: e.y};
