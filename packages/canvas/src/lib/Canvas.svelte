@@ -9,10 +9,7 @@
   import {setCanvasContext} from "$lib/context/canvasContext";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {selector} from "$lib/components/Selector.svelte";
-  import {
-    DEFAULT_BACKGROUND_COLOR,
-    DEFAULT_GRID_COLOR
-  } from "$lib/stores/canvasColors";
+  import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
   import type {Vector} from "@fig/types/properties/Vector";
 
   type Props = {
@@ -54,7 +51,7 @@
     y: 0,
   }
 
-  const ZOOM_AMOUNT: number = 1.3;
+  const ZOOM_AMOUNT: number = 1.15;
 
   updateCanvas(() => [
     navigation.scale,
@@ -250,6 +247,7 @@
 
   function handleWheel(event: WheelEvent) {
     event.preventDefault();
+    console.log(keys.ctrlPressed());
     if (keys.ctrlPressed()) {
       handleZoom(event);
     } else {

@@ -1,4 +1,4 @@
-import type {Vector} from "@fig/types/properties/Vector";
+import type { Vector } from "@fig/types/properties/Vector";
 
 /**
  * Represent a line that can be curved (start command (point), end command (point), startControl, endControl)

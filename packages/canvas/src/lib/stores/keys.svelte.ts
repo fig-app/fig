@@ -1,4 +1,4 @@
-import type { KeyboardKey } from "@fig/types/KeyboardKey";
+import type {KeyboardKey} from "@fig/types/KeyboardKey";
 
 class Keys {
   keyPressed: KeyboardKey[] = $state([]);
@@ -21,15 +21,9 @@ class Keys {
 
   private handleKeyUp(e: KeyboardEvent) {
     e.preventDefault();
-
-    let isCommand = e.ctrlKey || e.altKey || e.shiftKey || e.metaKey;
-
-    if (!isCommand) {
-      this.keyPressed = [];
-    } else {
-      if (this.containCommandsKey()) {
-        this.keyPressed = this.keyPressed.slice(0, 1);
-      }
+    let idx = this.keyPressed.indexOf(e.key);
+    if (idx > -1) {
+      this.keyPressed.splice(idx, 1);
     }
   }
 

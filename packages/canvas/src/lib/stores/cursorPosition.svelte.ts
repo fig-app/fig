@@ -1,11 +1,10 @@
-import type {Vector} from "@fig/types/properties/Vector";
-import {navigation} from "$lib/stores/navigation.svelte";
+import type { Vector } from "@fig/types/properties/Vector";
+import { navigation } from "$lib/stores/navigation.svelte";
 
 class CursorPosition {
-  private state: Vector = $state({x: 0, y: 0});
+  private state: Vector = $state({ x: 0, y: 0 });
 
-  constructor() {
-  }
+  constructor() {}
 
   get x() {
     return this.state.x;
