@@ -3,7 +3,7 @@
   import SelectScrollUpButton from "./select-scroll-up-button.svelte";
   import SelectScrollDownButton from "./select-scroll-down-button.svelte";
   import {cn} from "$lib/utils.js";
-  import {OptionContainer} from "$lib/components/ui/options/index.js";
+  import {OptionContainer} from "$lib/components/editor/options/index.js";
 
   let {
     ref = $bindable(null),

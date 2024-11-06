@@ -73,6 +73,7 @@ const config: Config = {
       fontFamily: {
         sans: [...fontFamily.sans],
       },
+      fontSize: {},
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

@@ -1,16 +1,22 @@
 <script lang="ts">
-  import {Button, Input} from "$lib";
-  import * as Select from "$lib/components/ui/select";
+  import {Button, Input} from "$lib/index.js";
+  import * as Select from "$lib/components/editor/select/index.js";
+  import * as Tabs from "$lib/components/editor/tabs/index.js";
+
   import {
     Component,
     Crop,
     Hash,
     Percent,
-    Ruler,
+    Ruler, Search,
     Square,
     VenetianMask
   } from "lucide-svelte";
-  import {Option, OptionContainer} from "$lib/components/ui/options/index.js";
+  import {
+    Option,
+    OptionContainer,
+    OptionSeparator
+  } from "$lib/components/editor/options/index.js";
 
   function toggleTheme() {
     document.documentElement.classList.toggle("dark");
@@ -212,10 +218,12 @@
       <Crop/>
       Crop image
     </Option>
+    <OptionSeparator/>
     <Option>
       <Component/>
       Create component
     </Option>
+    <OptionSeparator/>
     <Option>
       <Square/>
       Edit object
@@ -241,5 +249,44 @@
         {/each}
       </Select.Content>
     </Select.Root>
+  </div>
+
+
+  <!-- Tabs -->
+
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Tabs</h2>
+
+  <div class="flex flex-col gap-6">
+
+    <Tabs.Root value="tab-1" class="w-[200px]">
+      <Tabs.List class="grid w-full grid-cols-2">
+        <Tabs.Trigger value="tab-1">Tab 1</Tabs.Trigger>
+        <Tabs.Trigger value="tab-2">Tab 2</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value="tab-1">
+        <p>Tab 1 content</p>
+      </Tabs.Content>
+      <Tabs.Content value="tab-2">
+        <p>Tab 2 content</p>
+      </Tabs.Content>
+    </Tabs.Root>
+
+    <Tabs.Root value="tab-1" class="w-[200px]">
+      <div class="flex items-center justify-between">
+        <Tabs.List class="grid w-full grid-cols-2">
+          <Tabs.Trigger value="tab-1">File</Tabs.Trigger>
+          <Tabs.Trigger value="tab-2">Assets</Tabs.Trigger>
+        </Tabs.List>
+        <Button size="icon-sm" variant="ghost">
+          <Search/>
+        </Button>
+      </div>
+      <Tabs.Content value="tab-1">
+        <p>File</p>
+      </Tabs.Content>
+      <Tabs.Content value="tab-2">
+        <p>Assets</p>
+      </Tabs.Content>
+    </Tabs.Root>
   </div>
 </div>

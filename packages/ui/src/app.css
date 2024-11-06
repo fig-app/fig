@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,14 +8,14 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-    --muted: 300 1% 67%;
-    --muted-foreground: 300 1% 67%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 50%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --input: 0 0% 96%;
     --primary: 205 100% 53%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 90%;
@@ -32,7 +34,7 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    --option: 0 0% 95%;
+    --option: 0 0% 96%;
     --option-foreground: 0 0% 0%;
   }
 
@@ -40,7 +42,7 @@
     --background: 0 0% 17%;
     --foreground: 210 40% 98%;
     --muted: 120 1% 53%;
-    --muted-foreground: 120 1% 53%;
+    --muted-foreground: 120 1% 70%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -77,4 +79,8 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+body {
+  font-family: 'Inter', sans-serif;
 }

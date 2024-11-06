@@ -19,6 +19,6 @@
   }: OptionProps = $props();
 </script>
 
-<div class={cn([optionStyle, className])}>
+<button class={cn([optionStyle, className])}>
   {@render children()}
-</div>
+</button>
