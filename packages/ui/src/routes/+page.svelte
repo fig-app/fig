@@ -2,6 +2,7 @@
   import {Button, Input} from "$lib/index.js";
   import * as Select from "$lib/components/editor/select/index.js";
   import * as Tabs from "$lib/components/editor/tabs/index.js";
+  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
 
   import {
     Component,
@@ -288,5 +289,28 @@
         <p>Assets</p>
       </Tabs.Content>
     </Tabs.Root>
+  </div>
+
+
+  <!-- Tooltip -->
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Tooltip</h2>
+
+  <div class="flex flex-col gap-2 items-start">
+    <Tooltip.Root>
+      <Tooltip.Trigger>Hover to show a tooltip</Tooltip.Trigger>
+      <Tooltip.Content>
+        <Tooltip.Arrow/>
+        <p>Hi I'm a tooltip</p>
+      </Tooltip.Content>
+    </Tooltip.Root>
+    <Tooltip.Root>
+      <Tooltip.Trigger>Hover to show a long tooltip</Tooltip.Trigger>
+      <Tooltip.Content>
+        <Tooltip.Arrow/>
+        <p class="w-[300px]">Lorem ipsum dolor sit amet, consectetur adipiscing
+          elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+          aliqua.</p>
+      </Tooltip.Content>
+    </Tooltip.Root>
   </div>
 </div>

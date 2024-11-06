@@ -4565,7 +4565,7 @@ snapshots:
 
   ast-types@0.16.1:
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   async-lock@1.4.1: {}
 
