@@ -3,6 +3,7 @@
   import * as Select from "$lib/components/editor/select/index.js";
   import * as Tabs from "$lib/components/editor/tabs/index.js";
   import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+  import * as Window from "$lib/components/editor/window/index.js";
 
   import {
     Component,
@@ -37,6 +38,11 @@
   const triggerContent = $derived(
     fruits.find((f) => f.value === value)?.label ?? "Select a fruit"
   );
+
+  // For window
+  let showWindow = $state(false);
+  let windowTop = $state(60);
+  let windowLeft = $state(60);
 </script>
 
 <div class="container py-10">
@@ -49,6 +55,33 @@
   <p>Storybook is <a
     href="https://github.com/frequency-chain/style-guide/issues/37">not yet
     compatible</a> with Svelte 5.</p>
+
+
+  <!-- Window -->
+
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Window</h2>
+
+  <div class="flex gap-4">
+    <Button onclick={() => showWindow = true} variant="secondary">
+      Open window
+    </Button>
+
+    <div class="w-[200px] flex gap-2">
+      <Input placeholder="X" bind:value={windowTop} type="number"/>
+      <Input placeholder="Y" bind:value={windowLeft} type="number"/>
+    </div>
+  </div>
+
+  <Window.Root class="w-[400px]" bind:show={showWindow} top={windowTop}
+               left={windowLeft} minHeight={100}>
+    <Window.Header>
+      Window title
+    </Window.Header>
+
+    <Window.Content class="px-4 py-2">
+      <p>Window content</p>
+    </Window.Content>
+  </Window.Root>
 
   <!-- Buttons -->
 
@@ -313,4 +346,5 @@
       </Tooltip.Content>
     </Tooltip.Root>
   </div>
+
 </div>

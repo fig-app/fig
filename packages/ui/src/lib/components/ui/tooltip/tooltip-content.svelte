@@ -5,7 +5,7 @@
   let {
     ref = $bindable(null),
     class: className,
-    sideOffset = 8,
+    sideOffset = 4,
     ...restProps
   }: TooltipPrimitive.ContentProps = $props();
 </script>
