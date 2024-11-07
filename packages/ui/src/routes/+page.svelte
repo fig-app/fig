@@ -9,10 +9,10 @@
   import {
     Component,
     Crop,
-    Hash,
+    Hash, Link2,
     Percent,
     Ruler, Search,
-    Square,
+    Square, Unlink2,
     VenetianMask
   } from "lucide-svelte";
   import {
@@ -20,6 +20,7 @@
     OptionContainer,
     OptionSeparator
   } from "$lib/components/editor/options/index.js";
+  import {Toggle} from "$lib/components/ui/toggle/index.js";
 
   function toggleTheme() {
     document.documentElement.classList.toggle("dark");
@@ -55,6 +56,9 @@
 
   // and for radio
   let radioValue = $state("all")
+
+  // For toggle
+  let linked = $state(false);
 </script>
 
 <div class="container py-10">
@@ -226,6 +230,35 @@
         </DropdownMenu.RadioGroup>
       </DropdownMenu.Content>
     </DropdownMenu.Root>
+  </div>
+
+
+  <!-- Toggle -->
+
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Toggle</h2>
+
+  <div class="flex gap-2">
+
+    <Toggle>
+      Toggle
+    </Toggle>
+
+    <Toggle bind:pressed={linked} size="icon">
+      {#if (linked)}
+        <Link2/>
+      {:else}
+        <Unlink2/>
+      {/if}
+    </Toggle>
+
+    <Toggle bind:pressed={linked} size="icon-sm">
+      {#if (linked)}
+        <Link2/>
+      {:else}
+        <Unlink2/>
+      {/if}
+    </Toggle>
+
   </div>
 
   <!-- Buttons -->

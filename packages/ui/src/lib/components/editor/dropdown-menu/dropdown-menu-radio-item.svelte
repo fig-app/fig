@@ -22,7 +22,7 @@
 >
   {#snippet children({checked})}
     {#if checked}
-      <Circle class="size-2 fill-current"/>
+      <Circle class="!size-2 fill-current"/>
     {/if}
     {@render childrenProp?.({checked})}
   {/snippet}
