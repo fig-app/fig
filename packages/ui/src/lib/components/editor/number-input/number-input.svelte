@@ -15,8 +15,6 @@
 
 <script lang="ts">
   import {Input} from "$lib/components/ui/input/index.js";
-  import {Portal} from "bits-ui";
-  import {MoveHorizontal} from "lucide-svelte";
 
   let {
     ref = $bindable(undefined),
@@ -44,8 +42,22 @@
 
         direction = Math.sign(e.movementX);
 
-        if (direction !== 0 && value + direction >= min && value + direction <= max) {
-          value += direction;
+        if (direction !== 0) {
+          if (max && direction > 0 && value + direction <= max) {
+            value += direction;
+          } else if (!max && min && direction > 0) {
+            value += direction;
+          }
+
+          if (min && direction < 0 && value + direction >= min) {
+            value += direction;
+          } else if (!min && max && direction < 0) {
+            value += direction;
+          }
+
+          if (!min && !max) {
+            value += direction;
+          }
         }
       }
     })
@@ -57,10 +69,15 @@
   }
 
   $effect(() => {
-    if (value < min) {
-      value = min;
-    } else if (value > max) {
-      value = max;
+    if (min) {
+      if (value < min) {
+        value = min;
+      }
+    }
+    if (max) {
+      if (value > max) {
+        value = max;
+      }
     }
   })
 
