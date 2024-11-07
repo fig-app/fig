@@ -1,13 +1,13 @@
-import type {VectorPart} from "$lib/types/VectorPart";
-import {getVectorContext} from "$lib/context/vectorContext";
-import {keys} from "$lib/stores/keys.svelte";
-import {canvasClick} from "$lib/stores/canvasClick.svelte";
-import {selector} from "$lib/components/Selector.svelte";
-import type {CanvasDrawFunction} from "$lib/types/CanvasFunction";
-import type {VectorContext} from "$lib/types/VectorContext";
-import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
-import {navigation} from "$lib/stores/navigation.svelte";
-import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
+import type { VectorPart } from "$lib/types/VectorPart";
+import { getVectorContext } from "$lib/context/vectorContext";
+import { keys } from "$lib/stores/keys.svelte";
+import { canvasClick } from "$lib/stores/canvasClick.svelte";
+import { selector } from "$lib/components/Selector.svelte";
+import type { CanvasDrawFunction } from "$lib/types/CanvasFunction";
+import type { VectorContext } from "$lib/types/VectorContext";
+import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
+import { navigation } from "$lib/stores/navigation.svelte";
+import type { PathCommandWithEndPoint } from "@fig/functions/path/PathCommand";
 
 /**
  * Handle the selection of a vector part

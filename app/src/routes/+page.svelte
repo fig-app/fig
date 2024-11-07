@@ -3,7 +3,22 @@
   // import Button from "@fig/ui/components/ui/button/button.svelte";
   import Canvas from "@fig/canvas/Canvas.svelte"
   import Vector from "@fig/canvas/components/Vector.svelte"
+  import {keys} from "@fig/canvas/stores/keys.svelte";
+  import {userMode} from "@fig/canvas/stores/userMode.svelte";
+
+  function handleKeyDown() {
+    if (keys.isPressed('p')) {
+      userMode.mode = 'PEN';
+    } else if (keys.isPressed('v')) {
+      userMode.mode = 'SELECTOR';
+    }
+  }
+
 </script>
+
+<svelte:window
+  onkeydown={(handleKeyDown)}
+/>
 
 <div class="overflow-hidden w-[100vw] h-[100vh]">
   <Canvas fullscreen={true}>
@@ -26,4 +41,7 @@
               }
             }}/>
   </Canvas>
+
+  <div class="fixed rounded-lg bottom-4 left-1/2 -translate-x-1/2 h-[48px] w-[420px] bg-white"></div>
+
 </div>

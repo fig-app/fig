@@ -1,11 +1,7 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
   import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
-  import {
-    centerOfSegment,
-    getLineLength,
-    hoverLine
-  } from "@fig/functions/shape/line";
+  import {centerOfSegment, getLineLength, hoverLine} from "@fig/functions/shape/line";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {useId} from "@fig/functions/id";
@@ -13,10 +9,7 @@
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {EditPoint} from "$lib/components/EditPoint.svelte";
   import {navigation} from "$lib/stores/navigation.svelte";
-  import {
-    getVectorContext,
-    registerVectorPart
-  } from "$lib/context/vectorContext";
+  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
   import {selector} from "$lib/components/Selector.svelte";
   import {line} from "$lib/primitive/line";
@@ -53,8 +46,6 @@
 
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
-
-  $inspect(startCommandTuplesList)
 
   // Line real and virtual commands calculated with command tuples (gi, i)[]
   let startCommandList: PathCommandWithEndPoint[] = [];
@@ -133,7 +124,6 @@
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
     if (!loadTimer.finished()) return;
-
     handleVectorPartDrawing(ctx, () => hovered, () => clicked, () => dragged, () => part, drawDefault, drawHovered, drawSelected, vectorContext);
   }
 
@@ -155,19 +145,12 @@
       cursorHover.hoveredPart = null;
     }
 
-    if (selector.rect) {
-      if (selector.pointMode) {
-        if (selector.rect.containLine(virtualLine)) {
-          selector.selectPart(part);
-        } else {
-          selector.unselectPart(part);
-        }
+    // Check for selection with the rectangle selector
+    if (selector.rect && selector.partsMode) {
+      if (selector.rect.containLine(virtualLine)) {
+        selector.selectPart(part);
       } else {
-        if (selector.rect.collideLine(virtualLine)) {
-          selector.selectPart(part);
-        } else {
-          selector.unselectPart(part);
-        }
+        selector.unselectPart(part);
       }
     }
 

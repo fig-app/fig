@@ -1,4 +1,4 @@
-import type {CanvasDrawFunction} from "$lib/types/CanvasFunction";
+import type { CanvasDrawFunction } from "$lib/types/CanvasFunction";
 
 /**
  * Represents a part of a vector when it is in edit mode.

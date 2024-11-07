@@ -9,11 +9,10 @@
   import {setCanvasContext} from "$lib/context/canvasContext";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {selector} from "$lib/components/Selector.svelte";
-  import {
-    DEFAULT_BACKGROUND_COLOR,
-    DEFAULT_GRID_COLOR
-  } from "$lib/stores/canvasColors";
+  import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
   import type {Vector} from "@fig/types/properties/Vector";
+  import {canvasPipeline} from "$lib/stores/canvasPipeline.svelte";
+  import {userMode} from "$lib/stores/userMode.svelte";
 
   type Props = {
     width?: number;
@@ -32,7 +31,7 @@
     children
   }: Props = $props();
 
-  let pipeline: Set<CanvasNode> = $state(new Set());
+  let pipeline: Set<CanvasNode> = canvasPipeline.pipeline;
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D | null = null;
@@ -54,7 +53,7 @@
     y: 0,
   }
 
-  const ZOOM_AMOUNT: number = 1.3;
+  const ZOOM_AMOUNT: number = 1.15;
 
   updateCanvas(() => [
     navigation.scale,
@@ -110,7 +109,7 @@
         if (scheduled) return;
         scheduled = true;
         tick().then(() => {
-          console.log("Update canvas")
+          // console.log("Update canvas")
           scheduled = false;
         });
         return draw();
@@ -258,7 +257,6 @@
   }
 
   function handleZoom(event: WheelEvent) {
-
     let oldScale = navigation.scale;
     // zooming considering the position of the cursor
     if (event.deltaY > 0) {
@@ -300,8 +298,15 @@
     clickTimeout = setTimeout(() => {
       canvasClick.resetClick()
     }, 100)
-  }
 
+    // IN WORK !!! (but do better selector first)
+    // Add new vector when clicking on canvas
+    // If nothing is actually selected
+    // And if in pen mode
+    if (userMode.mode === 'PEN' && !selector.hasSelectedParts()) {
+    } else {
+    }
+  }
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
@@ -319,9 +324,12 @@
           }
         }}
         onmousedown={(e: MouseEvent) => {
+          // Left click
           if (e.button === 0) {
             canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
-          } else if (e.button === 1) {
+          }
+          // Middle click -> panning
+          else if (e.button === 1) {
             isPanning = true;
             startPanningPos = {x: e.x, y: e.y};
             lastPanningPos = {x: e.x, y: e.y};
