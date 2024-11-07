@@ -12,7 +12,6 @@
     } else if (keys.isPressed('v')) {
       userMode.mode = 'SELECTOR';
     }
-    console.log(userMode.mode);
   }
 
 </script>

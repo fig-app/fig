@@ -11,6 +11,8 @@
   import {selector} from "$lib/components/Selector.svelte";
   import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
   import type {Vector} from "@fig/types/properties/Vector";
+  import {canvasPipeline} from "$lib/stores/canvasPipeline.svelte";
+  import {userMode} from "$lib/stores/userMode.svelte";
 
   type Props = {
     width?: number;
@@ -29,7 +31,7 @@
     children
   }: Props = $props();
 
-  let pipeline: Set<CanvasNode> = $state(new Set());
+  let pipeline: Set<CanvasNode> = canvasPipeline.pipeline;
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D | null = null;
@@ -107,7 +109,7 @@
         if (scheduled) return;
         scheduled = true;
         tick().then(() => {
-          console.log("Update canvas")
+          // console.log("Update canvas")
           scheduled = false;
         });
         return draw();
@@ -296,6 +298,14 @@
     clickTimeout = setTimeout(() => {
       canvasClick.resetClick()
     }, 100)
+
+    // IN WORK !!! (but do better selector first)
+    // Add new vector when clicking on canvas
+    // If nothing is actually selected
+    // And if in pen mode
+    if (userMode.mode === 'PEN' && !selector.hasSelectedParts()) {
+    } else {
+    }
   }
 </script>
 

@@ -124,7 +124,6 @@
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
     if (!loadTimer.finished()) return;
-
     handleVectorPartDrawing(ctx, () => hovered, () => clicked, () => dragged, () => part, drawDefault, drawHovered, drawSelected, vectorContext);
   }
 
@@ -146,19 +145,12 @@
       cursorHover.hoveredPart = null;
     }
 
-    if (selector.rect) {
-      if (selector.pointMode) {
-        if (selector.rect.containLine(virtualLine)) {
-          selector.selectPart(part);
-        } else {
-          selector.unselectPart(part);
-        }
+    // Check for selection with the rectangle selector
+    if (selector.rect && selector.partsMode) {
+      if (selector.rect.containLine(virtualLine)) {
+        selector.selectPart(part);
       } else {
-        if (selector.rect.collideLine(virtualLine)) {
-          selector.selectPart(part);
-        } else {
-          selector.unselectPart(part);
-        }
+        selector.unselectPart(part);
       }
     }
 

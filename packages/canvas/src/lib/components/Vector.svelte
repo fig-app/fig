@@ -6,12 +6,12 @@
   import {normalize} from "@fig/functions/path/normalize";
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
-  import {colorToString} from "@fig/functions/color";
+  import {colorToString, getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
   import type {PathCommand, PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
   import {Rect} from "$lib/Rect.svelte";
-  import {strokeRect} from "$lib/primitive/rect";
+  import {rect, strokeRect} from "$lib/primitive/rect";
   import type {Node} from "@fig/types/nodes/Node"
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
@@ -43,7 +43,6 @@
   let strokeGeometriesCommands: PathCommand[][] = $state([]);
 
   let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
-  let rect = Rect.new();
 
   let hovered: boolean = $state(false);
   let dblclick: boolean = $state(false);
@@ -134,14 +133,13 @@
     }
   }
 
-  console.log(allLines);
-
   // Register vector node
   let canvasNode: CanvasNode = $state({
     draw,
     update,
     node: node,
-    selected: false
+    selected: false,
+    boundingBox: Rect.new(),
   });
 
   registerCanvasNode(canvasNode);
@@ -192,15 +190,34 @@
 
     // Draw bounding box
     if (!editMode && canvasNode.selected) {
+      // Draw bounding box of the node
       strokeRect({
         ctx,
-        x: rect.center.x,
-        y: rect.center.y,
-        width: rect.width,
-        height: rect.height,
+        x: canvasNode.boundingBox.center.x,
+        y: canvasNode.boundingBox.center.y,
+        width: canvasNode.boundingBox.width,
+        height: canvasNode.boundingBox.height,
         color: canvasColors.blue,
         strokeWidth: 2,
-      })
+      });
+
+      // Draw 4 drag squares to corners of the bounding rect
+      for (const corner of canvasNode.boundingBox.corners) {
+        rect({
+          ctx,
+          x: corner.x,
+          y: corner.y,
+          width: 10,
+          height: 10,
+          colors: {
+            stroke: getPrimitiveBlue(),
+            background: getPrimitiveWhite(),
+          },
+          radius: 0,
+          rotation: 0,
+          strokeWeight: 2,
+        });
+      }
     }
 
     // Update string paths commands of node
@@ -246,9 +263,19 @@
   }
 
   function update() {
-    updateRect();
-    hovered = rect.hovered();
+    // Update bounding box size and coordinates
+    updateBoundingBox();
+    // To rework -> only hover if one of the parts (still not drawn) is hovered
+    // ----------------------------------------
+    hovered = canvasNode.boundingBox.hovered();
+    // ----------------------------------------
+
     dblclick = hovered && canvasClick.double;
+
+    // Check for selection with selector rectangle
+    if (selector.rect && !selector.partsMode) {
+      canvasNode.selected = selector.rect.collide(canvasNode.boundingBox);
+    }
 
     // Toggle edit mode when double click
     if (dblclick && !editMode && editTimer.finished()) {
@@ -260,7 +287,7 @@
       editTimer.reset();
     }
 
-    // Toggle fill mode
+    // Toggle fill mode (IN WORK)
     if (keys.isPressed("b") && editMode) {
       fillMode = true;
 
@@ -307,8 +334,8 @@
     }
   }
 
-  function updateRect() {
-    rect.update(
+  function updateBoundingBox() {
+    canvasNode.boundingBox.update(
       navigation.toVirtualX(bbox.min.x),
       navigation.toVirtualY(bbox.min.y),
       (bbox.width) * navigation.scale,
