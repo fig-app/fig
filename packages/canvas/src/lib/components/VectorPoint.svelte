@@ -3,10 +3,7 @@
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {useId} from "@fig/functions/id";
   import {navigation} from "$lib/stores/navigation.svelte";
-  import {
-    getVectorContext,
-    registerVectorPart
-  } from "$lib/context/vectorContext";
+  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
   import {EditPoint} from "$lib/components/EditPoint.svelte";
   import {Timer} from "$lib/stores/canvasTime.svelte"
@@ -60,7 +57,7 @@
   registerVectorPart(part);
 
   // Update canvas when this variables change (trigger the redraw)
-  canvasContext.updateCanvas(() => [part.selected, point.hovered, point.clicked])
+  canvasContext.updateCanvas(() => [part.selected, point.hovered, point.clicked]);
 
   // Update selected state
   handleVectorPartSelection(() => point.hovered, () => dragged, () => part);
@@ -68,7 +65,6 @@
   // Functions
   function draw(ctx: CanvasRenderingContext2D) {
     if (!loadTimer.finished()) return;
-
     handleVectorPartDrawing(ctx, () => point.hovered, () => point.clicked, () => dragged, () => part, drawDefault, drawHovered, drawSelected, vectorContext);
   }
 

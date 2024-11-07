@@ -1,26 +1,26 @@
-import type { VectorPart } from "$lib/types/VectorPart";
-import type { CanvasNode } from "$lib/types/CanvasNode";
-import { Rect } from "$lib/Rect.svelte";
-import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
-import { canvasClick } from "$lib/stores/canvasClick.svelte";
-import { canvasColors } from "$lib/stores/canvasColors";
-import { keys } from "$lib/stores/keys.svelte";
-import { removeArrayOfTupleDuplicates } from "@fig/functions/array";
+import type {VectorPart} from "$lib/types/VectorPart";
+import type {CanvasNode} from "$lib/types/CanvasNode";
+import {Rect} from "$lib/Rect.svelte";
+import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
+import {canvasClick} from "$lib/stores/canvasClick.svelte";
+import {canvasColors} from "$lib/stores/canvasColors";
+import {keys} from "$lib/stores/keys.svelte";
+import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
 
 class Selector {
   mode: "node" | "vector" = $state("node");
   nodes: CanvasNode[] = $state([]);
   parts: VectorPart[] = $state([]);
 
-  // If true, the selector will only select point
-  // of vector (and also lines between two points)
-  pointMode: boolean = $state(false);
+  // If true, the selector will only select vectorParts
+  partsMode: boolean = $state(false);
 
   disabled: boolean = $state(false);
   inSelection: boolean = $state(false);
   rect: Rect | null = $state(null);
 
-  constructor() {}
+  constructor() {
+  }
 
   draw(ctx: CanvasRenderingContext2D) {
     if (this.disabled) return;
@@ -28,7 +28,7 @@ class Selector {
     if (this.rect) {
       this.rect.drawTopLeft({
         ctx,
-        colors: { stroke: canvasColors.blue },
+        colors: {stroke: canvasColors.blue},
         strokeWeight: 2,
       });
     }
@@ -37,30 +37,29 @@ class Selector {
   update() {
     if (this.disabled) return;
 
-    // Create a rect
-    if (canvasClick.pressed && !this.rect) {
-      if (!keys.shiftPressed()) {
-        this.unselectAllParts();
+    // Check for dragging
+    if (canvasClick.pressed) {
+      if (!this.rect) {
+        if (!keys.shiftPressed()) {
+          this.unselectAllParts();
+        }
+        this.inSelection = true;
+        this.rect = new Rect({
+          x: cursorPosition.x,
+          y: cursorPosition.y,
+          width: 0,
+          height: 0,
+        });
+      } else {
+        this.rect.width = cursorPosition.x - this.rect.x;
+        this.rect.height = cursorPosition.y - this.rect.y;
       }
-      this.inSelection = true;
-      this.rect = new Rect({
-        x: cursorPosition.x,
-        y: cursorPosition.y,
-        width: 0,
-        height: 0,
-      });
     }
 
-    // Remove the rect
+    // Remove the rect if not dragging anymore
     if (!canvasClick.pressed && this.rect) {
       this.inSelection = false;
       this.rect = null;
-    }
-
-    // Update the rect
-    if (this.rect) {
-      this.rect.width = cursorPosition.x - this.rect.x;
-      this.rect.height = cursorPosition.y - this.rect.y;
     }
   }
 
@@ -72,23 +71,22 @@ class Selector {
     this.disabled = false;
   }
 
-  // Nodes
-
-  select(node: CanvasNode) {
+  // Nodes (for now not used functions)
+  selectNode(node: CanvasNode) {
     if (!this.nodeIsSelected(node)) {
       node.selected = true;
       this.nodes.push(node);
     }
   }
 
-  unselect(node: CanvasNode) {
+  unselectNode(node: CanvasNode) {
     if (this.nodeIsSelected(node)) {
       node.selected = false;
       this.nodes.splice(this.nodes.indexOf(node), 1);
     }
   }
 
-  unselectAll() {
+  unselectAllNodes() {
     for (const node of this.nodes) {
       node.selected = false;
     }
@@ -100,7 +98,6 @@ class Selector {
   }
 
   // Vector parts
-
   hasSelectedParts() {
     return this.parts.length > 0;
   }
@@ -113,7 +110,7 @@ class Selector {
   selectPart(part: VectorPart) {
     if (!this.partIsSelected(part)) {
       if (part.type === "point") {
-        this.pointMode = true;
+        this.partsMode = true;
       }
       part.selected = true;
       this.parts.push(part);
@@ -131,7 +128,7 @@ class Selector {
           this.parts.filter((part) => part.type === "point").length > 0;
 
         if (!hasPoint) {
-          this.pointMode = false;
+          this.partsMode = false;
         }
       }
     }
@@ -142,7 +139,7 @@ class Selector {
       part.selected = false;
     }
     this.parts = [];
-    this.pointMode = false;
+    this.partsMode = false;
   }
 
   partIsSelected(part: VectorPart) {
