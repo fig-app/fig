@@ -7,6 +7,7 @@
   import * as DropdownMenu from "$lib/components/editor/dropdown-menu/index.js";
 
   import {
+    Banana,
     Component,
     Crop,
     Hash, Link2,
@@ -21,6 +22,8 @@
     OptionSeparator
   } from "$lib/components/editor/options/index.js";
   import {Toggle} from "$lib/components/ui/toggle/index.js";
+  import {InputGroup} from "$lib/components/ui/input/index.js";
+  import {NumberInput} from "$lib/components/editor/number-input/index.js";
 
   function toggleTheme() {
     document.documentElement.classList.toggle("dark");
@@ -59,6 +62,9 @@
 
   // For toggle
   let linked = $state(false);
+
+  // For number input
+  let numberInputValue = $state(50);
 </script>
 
 <div class="container py-10">
@@ -71,6 +77,25 @@
   <p>Storybook is <a
     href="https://github.com/frequency-chain/style-guide/issues/37">not yet
     compatible</a> with Svelte 5.</p>
+
+
+  <!-- Number input -->
+
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Number input</h2>
+
+
+  <div class="flex flex-col gap-2">
+    <NumberInput class="w-[100px]" min="0" max="100" bind:value={numberInputValue}>
+      {#snippet right()}
+        <Percent/>
+      {/snippet}
+    </NumberInput>
+    <NumberInput class="w-[100px]" min="0" max="100" suffix="%" bind:value={numberInputValue}>
+      {#snippet left()}
+        <Banana/>
+      {/snippet}
+    </NumberInput>
+  </div>
 
 
   <!-- Window -->
@@ -420,6 +445,39 @@
           <Hash/>
         {/snippet}
       </Input>
+    </div>
+  </div>
+
+
+  <!-- Input group -->
+
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Input group</h2>
+
+  <div class="flex flex-col gap-2">
+    <div class="grid grid-cols-3 gap-2">
+      <InputGroup>
+        <Input size="lg" placeholder="Number"/>
+        <Input size="lg" placeholder="Number"/>
+      </InputGroup>
+      <InputGroup>
+        <Input placeholder="Number"/>
+        <Input placeholder="Number"/>
+      </InputGroup>
+      <InputGroup>
+        <Input size="sm" placeholder="Number"/>
+        <Input size="sm" placeholder="Number"/>
+      </InputGroup>
+    </div>
+
+    <div class="flex gap-2">
+      <InputGroup>
+        <Input class="w-[150px]" value="#FFFFFF"/>
+        <Input class="w-[100px]" value="100">
+          {#snippet right()}
+            <Percent/>
+          {/snippet}
+        </Input>
+      </InputGroup>
     </div>
   </div>
 

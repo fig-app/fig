@@ -12,10 +12,10 @@
         sm: "px-2 py-1 h-fit [&_svg]:size-3",
         lg: "h-12",
       },
-      defaultVariants: {
-        size: "default",
-      },
-    }
+    },
+    defaultVariants: {
+      size: "default",
+    },
   });
 
   export type InputSize = VariantProps<typeof inputVariants>["size"];
