@@ -2,6 +2,8 @@
   import type {Snippet} from "svelte";
   import type {HTMLAttributes} from "svelte/elements";
 
+  export const optionContainerStyle = "relative z-50 bg-option rounded-[12px] px-2 py-2 border border-border h-fit";
+
   export type OptionContainerProps = HTMLAttributes<HTMLDivElement> & {
     children: Snippet
   }
@@ -14,6 +16,6 @@
 </script>
 
 <div
-  class={cn(["bg-option rounded-[12px] px-2 py-2 border border-border h-fit", className])}>
+  class={cn(optionContainerStyle, className)}>
   {@render children()}
 </div>

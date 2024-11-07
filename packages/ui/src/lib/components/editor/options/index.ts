@@ -1,5 +1,13 @@
 import Option, { optionStyle } from "./option.svelte";
-import OptionContainer from "./option-container.svelte";
+import OptionContainer, {
+  optionContainerStyle,
+} from "./option-container.svelte";
 import OptionSeparator from "./option-separator.svelte";
 
-export { OptionContainer, OptionSeparator, Option, optionStyle };
+export {
+  OptionContainer,
+  OptionSeparator,
+  Option,
+  optionStyle,
+  optionContainerStyle,
+};

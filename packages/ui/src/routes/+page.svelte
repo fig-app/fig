@@ -4,6 +4,7 @@
   import * as Tabs from "$lib/components/editor/tabs/index.js";
   import * as Tooltip from "$lib/components/ui/tooltip/index.js";
   import * as Window from "$lib/components/editor/window/index.js";
+  import * as DropdownMenu from "$lib/components/editor/dropdown-menu/index.js";
 
   import {
     Component,
@@ -43,6 +44,17 @@
   let showWindow = $state(false);
   let windowTop = $state(60);
   let windowLeft = $state(60);
+
+  // For dropdown with checkbox
+  let options = $state({
+    pixelGrid: true,
+    snap: true,
+    layoutGrid: false,
+    rulers: false
+  })
+
+  // and for radio
+  let radioValue = $state("all")
 </script>
 
 <div class="container py-10">
@@ -75,13 +87,146 @@
   <Window.Root class="w-[400px]" bind:show={showWindow} top={windowTop}
                left={windowLeft} minHeight={100}>
     <Window.Header>
-      Window title
+      <Window.Title>Window title</Window.Title>
     </Window.Header>
 
     <Window.Content class="px-4 py-2">
       <p>Window content</p>
     </Window.Content>
   </Window.Root>
+
+
+  <!-- Dropdown Menu -->
+
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Dropdown Menu</h2>
+
+  <div class="flex gap-4">
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger>
+        <Button variant="secondary">
+          Open menu
+        </Button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.Item>
+          Back to files
+        </DropdownMenu.Item>
+        <OptionSeparator/>
+        <DropdownMenu.Item>
+          <Search/>
+          Actions...
+          <DropdownMenu.Shortcut>
+            Ctrl+K
+          </DropdownMenu.Shortcut>
+        </DropdownMenu.Item>
+        <OptionSeparator/>
+        <DropdownMenu.Sub>
+          <DropdownMenu.SubTrigger>
+            File
+          </DropdownMenu.SubTrigger>
+          <DropdownMenu.SubContent>
+            <DropdownMenu.Item>
+              New design file
+            </DropdownMenu.Item>
+            <DropdownMenu.Item>
+              New FigJam file
+            </DropdownMenu.Item>
+            <OptionSeparator/>
+            <DropdownMenu.Item>
+              Export...
+              <DropdownMenu.Shortcut>
+                Ctrl+Shift+E
+              </DropdownMenu.Shortcut>
+            </DropdownMenu.Item>
+          </DropdownMenu.SubContent>
+        </DropdownMenu.Sub>
+        <DropdownMenu.Sub>
+          <DropdownMenu.SubTrigger>
+            Edit
+          </DropdownMenu.SubTrigger>
+          <DropdownMenu.SubContent>
+            <DropdownMenu.Item>
+              Undo
+              <DropdownMenu.Shortcut>
+                Ctrl+Z
+              </DropdownMenu.Shortcut>
+            </DropdownMenu.Item>
+            <DropdownMenu.Item>
+              Redo
+              <DropdownMenu.Shortcut>
+                Ctrl+Y
+              </DropdownMenu.Shortcut>
+            </DropdownMenu.Item>
+          </DropdownMenu.SubContent>
+        </DropdownMenu.Sub>
+        <DropdownMenu.Sub>
+          <DropdownMenu.SubTrigger>
+            View
+          </DropdownMenu.SubTrigger>
+          <DropdownMenu.SubContent>
+            <DropdownMenu.CheckboxItem bind:checked={options.pixelGrid}>
+              Pixel grid
+            </DropdownMenu.CheckboxItem>
+            <DropdownMenu.CheckboxItem bind:checked={options.snap}>
+              Snap to pixel grid
+            </DropdownMenu.CheckboxItem>
+            <DropdownMenu.CheckboxItem bind:checked={options.layoutGrid}>
+              Layout grids
+            </DropdownMenu.CheckboxItem>
+            <DropdownMenu.CheckboxItem bind:checked={options.rulers}>
+              Rulers
+            </DropdownMenu.CheckboxItem>
+          </DropdownMenu.SubContent>
+        </DropdownMenu.Sub>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger>
+        <Button variant="secondary">
+          Options
+        </Button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.CheckboxItem bind:checked={options.pixelGrid}>
+          Pixel grid
+        </DropdownMenu.CheckboxItem>
+        <DropdownMenu.CheckboxItem bind:checked={options.snap}>
+          Snap to pixel grid
+        </DropdownMenu.CheckboxItem>
+        <DropdownMenu.CheckboxItem bind:checked={options.layoutGrid}>
+          Layout grids
+        </DropdownMenu.CheckboxItem>
+        <DropdownMenu.CheckboxItem bind:checked={options.rulers}>
+          Rulers
+        </DropdownMenu.CheckboxItem>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger>
+        <Button variant="secondary">
+          Filter by
+        </Button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.RadioGroup bind:value={radioValue}>
+          <DropdownMenu.RadioItem value="all">
+            All
+          </DropdownMenu.RadioItem>
+          <DropdownMenu.RadioItem value="images">
+            Images
+          </DropdownMenu.RadioItem>
+          <DropdownMenu.RadioItem value="videos">
+            Videos
+          </DropdownMenu.RadioItem>
+          <DropdownMenu.RadioItem value="audio">
+            Audio
+          </DropdownMenu.RadioItem>
+        </DropdownMenu.RadioGroup>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+  </div>
 
   <!-- Buttons -->
 

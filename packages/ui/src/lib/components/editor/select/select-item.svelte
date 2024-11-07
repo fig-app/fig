@@ -19,17 +19,15 @@
   {value}
   class={cn(
     optionStyle,
-		"data-[highlighted]:bg-primary data-[highlighted]:text-primary-foreground relative flex w-full cursor-default select-none items-center rounded-sm pl-7 pr-2 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+		"data-[highlighted]:bg-primary data-[highlighted]:text-primary-foreground rounded-sm pl-7 pr-2 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 		className
 	)}
   {...restProps}
 >
   {#snippet children({selected, highlighted})}
-		<span class="absolute left-2 flex size-3 items-center justify-center">
-			{#if selected}
-				<Check class="size-4"/>
-			{/if}
-		</span>
+    {#if selected}
+      <Check class="size-4 left-2"/>
+    {/if}
     {#if childrenProp}
       {@render childrenProp({selected, highlighted})}
     {:else}

@@ -1,14 +1,15 @@
 <script lang="ts" module>
-  import {type Snippet} from "svelte";
+  import type {Snippet} from "svelte";
   import type {HTMLAttributes} from "svelte/elements";
+  import type {WithElementRef} from "bits-ui";
 
-  export type WindowProps = HTMLAttributes<HTMLDivElement> & {
-    ref?: HTMLElement;
+  export type WindowProps = WithElementRef<HTMLAttributes<HTMLDivElement>> & {
     minWidth?: number;
     minHeight?: number;
     top?: number;
     left?: number;
     show?: boolean;
+    closeWhenClickOutside?: boolean;
     children: Snippet;
   }
 
@@ -30,6 +31,7 @@
     top = 0,
     left = 0,
     show = $bindable(false),
+    closeWhenClickOutside = true,
     children,
     ...restProps
   }: WindowProps = $props();
@@ -64,7 +66,7 @@
 
   // Function that is used to close the window when clicking outside
   function handleClickOutside(event: MouseEvent) {
-    if (canClose && ref && !ref.contains(event.target as Node)) {
+    if (closeWhenClickOutside && canClose && ref && !ref.contains(event.target as Node)) {
       closeWindow();
     }
   }
@@ -83,7 +85,7 @@
       bind:this={ref}
       bind:this={windowContext.windowRef}
       class={cn(
-        "absolute z-40 bg-background border border-border rounded-[12px] divide-y divide-border shadow-2xl",
+        "absolute z-40 bg-background border border-border rounded-[12px] divide-y divide-border shadow-xl",
         className
       )}
       style:min-width={minWidth + "px"}

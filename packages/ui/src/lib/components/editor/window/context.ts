@@ -5,7 +5,7 @@ const WINDOW_TAG = Symbol("WINDOW");
 export type WindowContext = {
   top: number;
   left: number;
-  windowRef: HTMLElement | undefined;
+  windowRef: HTMLElement | undefined | null;
   closeWindow: () => void;
 };
 
