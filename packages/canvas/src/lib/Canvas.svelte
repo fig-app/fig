@@ -78,6 +78,7 @@
 
   onMount(() => {
     ctx = canvas.getContext("2d");
+    canvasRenderingContext.ctx = canvas.getContext("2d");
 
     // Update loop
     function loop(timestamp: number) {

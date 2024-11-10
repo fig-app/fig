@@ -29,10 +29,9 @@
   import {selector} from "$lib/components/Selector.svelte";
   import type {Line} from "@fig/types/shapes/Line";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
-  import {hoverLineWithDistance} from "@fig/functions/shape/line";
-  import {getHoverMarginDistance} from "@fig/functions/distance";
   import type {Curve} from "@fig/types/shapes/Curve";
-  import {isCubicBezierHovered} from "@fig/functions/shape/curve/cubic";
+  import {canvasRenderingContext} from "$lib/stores/canvasRenderingContext.svelte";
+  import {getHoverMarginDistance} from "@fig/functions/distance";
 
   let {node}: { node: Node } = $props();
 
@@ -119,7 +118,7 @@
     return getPointsAndCoordinates();
   });
 
-  // Get all vector parts' shape (lines & curve) of the vector (for the hover)
+  // TO KEEP EVEN IF USELESS FOR NOW : Get all vector parts' shape (lines & curve) of the vector (for the hover)
   let allLines: Line[] = $derived.by(() => {
     let allLines: Line[] = [];
     for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
@@ -292,27 +291,15 @@
   // ######################################################
 
   function isVectorHovered(): boolean {
-    // Check if any line of the vector is hovered
-    for (const line of allLines) {
-      if (hoverLineWithDistance({
-        line,
-        cursorPosition,
-        distance: Math.max(navigation.scale, getHoverMarginDistance())
-      })) {
-        return true;
+    for (const path of strokePathsSynchronization) {
+      if (canvasRenderingContext.ctx) {
+        canvasRenderingContext.ctx.lineWidth = Math.max(getHoverMarginDistance(), navigation.scale);
+        if (canvasRenderingContext.ctx.isPointInStroke(path, cursorPosition.x, cursorPosition.y)) {
+          return true;
+        }
       }
     }
-    // Check if any curve of the vector is hovered
-    for (const curve of allCurves) {
-      if (isCubicBezierHovered(curve.start,
-        curve.startControl,
-        curve.endControl,
-        curve.end,
-        cursorPosition,
-        Math.max(navigation.scale, getHoverMarginDistance()))) {
-        return true;
-      }
-    }
+
     return false;
   }
 
