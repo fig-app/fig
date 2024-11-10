@@ -27,7 +27,10 @@
   import VectorLine from "$lib/components/VectorLine.svelte";
   import VectorCurve from "$lib/components/VectorCurve.svelte";
   import {selector} from "$lib/components/Selector.svelte";
-  import type {Line} from "$lib/types/Line";
+  import type {Line} from "@fig/types/shapes/Line";
+  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
+  import {hoverLineWithDistance} from "@fig/functions/shape/line";
+  import {getHoverMarginDistance} from "@fig/functions/distance";
 
   let {node}: { node: Node } = $props();
 
@@ -113,25 +116,34 @@
 
   let pointsAndCoordinates: { [key: string]: [number, number][] } = $state({});
 
+  // Get all vector parts' shape of the vector (for the hover)
+  let allLines: Line[] = $derived.by(() => {
+    let allLines: Line[] = [];
+    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
+      for (const [i, command] of geometry.entries()) {
+        const prevCommand = strokeGeometriesCommands[gi][i - 1] as PathCommandWithEndPoint;
+        const firstCommand = strokeGeometriesCommands[gi][0] as PathCommandWithEndPoint;
+        if (command.type === 'L') {
+          allLines.push({
+            start: navigation.toVirtualPoint(prevCommand.endPoint),
+            end: navigation.toVirtualPoint(command.endPoint),
+          })
+        } else if (command.type === 'Z') {
+          allLines.push({
+            start: navigation.toVirtualPoint(prevCommand.endPoint),
+            end: navigation.toVirtualPoint(firstCommand.endPoint),
+          })
+        }
+      }
+    }
+    return allLines;
+  })
+
   function updateCommands() {
     pointsAndCoordinates = getPointsAndCoordinates();
   }
 
   updateCommands();
-
-  // Get a representation of the vector through 'Lines', which are defined by : startCommand, endCommand, startControl, endControl
-  let allLines: Line[] = [];
-  for (const commandTuple of getCommandsWithEndPoints()) {
-    const command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]]
-    if (command.type == 'C') {
-      allLines.push({
-        startTuple: [commandTuple[0], commandTuple[1] - 1],
-        endTuple: [commandTuple[0], commandTuple[1]],
-        startControl: command.controlPoints.start,
-        endControl: command.controlPoints.end,
-      })
-    }
-  }
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
@@ -186,8 +198,10 @@
     return list;
   }
 
+  // ######################################################
+  // BEGIN DRAW
+  // ######################################################
   function draw(ctx: CanvasRenderingContext2D) {
-
     // Draw bounding box
     if (!editMode && canvasNode.selected) {
       // Draw bounding box of the node
@@ -256,20 +270,33 @@
         part.draw(ctx);
       }
     }
-
-    // Update all subpaths in case the shape of the vector has changed
-    {
-    }
   }
 
+  // ######################################################
+  // END DRAW
+  // ######################################################
+
+  function isVectorHovered(): boolean {
+    for (const line of allLines) {
+      if (hoverLineWithDistance({
+        line,
+        cursorPosition,
+        distance: Math.max(navigation.scale, getHoverMarginDistance())
+      })) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // ######################################################
+  // BEGIN UPDATE
+  // ######################################################
   function update() {
     // Update bounding box size and coordinates
     updateBoundingBox();
-    // To rework -> only hover if one of the parts (still not drawn) is hovered
-    // ----------------------------------------
-    hovered = canvasNode.boundingBox.hovered();
-    // ----------------------------------------
-
+    // Updating hovered state
+    hovered = isVectorHovered();
     dblclick = hovered && canvasClick.double;
 
     // Check for selection with selector rectangle
@@ -333,6 +360,10 @@
       }
     }
   }
+
+  // ######################################################
+  // END UPDATE
+  // ######################################################
 
   function updateBoundingBox() {
     canvasNode.boundingBox.update(

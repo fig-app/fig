@@ -1,7 +1,7 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
   import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
-  import {centerOfSegment, getLineLength, hoverLine} from "@fig/functions/shape/line";
+  import {centerOfSegment, getLineLength, hoverLineWithDistance} from "@fig/functions/shape/line";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {useId} from "@fig/functions/id";
@@ -21,6 +21,7 @@
     handleVectorPartSelection
   } from "$lib/components/shared.svelte";
   import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
+  import {getHoverMarginDistance} from "@fig/functions/distance";
 
   type Props = {
     geometryIndex: number;
@@ -128,12 +129,14 @@
   }
 
   function update() {
-    // Be hovered only if nothing but it is being hovered
-    hovered = hoverLine({
+    // Be hovered only if nothing, but it, is being hovered
+    hovered = hoverLineWithDistance({
       line: {
         start: virtualStartCommandsList[0].endPoint,
         end: virtualEndCommandsList[0].endPoint
-      }, cursorPosition
+      },
+      cursorPosition,
+      distance: getHoverMarginDistance()
     }) && !selector.inSelection && (!cursorHover.hoveredPart || cursorHover.hoveredPart === part);
     clicked = hovered && canvasClick.single;
     dragged = ((dragged && canvasClick.pressed) || (hovered && canvasClick.pressed && !vectorContext.isDragged(part))) && !selector.inSelection;
