@@ -1,3 +1,3 @@
 export function getHoverMarginDistance() {
-  return 6;
+  return 5
 }

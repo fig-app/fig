@@ -31,6 +31,8 @@
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {hoverLineWithDistance} from "@fig/functions/shape/line";
   import {getHoverMarginDistance} from "@fig/functions/distance";
+  import type {Curve} from "@fig/types/shapes/Curve";
+  import {isCubicBezierHovered} from "@fig/functions/shape/curve/cubic";
 
   let {node}: { node: Node } = $props();
 
@@ -50,7 +52,6 @@
   let hovered: boolean = $state(false);
   let dblclick: boolean = $state(false);
   let editMode: boolean = $state(false);
-  let fillMode: boolean = $state(false);
   let triggerUpdate: boolean = $state(false);
 
   let editTimer = new Timer(100, "Once");
@@ -114,9 +115,11 @@
     return to_ret;
   }
 
-  let pointsAndCoordinates: { [key: string]: [number, number][] } = $state({});
+  let pointsAndCoordinates: { [key: string]: [number, number][] } = $derived.by(() => {
+    return getPointsAndCoordinates();
+  });
 
-  // Get all vector parts' shape of the vector (for the hover)
+  // Get all vector parts' shape (lines & curve) of the vector (for the hover)
   let allLines: Line[] = $derived.by(() => {
     let allLines: Line[] = [];
     for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
@@ -138,12 +141,24 @@
     }
     return allLines;
   })
-
-  function updateCommands() {
-    pointsAndCoordinates = getPointsAndCoordinates();
-  }
-
-  updateCommands();
+  let allCurves: Curve[] = $derived.by(() => {
+    let allCurves: Curve[] = [];
+    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
+      for (const [i, command] of geometry.entries()) {
+        const prevCommand = strokeGeometriesCommands[gi][i - 1] as PathCommandWithEndPoint;
+        const firstCommand = strokeGeometriesCommands[gi][0] as PathCommandWithEndPoint;
+        if (command.type === 'C') {
+          allCurves.push({
+            start: navigation.toVirtualPoint(prevCommand.endPoint),
+            end: navigation.toVirtualPoint(command.endPoint),
+            startControl: command.controlPoints.start,
+            endControl: command.controlPoints.end,
+          })
+        }
+      }
+    }
+    return allCurves;
+  })
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
@@ -277,12 +292,24 @@
   // ######################################################
 
   function isVectorHovered(): boolean {
+    // Check if any line of the vector is hovered
     for (const line of allLines) {
       if (hoverLineWithDistance({
         line,
         cursorPosition,
         distance: Math.max(navigation.scale, getHoverMarginDistance())
       })) {
+        return true;
+      }
+    }
+    // Check if any curve of the vector is hovered
+    for (const curve of allCurves) {
+      if (isCubicBezierHovered(curve.start,
+        curve.startControl,
+        curve.endControl,
+        curve.end,
+        cursorPosition,
+        Math.max(navigation.scale, getHoverMarginDistance()))) {
         return true;
       }
     }
@@ -307,25 +334,15 @@
     // Toggle edit mode when double click
     if (dblclick && !editMode && editTimer.finished()) {
       editMode = true;
-      pointsAndCoordinates = getPointsAndCoordinates();
       editTimer.reset();
     } else if (canvasClick.double && editMode && editTimer.finished()) {
       editMode = false;
       editTimer.reset();
     }
 
-    // Toggle fill mode (IN WORK)
-    if (keys.isPressed("b") && editMode) {
-      fillMode = true;
-
-      // calculate subpaths once to initialize them...
-    }
-
     // Exit edit & fill modes when pressing enter or escape
     if (editMode && keys.isPressed("Enter") || keys.isPressed("Escape")) {
       editMode = false;
-      fillMode = false;
-      updateCommands();
     }
 
     // Update parts
@@ -414,7 +431,6 @@
   }
 
   function updateVector() {
-    updateCommands();
     triggerUpdate = !triggerUpdate;
   }
 
