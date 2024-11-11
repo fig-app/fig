@@ -59,7 +59,8 @@
   let draggedPart: VectorPart | null = $state(null);
 
   let strokeColor = colorToString(data.strokes[0].color);
-  let strokeWeight = $derived(data.strokeWeight * navigation.scale);
+  let strokeWeight = $state(data.strokeWeight);
+  let stylizedStrokeWeight = $derived(strokeWeight * navigation.scale);
 
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
@@ -262,7 +263,7 @@
         ctx,
         path,
         colors: {stroke: strokeColor},
-        strokeWeight
+        strokeWeight: stylizedStrokeWeight
       });
     }
 
@@ -293,7 +294,8 @@
   function isVectorHovered(): boolean {
     for (const path of strokePathsSynchronization) {
       if (canvasRenderingContext.ctx) {
-        canvasRenderingContext.ctx.lineWidth = Math.max(getHoverMarginDistance(), navigation.scale);
+        // Threshold of line hover
+        canvasRenderingContext.ctx.lineWidth = stylizedStrokeWeight + getHoverMarginDistance();
         if (canvasRenderingContext.ctx.isPointInStroke(path, cursorPosition.x, cursorPosition.y)) {
           return true;
         }
@@ -315,7 +317,11 @@
 
     // Check for selection with selector rectangle
     if (selector.rect && !selector.partsMode) {
-      canvasNode.selected = selector.rect.collide(canvasNode.boundingBox);
+      if (selector.rect.collide(canvasNode.boundingBox)) {
+        selector.selectNode(canvasNode);
+      } else {
+        selector.unselectNode(canvasNode);
+      }
     }
 
     // Toggle edit mode when double click
@@ -327,8 +333,11 @@
       editTimer.reset();
     }
 
-    // Exit edit & fill modes when pressing enter or escape
+    // Exit edit mode when pressing enter or escape
     if (editMode && keys.isPressed("Enter") || keys.isPressed("Escape")) {
+      if (!editMode && canvasNode.selected && editTimer.finished()) {
+        selector.unselectNode(canvasNode);
+      }
       editMode = false;
     }
 

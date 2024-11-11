@@ -40,6 +40,7 @@ class Selector {
     // Check for dragging
     if (canvasClick.pressed) {
       if (!this.rect) {
+        // Allow to add selection with shift pressed
         if (!keys.shiftPressed()) {
           this.unselectAllParts();
         }
@@ -122,7 +123,7 @@ class Selector {
       part.selected = false;
       this.parts.splice(this.parts.indexOf(part), 1);
 
-      // check if a point in the selection to update point mode
+      // check if a point in the selection to update partsMode state
       if (part.type === "point") {
         let hasPoint =
           this.parts.filter((part) => part.type === "point").length > 0;

@@ -93,8 +93,10 @@
       cursorHover.hoveredPart = null;
     }
 
+    // Check if dragged
     dragged = ((dragged && canvasClick.pressed) || (point.hovered && canvasClick.pressed && !vectorContext.isDragged(part))) && !selector.inSelection;
 
+    // Update selected state
     if (selector.rect) {
       if (selector.rect.containPoint(virtualCommandsList[0].endPoint)) {
         selector.selectPart(part);
