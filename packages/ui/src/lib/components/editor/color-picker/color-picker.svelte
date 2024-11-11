@@ -24,7 +24,7 @@
     opacity = $bindable(100),
   }: ColorPickerProps = $props();
 
-  let showWindow = $state(true);
+  let showWindow = $state(false);
   let inputColor = $state('000000');
 
   watch(() => color, () => {
@@ -49,6 +49,9 @@
     if (inputColor.length === 3) {
       inputColor = inputColor.split('').map((c) => c + c).join('');
     }
+    if (inputColor.length < 6) {
+      inputColor = inputColor.padEnd(6, '0');
+    }
     inputColor = inputColor.toUpperCase();
   }
 
@@ -65,7 +68,8 @@
            onblur={autoCompleteColor} onkeydown={blurOnEnter}>
       <!-- Color preview -->
       {#snippet left()}
-        <button class="w-5 h-4 rounded relative overflow-hidden" style:background={color}
+        <button class="w-5 h-4 rounded relative overflow-hidden"
+                style:background={color}
                 onclick={toggleWindow}>
           <!-- Opacity -->
           <span class="opacity" style:opacity={(100 - opacity) / 100}></span>
@@ -81,13 +85,13 @@
   </InputGroup>
 </div>
 
-<Window.Root bind:show={showWindow} minWidth={280}>
+<Window.Root bind:show={showWindow} minWidth={260} class="max-w-[260px]">
   <Window.Header>
     <Window.Title>Color picker</Window.Title>
   </Window.Header>
 
   <Window.Content>
-    <ColorControls bind:color bind:opacity/>
+    <ColorControls bind:color bind:inputColor bind:opacity/>
   </Window.Content>
 </Window.Root>
 

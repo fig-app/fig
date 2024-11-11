@@ -72,6 +72,14 @@ export function hslToRgb(h: number, s: number, l: number) {
 }
 
 /**
+ * Convert hsl color to hex color
+ */
+export function hslToHex(h: number, s: number, l: number) {
+  const { r, g, b } = hslToRgb(h, s, l);
+  return rgbToHex(r, g, b);
+}
+
+/**
  * Convert rgb color to hsl color
  */
 export function rgbToHsl(r: number, g: number, b: number) {
@@ -141,6 +149,28 @@ export function hexToHsl(hex: string) {
   const rgb = hexToRgb(hex);
   if (!rgb) return null;
   return rgbToHsl(rgb.r, rgb.g, rgb.b);
+}
+
+/**
+ * Convert hsl to hsv
+ */
+export function hslToHsv(h: number, s: number, l: number) {
+  // Convert saturation and lightness from percentage to decimals
+  s /= 100;
+  l /= 100;
+
+  // Calculate value (v) in HSV
+  const v = l + s * Math.min(l, 1 - l);
+
+  // Calculate saturation (s) in HSV
+  const hsvSaturation = v === 0 ? 0 : 2 * (1 - l / v);
+
+  // Convert back to percentage
+  return {
+    h: h, // Hue remains the same
+    s: hsvSaturation * 100, // HSV Saturation in percentage
+    v: v * 100, // Value in percentage
+  };
 }
 
 /**

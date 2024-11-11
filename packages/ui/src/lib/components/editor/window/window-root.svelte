@@ -72,20 +72,22 @@
 
 </script>
 
-<svelte:window on:click={handleClickOutside}/>
+<svelte:window on:mousedown={handleClickOutside}/>
 
 <Portal>
-  <div
-    bind:this={ref}
-    bind:this={windowContext.windowRef}
-    class={cn(
+  {#if (show)}
+    <div
+      bind:this={ref}
+      bind:this={windowContext.windowRef}
+      class={cn(
         "absolute z-40 bg-background border border-border rounded-[12px] divide-y divide-border shadow-xl",
         className
       )}
-    class:hidden={!show}
-    style:min-width={minWidth + "px"}
-    style:min-height={minHeight + "px"}
-    {...restProps}>
-    {@render children()}
-  </div>
+      class:hidden={!show}
+      style:min-width={minWidth + "px"}
+      style:min-height={minHeight + "px"}
+      {...restProps}>
+      {@render children()}
+    </div>
+  {/if}
 </Portal>
