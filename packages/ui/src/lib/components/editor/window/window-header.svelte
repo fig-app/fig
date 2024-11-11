@@ -45,6 +45,8 @@
 
         windowRef.style.top = `${top}px`;
         windowRef.style.left = `${left}px`;
+        windowContext.top = top;
+        windowContext.left = left;
       }
     })
 

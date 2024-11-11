@@ -75,6 +75,7 @@
     "vite": "^5.0.11"
   },
   "dependencies": {
-    "@fig/functions": "workspace:*"
+    "@fig/functions": "workspace:*",
+    "runed": "^0.15.3"
   }
 }

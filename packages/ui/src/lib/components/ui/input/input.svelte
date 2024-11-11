@@ -10,7 +10,7 @@
       size: {
         default: "h-10 w-full",
         sm: "px-2 py-1 h-fit [&_svg]:size-3",
-        lg: "h-12",
+        lg: "h-12"
       },
     },
     defaultVariants: {
@@ -21,7 +21,8 @@
   export type InputSize = VariantProps<typeof inputVariants>["size"];
 
   export type InputProps = WithElementRef<HTMLInputAttributes> & {
-    size?: InputSize,
+    inputSize?: InputSize,
+    selectOnFocus?: boolean,
     left?: Snippet,
     right?: Snippet
   };
@@ -36,7 +37,8 @@
     id = null,
     value = $bindable(),
     class: className,
-    size,
+    selectOnFocus: _selectOnFocus = false,
+    inputSize,
     left,
     right,
     ...restProps
@@ -45,9 +47,17 @@
   if (!id) {
     id = useId();
   }
+
+  function selectOnFocus(node: HTMLInputElement) {
+    if (_selectOnFocus) {
+      node.addEventListener("focus", () => {
+        node.select();
+      });
+    }
+  }
 </script>
 
-<label for={id} class={cn(inputVariants({size, className}))}>
+<label for={id} class={cn(inputVariants({size: inputSize, className}))}>
   {#if (left)}
     {@render left()}
   {/if}
@@ -56,6 +66,7 @@
     id={id}
     bind:this={ref}
     bind:value
+    use:selectOnFocus
     {...restProps}
   />
 

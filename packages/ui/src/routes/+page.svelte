@@ -24,6 +24,7 @@
   import {Toggle} from "$lib/components/ui/toggle/index.js";
   import {InputGroup} from "$lib/components/ui/input/index.js";
   import {NumberInput} from "$lib/components/editor/number-input/index.js";
+  import {ColorPicker} from "$lib/components/editor/color-picker/index.js";
 
   function toggleTheme() {
     document.documentElement.classList.toggle("dark");
@@ -78,19 +79,26 @@
     href="https://github.com/frequency-chain/style-guide/issues/37">not yet
     compatible</a> with Svelte 5.</p>
 
+  <!-- Color picker -->
+
+  <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Color picker</h2>
+
+  <ColorPicker class="w-[200px]"/>
 
   <!-- Number input -->
 
   <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Number input</h2>
 
-
   <div class="flex flex-col gap-2">
-    <NumberInput class="w-[100px]" min="0" max="100" bind:value={numberInputValue}>
-      {#snippet right()}
-        <Percent/>
-      {/snippet}
-    </NumberInput>
-    <NumberInput class="w-[100px]" min="0" max="100" suffix="%" bind:value={numberInputValue}>
+    <div class="flex gap-5 items-center">
+      <NumberInput class="w-[100px]" min="0" max="100" bind:value={numberInputValue}>
+        {#snippet right()}
+          <Percent/>
+        {/snippet}
+      </NumberInput>
+      {numberInputValue}
+    </div>
+    <NumberInput class="w-[100px]">
       {#snippet left()}
         <Banana/>
       {/snippet}
@@ -108,8 +116,14 @@
     </Button>
 
     <div class="w-[200px] flex gap-2">
-      <Input placeholder="X" bind:value={windowTop} type="number"/>
-      <Input placeholder="Y" bind:value={windowLeft} type="number"/>
+      <NumberInput bind:value={windowTop} min="0">
+        {#snippet left()}
+          <p>X</p>
+        {/snippet}
+      </NumberInput>
+      <NumberInput bind:value={windowLeft} min="0">
+        {#snippet left()}Y{/snippet}
+      </NumberInput>
     </div>
   </div>
 
@@ -413,9 +427,9 @@
 
   <div class="flex flex-col gap-2">
     <div class="flex gap-2">
-      <Input size="lg" placeholder="Large input"/>
+      <Input inputSize="lg" placeholder="Large input"/>
       <Input placeholder="Default input"/>
-      <Input size="sm" placeholder="Small input"/>
+      <Input inputSize="sm" placeholder="Small input"/>
     </div>
     <div class="flex gap-2">
       <Input placeholder="Input">
@@ -430,7 +444,7 @@
       </Input>
     </div>
     <div class="flex gap-2">
-      <Input size="lg" placeholder="Input">
+      <Input inputSize="lg" placeholder="Input">
         {#snippet left()}
           <Hash/>
         {/snippet}
@@ -440,7 +454,7 @@
           <Hash/>
         {/snippet}
       </Input>
-      <Input size="sm" placeholder="Input">
+      <Input inputSize="sm" placeholder="Input">
         {#snippet left()}
           <Hash/>
         {/snippet}
@@ -456,16 +470,16 @@
   <div class="flex flex-col gap-2">
     <div class="grid grid-cols-3 gap-2">
       <InputGroup>
-        <Input size="lg" placeholder="Number"/>
-        <Input size="lg" placeholder="Number"/>
+        <Input inputSize="lg" placeholder="Number"/>
+        <Input inputSize="lg" placeholder="Number"/>
       </InputGroup>
       <InputGroup>
         <Input placeholder="Number"/>
         <Input placeholder="Number"/>
       </InputGroup>
       <InputGroup>
-        <Input size="sm" placeholder="Number"/>
-        <Input size="sm" placeholder="Number"/>
+        <Input inputSize="sm" placeholder="Number"/>
+        <Input inputSize="sm" placeholder="Number"/>
       </InputGroup>
     </div>
 

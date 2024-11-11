@@ -18,6 +18,7 @@
   }: WindowTitleProps = $props();
 </script>
 
-<h3 bind:this={ref} class={cn("text-sm font-semibold text-foreground leading-loose", className)}>
+<h3 bind:this={ref}
+    class={cn("text-xs font-semibold text-foreground leading-loose self-center", className)}>
   {@render children()}
 </h3>

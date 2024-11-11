@@ -22,6 +22,7 @@
     getWindowContext,
     setWindowContext
   } from "$lib/components/editor/window/context.js";
+  import {onMount} from "svelte";
 
   let {
     ref = $bindable(undefined),
@@ -43,19 +44,13 @@
   setWindowContext(initialWindowContext);
 
   // Get window context
-  let windowContext = $state(getWindowContext());
+  let windowContext = getWindowContext();
 
-  // Update window context
-  $effect(() => {
-    windowContext.top = top;
-    windowContext.left = left;
-  });
-
-  // Update canClose state
+  // Update states
   $effect(() => {
     if (show && ref) {
-      ref.style.top = `${top}px`;
-      ref.style.left = `${left}px`;
+      ref.style.top = `${windowContext.top}px`;
+      ref.style.left = `${windowContext.left}px`;
       setTimeout(() => {
         canClose = true;
       }, 100);
@@ -80,18 +75,17 @@
 <svelte:window on:click={handleClickOutside}/>
 
 <Portal>
-  {#if (show)}
-    <div
-      bind:this={ref}
-      bind:this={windowContext.windowRef}
-      class={cn(
+  <div
+    bind:this={ref}
+    bind:this={windowContext.windowRef}
+    class={cn(
         "absolute z-40 bg-background border border-border rounded-[12px] divide-y divide-border shadow-xl",
         className
       )}
-      style:min-width={minWidth + "px"}
-      style:min-height={minHeight + "px"}
-      {...restProps}>
-      {@render children()}
-    </div>
-  {/if}
+    class:hidden={!show}
+    style:min-width={minWidth + "px"}
+    style:min-height={minHeight + "px"}
+    {...restProps}>
+    {@render children()}
+  </div>
 </Portal>

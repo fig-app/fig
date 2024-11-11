@@ -2,14 +2,13 @@
   import type {Snippet} from "svelte";
   import type {HTMLInputAttributes} from "svelte/elements";
   import type {WithElementRef} from "bits-ui";
+  import type {InputProps} from "$lib/components/ui/input/input.svelte";
 
   export const partStyle = "cursor-col-resize";
 
-  export type NumberInputProps = WithElementRef<HTMLInputAttributes> & {
-    suffix?: string;
+  export type NumberInputProps = InputProps & {
     left?: Snippet;
     right?: Snippet;
-    children: Snippet
   }
 </script>
 
@@ -20,18 +19,16 @@
     ref = $bindable(undefined),
     class: className,
     value = $bindable(0),
-    suffix,
     left: leftPart,
     right: rightPart,
     min,
     max,
-    children,
     ...restProps
   }: NumberInputProps = $props();
 
   let canUpdateValue = $state(false);
 
-  function horizontalDrag(node: HTMLDivElement) {
+  function horizontalDrag(node: HTMLButtonElement) {
     let direction = 0;
 
     node.addEventListener("mousedown", () => canUpdateValue = true);
@@ -83,8 +80,8 @@
 
 </script>
 
-<Input bind:this={ref} type="number" bind:value={value} class={className} {...restProps}
-       onfocus={(e) => e.target.select()}>
+<Input bind:this={ref} type="number" bind:value={value} class={className} selectOnFocus
+       {...restProps}>
   {#snippet left()}
     {#if (leftPart)}
       <button use:horizontalDrag class={partStyle}>
