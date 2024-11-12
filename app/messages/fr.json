@@ -1,4 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "hello_world": "Salut, {name} depuis fr!"
+  "hello_world": "Bonjour, {name} de fr !",
+  "editor_right_panel_design": "Conception",
+  "editor_right_panel_prototype": "Prototype"
 }

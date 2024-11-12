@@ -14,7 +14,7 @@
   import {navigation} from "$lib/stores/navigation.svelte";
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {isCubicBezierHovered} from "@fig/functions/shape/curve/cubic";
-  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
+  import {cursorPosition} from "@fig/stores";
   import {canvasColors} from "$lib/stores/canvasColors";
   import {
     handleVectorPartDrawing,

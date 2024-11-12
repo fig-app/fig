@@ -2,7 +2,7 @@
   import {Button} from "@fig/ui";
   import Canvas from "@fig/canvas/Canvas.svelte"
   import Vector from "@fig/canvas/components/Vector.svelte"
-  import {keys} from "@fig/canvas/stores/keys.svelte";
+  import {keys} from "@fig/stores";
   import {navigation} from "@fig/canvas/stores/navigation.svelte";
   import {userMode} from "@fig/canvas/stores/userMode.svelte";
   import {Panel, PanelSection} from "$lib/components";
@@ -14,7 +14,7 @@
 
   let canvasBackgroundColor = $state("#1E1E1E")
 
-  function handleKeyDown(e: KeyboardEvent) {
+  function handleKeyDown() {
     if (keys.isPressed('p')) {
       userMode.mode = 'PEN';
     } else if (keys.isPressed('v')) {
@@ -33,15 +33,15 @@
     <Tabs.Root value="design" class="w-[275px]">
       <div class="p-2 flex items-center justify-between">
         <Tabs.List>
-          <Tabs.Trigger value="design">Design</Tabs.Trigger>
-          <Tabs.Trigger value="prototype">Prototype</Tabs.Trigger>
+          <Tabs.Trigger value="design">{m.editor_right_panel_design()}</Tabs.Trigger>
+          <Tabs.Trigger value="prototype">{m.editor_right_panel_prototype()}</Tabs.Trigger>
         </Tabs.List>
 
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <Button variant="ghost" size="sm" class="text-xs">
               {navigation.percentScale.toFixed(0)} %
-              <ChevronDown/>
+              <ChevronDown class="!size-3"/>
             </Button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content>

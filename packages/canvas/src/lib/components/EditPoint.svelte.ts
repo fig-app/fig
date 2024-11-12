@@ -1,7 +1,7 @@
 import type { Vector } from "@fig/types/properties/Vector";
 import { arc } from "$lib/primitive/arc";
 import { isCursorHoveringArc } from "@fig/functions/shape/arc";
-import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
+import { cursorPosition } from "@fig/stores";
 import { canvasClick } from "$lib/stores/canvasClick.svelte";
 import { canvasColors } from "$lib/stores/canvasColors";
 

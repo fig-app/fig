@@ -8,7 +8,7 @@
   import {EditPoint} from "$lib/components/EditPoint.svelte";
   import {Timer} from "$lib/stores/canvasTime.svelte"
   import {selector} from "$lib/components/Selector.svelte";
-  import {keys} from "$lib/stores/keys.svelte";
+  import {keys} from "@fig/stores";
   import {cursorHover} from "$lib/stores/cursorHover.svelte";
   import {
     handleVectorPartDragging,

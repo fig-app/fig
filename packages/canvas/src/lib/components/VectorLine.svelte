@@ -2,10 +2,10 @@
   import type {VectorPart} from "$lib/types/VectorPart";
   import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
   import {centerOfSegment, getLineLength, hoverLine} from "@fig/functions/shape/line";
-  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
+  import {cursorPosition} from "@fig/stores";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {useId} from "@fig/functions/id";
-  import {keys} from "../stores/keys.svelte";
+  import {keys} from "@fig/stores";
   import {Timer} from "$lib/stores/canvasTime.svelte";
   import {EditPoint} from "$lib/components/EditPoint.svelte";
   import {navigation} from "$lib/stores/navigation.svelte";

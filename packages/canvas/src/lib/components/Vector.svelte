@@ -20,7 +20,7 @@
   import type {EmptyData} from "@fig/types/nodes/vector/EmptyData";
   import {canvasColors} from "$lib/stores/canvasColors";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
-  import {keys} from "$lib/stores/keys.svelte";
+  import {keys} from "@fig/stores";
   import {commandHasEndPoint} from "@fig/functions/path/typeCheck";
   import {vectorToString} from "@fig/functions/vector";
   import VectorPoint from "$lib/components/VectorPoint.svelte";

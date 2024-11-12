@@ -32,6 +32,10 @@
       "types": "./dist/*.d.ts",
       "svelte": "./dist/*.svelte"
     },
+    "./c/*": {
+      "types": "./dist/components/ui/*.d.ts",
+      "svelte": "./dist/components/ui/*.js"
+    },
     "./utils": {
       "types": "./dist/utils.d.ts",
       "svelte": "./dist/utils.js"

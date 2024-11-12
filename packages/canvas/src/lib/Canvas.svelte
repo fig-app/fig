@@ -4,10 +4,9 @@
   import {fillRect} from "$lib/primitive/rect";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {canvasTime} from "$lib/stores/canvasTime.svelte";
-  import {keys} from "./stores/keys.svelte";
+  import {keys, cursorPosition} from "@fig/stores";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {setCanvasContext} from "$lib/context/canvasContext";
-  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
   import {selector} from "$lib/components/Selector.svelte";
   import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
   import type {Vector} from "@fig/types/properties/Vector";
@@ -212,8 +211,6 @@
   }
 
   function handleMouseMove(e: MouseEvent) {
-    cursorPosition.pos = {x: e.clientX, y: e.clientY}
-
     if (isPanning) {
       // move delta between last post and current pos
       let delta: Vector = {
