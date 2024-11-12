@@ -1,6 +1,32 @@
 // Reexport your entry components here
 
-import { Button } from "$lib/components/ui/button/index.js";
-import { Input } from "$lib/components/ui/input/index.js";
+import {
+  Button,
+  Input,
+  InputGroup,
+  Slider,
+  Toggle,
+  Tooltip,
+} from "$lib/components/ui";
 
-export { Button, Input };
+import {
+  DropdownMenu,
+  NumberInput,
+  Select,
+  Tabs,
+  Window,
+} from "$lib/components/editor";
+
+export {
+  Button,
+  Input,
+  InputGroup,
+  Slider,
+  Toggle,
+  Tooltip,
+  DropdownMenu,
+  NumberInput,
+  Select,
+  Tabs,
+  Window,
+};

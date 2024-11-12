@@ -5,7 +5,7 @@
   } from "bits-ui";
   import Check from "lucide-svelte/icons/check";
   import Minus from "lucide-svelte/icons/minus";
-  import {optionStyle} from "$lib/components/editor/options/index.js";
+  import {optionStyle} from "$lib/components/editor/options";
   import {cn} from "$lib/utils.js";
 
   let {

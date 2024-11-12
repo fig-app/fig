@@ -25,7 +25,6 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.2",
-    "@fig/tools": "workspace:*",
     "@storybook/addon-essentials": "^8.4.1",
     "@storybook/addon-interactions": "^8.4.1",
     "@storybook/addon-svelte-csf": "5.0.0-next.10",

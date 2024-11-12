@@ -3,7 +3,7 @@
   import {DropdownMenu as DropdownMenuPrimitive} from "bits-ui";
   import {
     optionContainerStyle
-  } from "$lib/components/editor/options/index.js";
+  } from "$lib/components/editor/options";
 
   let {
     ref = $bindable(null),

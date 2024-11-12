@@ -1,7 +1,7 @@
 <script lang="ts">
   import {cn} from "$lib/utils.js";
   import {DropdownMenu as DropdownMenuPrimitive} from "bits-ui";
-  import {optionStyle} from "$lib/components/editor/options/index.js";
+  import {optionStyle} from "$lib/components/editor/options";
 
   let {
     ref = $bindable(null),

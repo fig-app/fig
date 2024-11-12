@@ -10,10 +10,10 @@
 </script>
 
 <script lang="ts">
-  import {Button} from "$lib/components/ui/button/index.js";
+  import {Button} from "$lib/components/ui/button";
   import {X} from "lucide-svelte";
   import {cn} from "$lib/utils.js";
-  import {getWindowContext} from "$lib/components/editor/window/context.js";
+  import {getWindowContext} from "$lib/components/editor/window/context";
   import type {ActionReturn} from "svelte/action";
 
   let {

@@ -10,7 +10,6 @@
 
 <script lang="ts">
   import {onDestroy, onMount} from "svelte";
-  import {Slider} from "$lib/components/ui/slider/index.js";
   import {
     hexToHsl, hslToHsv,
     hueRotationToHex,
@@ -21,8 +20,8 @@
   import {clamp} from "@fig/functions/math";
   import {watch} from "runed";
   import {Percent} from "lucide-svelte";
-  import {Input, InputGroup} from "$lib/components/ui/input/index.js";
-  import {NumberInput} from "$lib/components/editor/number-input/index.js";
+  import {Input, InputGroup, Slider} from "@fig/ui";
+  import {NumberInput} from "@fig/ui/editor";
 
   let {
     color = $bindable("#000000"),
@@ -50,7 +49,7 @@
 
       let hsl = hexToHsl(color);
 
-      console.log("mount hsl", hsl, color);
+      // console.log("mount hsl", hsl, color);
 
       if (hsl) {
         hueRotation = [hsl.h];

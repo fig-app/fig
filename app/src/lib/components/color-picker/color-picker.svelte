@@ -1,30 +1,28 @@
 <script lang="ts" module>
-  import type {Snippet} from "svelte";
-  import type {HTMLAttributes} from "svelte/elements";
-
   export type ColorPickerProps = {
-    class: string;
+    class?: string;
     color?: string;
     opacity?: number;
   }
 </script>
 
 <script lang="ts">
-  import {Input, InputGroup} from "$lib/components/ui/input/index.js";
-  import {NumberInput} from "$lib/components/editor/number-input/index.js";
   import {Percent} from "lucide-svelte";
-  import {cn} from "$lib/utils.js";
-  import * as Window from "$lib/components/editor/window/index.js";
-  import {ColorControls} from "$lib/components/editor/color-picker/index.js";
   import {watch} from "runed";
+  import {cn} from "@fig/ui/utils";
+  import {Input, InputGroup} from "@fig/ui";
+  import {NumberInput, Window} from "@fig/ui/editor";
+  import type {Vector} from "@fig/types/properties/Vector";
+  import {ColorControls} from "$lib/components/color-picker/index";
 
   let {
     class: className,
-    color = "#000000",
+    color = $bindable("#000000"),
     opacity = $bindable(100),
   }: ColorPickerProps = $props();
 
   let showWindow = $state(false);
+  let windowPosition: Vector = $state({x: 0, y: 0});
   let inputColor = $state('000000');
 
   watch(() => color, () => {
@@ -32,6 +30,7 @@
   })
 
   watch(() => inputColor, () => {
+    console.log('inputColor', inputColor);
     color = '#' + inputColor;
   })
 
@@ -48,6 +47,9 @@
     }
     if (inputColor.length === 3) {
       inputColor = inputColor.split('').map((c) => c + c).join('');
+    }
+    if (inputColor.length === 2) {
+      inputColor = inputColor + inputColor + inputColor;
     }
     if (inputColor.length < 6) {
       inputColor = inputColor.padEnd(6, '0');
@@ -66,8 +68,8 @@
   <InputGroup>
     <Input bind:value={inputColor} class="pl-1 py-1" inputSize="sm" selectOnFocus
            onblur={autoCompleteColor} onkeydown={blurOnEnter}>
-      <!-- Color preview -->
       {#snippet left()}
+        <!-- Color preview -->
         <button class="w-5 h-4 rounded relative overflow-hidden"
                 style:background={color}
                 onclick={toggleWindow}>

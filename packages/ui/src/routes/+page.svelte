@@ -1,10 +1,10 @@
 <script lang="ts">
-  import {Button, Input} from "$lib/index.js";
-  import * as Select from "$lib/components/editor/select/index.js";
-  import * as Tabs from "$lib/components/editor/tabs/index.js";
-  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
-  import * as Window from "$lib/components/editor/window/index.js";
-  import * as DropdownMenu from "$lib/components/editor/dropdown-menu/index.js";
+  import {Button, Input} from "$lib";
+  import * as Select from "$lib/components/editor/select";
+  import * as Tabs from "$lib/components/editor/tabs";
+  import * as Tooltip from "$lib/components/ui/tooltip";
+  import * as Window from "$lib/components/editor/window";
+  import * as DropdownMenu from "$lib/components/editor/dropdown-menu";
 
   import {
     Banana,
@@ -20,11 +20,10 @@
     Option,
     OptionContainer,
     OptionSeparator
-  } from "$lib/components/editor/options/index.js";
-  import {Toggle} from "$lib/components/ui/toggle/index.js";
-  import {InputGroup} from "$lib/components/ui/input/index.js";
-  import {NumberInput} from "$lib/components/editor/number-input/index.js";
-  import {ColorPicker} from "$lib/components/editor/color-picker/index.js";
+  } from "$lib/components/editor/options";
+  import {Toggle} from "$lib/components/ui/toggle";
+  import {InputGroup} from "$lib/components/ui/input";
+  import {NumberInput} from "$lib/components/editor/number-input";
 
   function toggleTheme() {
     document.documentElement.classList.toggle("dark");
@@ -83,7 +82,7 @@
 
   <h2 class="text-2xl font-bold text-primary-500 mb-4 mt-6">Color picker</h2>
 
-  <ColorPicker class="w-[200px]"/>
+  <!--  <ColorPicker class="w-[200px]"/>-->
 
   <!-- Number input -->
 

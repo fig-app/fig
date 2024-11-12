@@ -13,7 +13,7 @@
 </script>
 
 <script lang="ts">
-  import {Input} from "$lib/components/ui/input/index.js";
+  import {Input} from "$lib/components/ui/input";
 
   let {
     ref = $bindable(undefined),
@@ -80,7 +80,7 @@
 
 </script>
 
-<Input bind:this={ref} type="number" bind:value={value} class={className} selectOnFocus
+<Input type="number" bind:value={value} class={className} selectOnFocus
        {...restProps}>
   {#snippet left()}
     {#if (leftPart)}

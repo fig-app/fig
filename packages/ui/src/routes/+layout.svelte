@@ -1,6 +1,6 @@
 <script lang="ts">
   import '../app.css';
-  import {TooltipProvider} from "$lib/components/ui/tooltip/index.js";
+  import {TooltipProvider} from "$lib/components/ui/tooltip";
 
   let {children} = $props();
 </script>

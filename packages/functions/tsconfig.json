@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "ES6",
     "outDir": "dist",
     "moduleResolution": "bundler",
     "declaration": true,
@@ -17,5 +15,5 @@
     "src/**/*.ts",
     "test/**/*.ts",
     "vitest.config.ts"
-  ],
+  ]
 }

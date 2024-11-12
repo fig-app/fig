@@ -39,12 +39,24 @@ importers:
       '@fig/canvas':
         specifier: workspace:*
         version: link:../packages/canvas
+      '@fig/functions':
+        specifier: workspace:*
+        version: link:../packages/functions
+      '@fig/types':
+        specifier: workspace:*
+        version: link:../packages/types
       '@fig/ui':
         specifier: workspace:*
         version: link:../packages/ui
       '@inlang/paraglide-sveltekit':
         specifier: ^0.11.1
         version: 0.11.5(@sveltejs/kit@2.5.28(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))
+      lucide-svelte:
+        specifier: ^0.454.0
+        version: 0.454.0(svelte@5.1.9)
+      runed:
+        specifier: ^0.15.3
+        version: 0.15.3(svelte@5.1.9)
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^3.0.0
@@ -73,6 +85,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.47)
+      bits-ui:
+        specifier: 1.0.0-next.46
+        version: 1.0.0-next.46(svelte@5.1.9)
       svelte:
         specifier: ^5.0.0
         version: 5.1.9
@@ -101,9 +116,6 @@ importers:
       '@chromatic-com/storybook':
         specifier: ^3.2.2
         version: 3.2.2(react@18.3.1)(storybook@8.4.1(prettier@3.3.3))
-      '@fig/tools':
-        specifier: workspace:*
-        version: link:../tools
       '@storybook/addon-essentials':
         specifier: ^8.4.1
         version: 8.4.1(@types/react@18.3.7)(storybook@8.4.1(prettier@3.3.3))
@@ -181,8 +193,6 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1(@types/node@22.5.5)
 
-  packages/tools: {}
-
   packages/types:
     dependencies:
       keyboard-event-key-type:
@@ -198,9 +208,6 @@ importers:
 
   packages/ui:
     dependencies:
-      '@fig/functions':
-        specifier: workspace:*
-        version: link:../functions
       runed:
         specifier: ^0.15.3
         version: 0.15.3(svelte@5.1.9)
@@ -208,6 +215,12 @@ importers:
       '@chromatic-com/storybook':
         specifier: ^1.9.0
         version: 1.9.0(react@18.3.1)
+      '@fig/functions':
+        specifier: workspace:*
+        version: link:../functions
+      '@inlang/paraglide-sveltekit':
+        specifier: ^0.11.1
+        version: 0.11.5(@sveltejs/kit@2.5.28(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))
       '@storybook/addon-essentials':
         specifier: ^8.3.6
         version: 8.4.2(@types/react@18.3.7)(storybook@8.4.1(prettier@3.3.3))
@@ -232,9 +245,6 @@ importers:
       '@storybook/test':
         specifier: ^8.3.6
         version: 8.4.2(storybook@8.4.1(prettier@3.3.3))
-      '@sveltejs/adapter-auto':
-        specifier: ^3.0.0
-        version: 3.3.1(@sveltejs/kit@2.5.28(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))
       '@sveltejs/adapter-static':
         specifier: ^3.0.6
         version: 3.0.6(@sveltejs/kit@2.5.28(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))
@@ -3428,7 +3438,7 @@ snapshots:
       '@inlang/paraglide-js': 1.11.3
       '@inlang/sdk': 0.36.3
       '@lix-js/client': 2.2.1
-      unplugin: 1.14.1
+      unplugin: 1.15.0
     transitivePeerDependencies:
       - babel-plugin-macros
       - debug
@@ -4430,7 +4440,7 @@ snapshots:
     dependencies:
       '@vitest/spy': 2.1.1
       estree-walker: 3.0.3
-      magic-string: 0.30.11
+      magic-string: 0.30.12
     optionalDependencies:
       vite: 5.4.6(@types/node@22.5.5)
 
@@ -4467,7 +4477,7 @@ snapshots:
   '@vitest/snapshot@2.1.1':
     dependencies:
       '@vitest/pretty-format': 2.1.1
-      magic-string: 0.30.11
+      magic-string: 0.30.12
       pathe: 1.1.2
 
   '@vitest/snapshot@2.1.4':

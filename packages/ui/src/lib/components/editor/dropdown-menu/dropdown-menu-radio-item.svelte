@@ -2,7 +2,7 @@
   import {DropdownMenu as DropdownMenuPrimitive, type WithoutChild} from "bits-ui";
   import Circle from "lucide-svelte/icons/circle";
   import {cn} from "$lib/utils.js";
-  import {optionStyle} from "$lib/components/editor/options/index.js";
+  import {optionStyle} from "$lib/components/editor/options";
 
   let {
     ref = $bindable(null),

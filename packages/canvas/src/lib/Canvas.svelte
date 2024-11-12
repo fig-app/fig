@@ -27,7 +27,7 @@
     width = 100,
     height = 100,
     fullscreen = false,
-    backgroundColor = DEFAULT_BACKGROUND_COLOR,
+    backgroundColor = $bindable(DEFAULT_BACKGROUND_COLOR),
     children
   }: Props = $props();
 
@@ -56,6 +56,7 @@
   const ZOOM_AMOUNT: number = 1.15;
 
   updateCanvas(() => [
+    backgroundColor,
     navigation.scale,
     navigation.offsetX,
     navigation.offsetY,

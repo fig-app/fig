@@ -1,42 +1,49 @@
-import type {KeyboardKey} from "@fig/types/KeyboardKey";
+import type { KeyboardKey } from "@fig/types/KeyboardKey";
+
+const actionKeys = ["Control", "Alt", "Shift", "Meta"];
 
 class Keys {
   keyPressed: KeyboardKey[] = $state([]);
 
   constructor() {
     if (typeof window !== "undefined") {
-      window.addEventListener("keydown", this.handleKeyDown.bind(this));
-      window.addEventListener("keyup", this.handleKeyUp.bind(this));
+      document.body.addEventListener("keydown", this.handleKeyDown.bind(this));
+      document.body.addEventListener("keyup", this.handleKeyUp.bind(this));
     }
   }
 
   private handleKeyDown(e: KeyboardEvent) {
-    e.preventDefault();
+    if (actionKeys.includes(e.key)) {
+      e.preventDefault();
+    }
 
     let key = e.key;
-    if (!this.keyPressed.includes(key)) {
+    if (!Array.from(this.keyPressed).includes(key)) {
       this.keyPressed = [...this.keyPressed, key];
     }
   }
 
   private handleKeyUp(e: KeyboardEvent) {
-    e.preventDefault();
-    let idx = this.keyPressed.indexOf(e.key);
+    if (actionKeys.includes(e.key)) {
+      e.preventDefault();
+    }
+
+    let idx = Array.from(this.keyPressed).indexOf(e.key);
     if (idx > -1) {
       this.keyPressed.splice(idx, 1);
     }
   }
 
   get anyPressed(): boolean {
-    return this.keyPressed.length > 0;
+    return Array.from(this.keyPressed).length > 0;
   }
 
   get combo(): KeyboardKey[] {
-    return this.keyPressed;
+    return Array.from(this.keyPressed);
   }
 
   isPressed(key: KeyboardKey): boolean {
-    return this.keyPressed.includes(key);
+    return Array.from(this.keyPressed).includes(key);
   }
 
   checkCombo(keys: KeyboardKey[]): boolean {

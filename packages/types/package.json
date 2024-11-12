@@ -13,7 +13,7 @@
       "types": "./dist/index.d.ts"
     },
     "./*": {
-      "import": "./dist/*.ts",
+      "import": "./dist/*.js",
       "types": "./dist/*.d.ts"
     }
   },

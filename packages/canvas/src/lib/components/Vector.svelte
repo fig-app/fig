@@ -6,7 +6,7 @@
   import {normalize} from "@fig/functions/path/normalize";
   import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
-  import {colorToString, getPrimitiveBlue, getPrimitiveWhite} from "@fig/functions/color";
+  import {colorToString} from "@fig/functions/color";
   import type {PathCommand, PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {getGeometryBbox} from "@fig/functions/path/bBox";
@@ -210,8 +210,8 @@
           width: 10,
           height: 10,
           colors: {
-            stroke: getPrimitiveBlue(),
-            background: getPrimitiveWhite(),
+            stroke: canvasColors.blue,
+            background: canvasColors.white,
           },
           radius: 0,
           rotation: 0,

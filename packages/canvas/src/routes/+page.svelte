@@ -3,7 +3,6 @@
   import Vector from "$lib/components/Vector.svelte";
 </script>
 
-
 <Canvas fullscreen={true}>
 
   <Vector node={{
