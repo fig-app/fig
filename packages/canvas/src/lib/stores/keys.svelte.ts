@@ -11,8 +11,6 @@ class Keys {
   }
 
   private handleKeyDown(e: KeyboardEvent) {
-    e.preventDefault();
-
     let key = e.key;
     if (!this.keyPressed.includes(key)) {
       this.keyPressed = [...this.keyPressed, key];

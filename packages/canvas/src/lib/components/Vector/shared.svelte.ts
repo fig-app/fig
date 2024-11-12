@@ -7,7 +7,12 @@ import type {CanvasDrawFunction} from "$lib/types/CanvasFunction";
 import type {VectorContext} from "$lib/types/VectorContext";
 import {cursorPosition} from "$lib/stores/cursorPosition.svelte.js";
 import {navigation} from "$lib/stores/navigation.svelte.js";
-import type {PathCommandWithEndPoint} from "@fig/functions/dist/src/path/PathCommand";
+import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
+
+/**
+ * File to handle all shared functionalities between vector parts with function
+ */
+
 
 /**
  * Handle the selection of a vector part

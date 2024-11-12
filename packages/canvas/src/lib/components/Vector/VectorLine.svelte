@@ -178,6 +178,7 @@
           relative: false,
           endPoint: navigation.toRealPoint(center),
         });
+        // Force redrawind the whole vector to add the new VectorPoint instance
         vectorContext.updateVector();
       }
     }

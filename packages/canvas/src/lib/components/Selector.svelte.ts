@@ -95,19 +95,35 @@ class Selector {
     this.disabled = false;
   }
 
-  // Nodes (for now not used functions)
+  // Nodes
+  isPartMultiSelectionNodes(node: CanvasNode): boolean {
+    return this.nodes.includes(node) && this.nodes.length > 1;
+  }
+
+  hasSelectedNodes(): boolean {
+    return this.nodes.length > 0;
+  }
+
   selectNode(node: CanvasNode) {
+    node.selected = true;
     if (!this.nodeIsSelected(node)) {
-      node.selected = true;
       this.nodes.push(node);
     }
   }
 
+  selectSingleNode(node: CanvasNode) {
+    console.log("testouille");
+    for (const node of this.nodes) {
+      node.selected = false;
+    }
+    this.selectNode(node);
+  }
+
   unselectNode(node: CanvasNode) {
     if (this.nodeIsSelected(node)) {
-      node.selected = false;
       this.nodes.splice(this.nodes.indexOf(node), 1);
     }
+    node.selected = false;
   }
 
   unselectAllNodes() {

@@ -49,6 +49,7 @@
   let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
 
   let hovered: boolean = $state(false);
+  let clicked: boolean = $state(false);
   let dblclick: boolean = $state(false);
   let editMode: boolean = $state(false);
   let triggerUpdate: boolean = $state(false);
@@ -312,7 +313,9 @@
     // Update bounding box size and coordinates
     updateBoundingBox();
     // Updating hovered state
-    hovered = isVectorHovered();
+    hovered = isVectorHovered() && !selector.isPartMultiSelectionNodes();
+
+    clicked = hovered && canvasClick.single;
     dblclick = hovered && canvasClick.double;
 
     // Check for selection with selector rectangle
@@ -322,6 +325,17 @@
       } else {
         selector.unselectNode(canvasNode);
       }
+    }
+
+    // Add selection
+    if (clicked) {
+      if (keys.shiftPressed()) {
+        selector.selectNode(canvasNode)
+      } else {
+        selector.selectSingleNode(canvasNode);
+      }
+    } else if (!keys.shiftPressed() && canvasClick.single && canvasNode.selected && !editMode) {
+      selector.unselectNode(canvasNode);
     }
 
     // Toggle edit mode when double click
@@ -335,9 +349,11 @@
 
     // Exit edit mode when pressing enter or escape
     if (editMode && keys.isPressed("Enter") || keys.isPressed("Escape")) {
-      if (!editMode && canvasNode.selected && editTimer.finished()) {
+      if (!editMode && canvasNode.selected) {
         selector.unselectNode(canvasNode);
       }
+
+      selector.unselectAllParts();
       editMode = false;
     }
 
