@@ -1,4 +1,4 @@
-import Vector from "$lib/components/Vector.svelte";
+import Vector from "$lib/components/Vector/Vector.svelte";
 
 type CubicCurveArgs = {
   ctx: CanvasRenderingContext2D;
@@ -11,14 +11,14 @@ type CubicCurveArgs = {
 };
 
 export function cubicCurve({
-  ctx,
-  startPoint,
-  startControlPoint,
-  endControlPoint,
-  endPoint,
-  color = "#fff",
-  weight = 1,
-}: CubicCurveArgs) {
+                             ctx,
+                             startPoint,
+                             startControlPoint,
+                             endControlPoint,
+                             endPoint,
+                             color = "#fff",
+                             weight = 1,
+                           }: CubicCurveArgs) {
   ctx.save();
 
   ctx.lineWidth = weight;

@@ -1,20 +1,20 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
-  import {canvasClick} from "$lib/stores/canvasClick.svelte";
-  import {useId} from "@fig/functions/id";
-  import {navigation} from "$lib/stores/navigation.svelte";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte.js";
+  import {navigation} from "$lib/stores/navigation.svelte.js";
   import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
-  import {EditPoint} from "$lib/components/EditPoint.svelte";
-  import {Timer} from "$lib/stores/canvasTime.svelte"
-  import {selector} from "$lib/components/Selector.svelte";
-  import {keys} from "$lib/stores/keys.svelte";
-  import {cursorHover} from "$lib/stores/cursorHover.svelte";
+  import {EditPoint} from "$lib/components/Vector/EditPoint.svelte.js";
+  import {Timer} from "$lib/stores/canvasTime.svelte.js"
+  import {selector} from "$lib/components/Selector.svelte.js";
+  import {keys} from "$lib/stores/keys.svelte.js";
+  import {cursorHover} from "$lib/stores/cursorHover.svelte.js";
   import {
     handleVectorPartDragging,
     handleVectorPartDrawing,
     handleVectorPartSelection
-  } from "$lib/components/shared.svelte";
+  } from "$lib/components/Vector/shared.svelte.js";
+  import {useId} from "@fig/functions/id";
   import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
 
   type Props = {

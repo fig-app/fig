@@ -1,10 +1,10 @@
 import type {Vector} from "@fig/types/properties/Vector";
-import type {Line} from "@fig/types/shapes/Line";
-import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
 import {hoverRect} from "@fig/functions/shape/rect";
+import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
 import {canvasClick} from "$lib/stores/canvasClick.svelte";
 import {rect} from "$lib/primitive/rect";
 import {linesIntersection} from "@fig/functions/shape/line";
+import type {Line} from "@fig/types/shapes/Line";
 
 type RectConstructorArgs = {
   x?: number;

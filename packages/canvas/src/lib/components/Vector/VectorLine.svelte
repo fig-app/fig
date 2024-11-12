@@ -2,24 +2,24 @@
   import type {VectorPart} from "$lib/types/VectorPart";
   import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
   import {centerOfSegment, getLineLength, hoverLineWithDistance} from "@fig/functions/shape/line";
-  import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
-  import {canvasClick} from "$lib/stores/canvasClick.svelte";
+  import {cursorPosition} from "$lib/stores/cursorPosition.svelte.js";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte.js";
   import {useId} from "@fig/functions/id";
-  import {keys} from "../stores/keys.svelte";
-  import {Timer} from "$lib/stores/canvasTime.svelte";
-  import {EditPoint} from "$lib/components/EditPoint.svelte";
-  import {navigation} from "$lib/stores/navigation.svelte";
+  import {keys} from "$lib/stores/keys.svelte";
+  import {Timer} from "$lib/stores/canvasTime.svelte.js";
+  import {EditPoint} from "$lib/components/Vector/EditPoint.svelte.js";
+  import {navigation} from "$lib/stores/navigation.svelte.js";
   import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
-  import {selector} from "$lib/components/Selector.svelte";
+  import {selector} from "$lib/components/Selector.svelte.js";
   import {line} from "$lib/primitive/line";
   import {canvasColors} from "$lib/stores/canvasColors";
-  import {cursorHover} from "$lib/stores/cursorHover.svelte";
+  import {cursorHover} from "$lib/stores/cursorHover.svelte.js";
   import {
     handleVectorPartDragging,
     handleVectorPartDrawing,
     handleVectorPartSelection
-  } from "$lib/components/shared.svelte";
+  } from "$lib/components/Vector/shared.svelte.js";
   import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
   import {getHoverMarginDistance} from "@fig/functions/distance";
 

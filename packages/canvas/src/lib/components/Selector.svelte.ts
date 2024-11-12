@@ -1,10 +1,11 @@
 import type {VectorPart} from "$lib/types/VectorPart";
 import type {CanvasNode} from "$lib/types/CanvasNode";
-import {Rect} from "$lib/Rect.svelte";
-import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
-import {canvasClick} from "$lib/stores/canvasClick.svelte";
+import {Rect} from "../Rect.svelte.js";
+import {cursorPosition} from "$lib/stores/cursorPosition.svelte.js";
+import {canvasClick} from "$lib/stores/canvasClick.svelte.js";
 import {canvasColors} from "$lib/stores/canvasColors";
-import {keys} from "$lib/stores/keys.svelte";
+import {keys} from "$lib/stores/keys.svelte.js";
+import type {Vector} from "@fig/types/properties/Vector";
 import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
 
 class Selector {
@@ -18,6 +19,7 @@ class Selector {
   disabled: boolean = $state(false);
   inSelection: boolean = $state(false);
   rect: Rect | null = $state(null);
+  origin: Vector | null = $state(null);
 
   constructor() {
   }
@@ -34,23 +36,39 @@ class Selector {
     }
   }
 
+  // ################################
+  // BEGIN UPDATE
+  // ################################
+
   update() {
     if (this.disabled) return;
 
     // Check for dragging
     if (canvasClick.pressed) {
-      if (!this.rect) {
-        // Allow to add selection with shift pressed
-        if (!keys.shiftPressed()) {
-          this.unselectAllParts();
-        }
-        this.inSelection = true;
-        this.rect = new Rect({
+
+      // Create this
+      if (this.origin == null) {
+        this.origin = {
           x: cursorPosition.x,
           y: cursorPosition.y,
-          width: 0,
-          height: 0,
-        });
+        };
+      }
+
+      if (!this.rect) {
+        // Only create a selector rect if clicked somewhere (origin) and moved
+        if (this.origin.x != cursorPosition.x && this.origin.y != cursorPosition.y) {
+          // Allow to add selection with shift pressed
+          if (!keys.shiftPressed()) {
+            this.unselectAllParts();
+          }
+          this.inSelection = true;
+          this.rect = new Rect({
+            x: cursorPosition.x,
+            y: cursorPosition.y,
+            width: cursorPosition.x - this.origin.x,
+            height: cursorPosition.y - this.origin.y,
+          });
+        }
       } else {
         this.rect.width = cursorPosition.x - this.rect.x;
         this.rect.height = cursorPosition.y - this.rect.y;
@@ -58,11 +76,16 @@ class Selector {
     }
 
     // Remove the rect if not dragging anymore
-    if (!canvasClick.pressed && this.rect) {
+    if (!canvasClick.pressed) {
       this.inSelection = false;
       this.rect = null;
+      this.origin = null;
     }
   }
+
+  // ################################
+  // END UPDATE
+  // ################################
 
   disable() {
     this.disabled = true;

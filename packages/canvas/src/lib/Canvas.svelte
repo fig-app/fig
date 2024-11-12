@@ -8,7 +8,7 @@
   import {navigation} from "$lib/stores/navigation.svelte";
   import {setCanvasContext} from "$lib/context/canvasContext";
   import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
-  import {selector} from "$lib/components/Selector.svelte";
+  import {selector} from "$lib/components/Selector.svelte.js";
   import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
   import type {Vector} from "@fig/types/properties/Vector";
   import {canvasPipeline} from "$lib/stores/canvasPipeline.svelte";
