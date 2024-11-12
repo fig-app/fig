@@ -10,6 +10,9 @@ export default defineConfig({
       outdir: "./src/lib/paraglide",
     }),
   ],
+  ssr: {
+    noExternal: ["@inlang/paraglide-sveltekit"],
+  },
   server: {
     port: 1042,
     strictPort: true,

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,14 +8,15 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-    --muted: 300 1% 67%;
-    --muted-foreground: 300 1% 67%;
-    --popover: 0 0% 100%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 50%;
+    --popover: 0 0% 96%;
     --popover-foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --input: 0 0% 96%;
+    /*--primary: 249 100% 70%;*/
     --primary: 205 100% 53%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 90%;
@@ -32,19 +35,22 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --option: 0 0% 96%;
+    --option-foreground: 0 0% 0%;
   }
 
   .dark {
     --background: 0 0% 17%;
     --foreground: 210 40% 98%;
     --muted: 120 1% 53%;
-    --muted-foreground: 120 1% 53%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --muted-foreground: 120 1% 70%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 95%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
     --border: 0 0% 22%;
     --input: 0 0% 22%;
+    /*--primary: 249 61% 59%;*/
     --primary: 205 90% 48%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 22%;
@@ -62,6 +68,8 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --option: 0 0% 12%;
+    --option-foreground: 0 0% 95%;
   }
 }
 
@@ -71,6 +79,17 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground selection:bg-primary/30;
+    font-family: 'Inter', sans-serif;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
   }
 }

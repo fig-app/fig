@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { fontFamily } from "tailwindcss/defaultTheme";
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
@@ -59,6 +60,10 @@ const config: Config = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        option: {
+          DEFAULT: "hsl(var(--option) / <alpha-value>)",
+          foreground: "hsl(var(--option-foreground) / <alpha-value>)",
+        },
       },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",
@@ -69,6 +74,7 @@ const config: Config = {
       fontFamily: {
         sans: [...fontFamily.sans],
       },
+      fontSize: {},
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
