@@ -73,11 +73,11 @@ scaleMode: PaintScaleMode,
 /**
  * Affine transform applied to the image, only present if scaleMode is STRETCH
  */
-imageTransform: Transform, 
+imageTransform?: Transform, 
 /**
  * Amount image is scaled by in tiling, only present if scaleMode is TILE
  */
-scalingFactor: number, 
+scalingFactor?: number, 
 /**
  * Image rotation, in degrees.
  */
@@ -103,4 +103,4 @@ gifRef: string,
 /**
  * A mapping of field to the VariableAlias of the bound variable.
  */
-boundVariables: { [key in string]?: VariableAlias }, };
+boundVariables?: { [key in string]?: VariableAlias }, };

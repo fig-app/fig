@@ -35,6 +35,7 @@
 
   let {node}: { node: Node } = $props();
 
+  console.log(node.name, node.id);
   if (node.node.type !== "vector") {
     console.error(`${node.name} isn't a vector.`);
   }
@@ -66,16 +67,7 @@
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
 
-  // Force update when this variables change (trigger the redraw)
-  canvasContext.updateCanvas(() => [hovered, bbox, strokeGeometriesCommands])
-
-  // Update position of the node
-  $effect(() => {
-    canvasNode.position = {
-      x: roundFloat(navigation.toRealX(canvasNode.boundingBox.topLeft.x), 1),
-      y: roundFloat(navigation.toRealY(canvasNode.boundingBox.topLeft.y), 1),
-    };
-  })
+  console.log(canvasContext)
 
   // Create vector context
   setVectorContext({
@@ -88,40 +80,22 @@
     strokeGeometriesCommands: strokeGeometriesCommands,
   });
 
+  // Register vector node
+  let canvasNode: CanvasNode = $state({
+    draw,
+    update,
+    node: node,
+    selected: false,
+    boundingBox: Rect.new(),
+    position: {x: 0, y: 0},
+  });
+
+  registerCanvasNode(canvasNode);
+
   // Parse all geometries path to an array of PathCommand
   let strokeGeometry = data.strokeGeometry;
   for (const geometry of strokeGeometry) {
     strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
-  }
-
-  // Get all commands with end points.
-  // Here a command is defined thanks to its geometryIdx and its own idx in the geometry
-  function getCommandsWithEndPoints() {
-    let listOfCommands: [number, number][] = [];
-    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
-      for (const [i, command] of geometry.entries()) {
-        if (commandHasEndPoint(command)) {
-          listOfCommands.push([gi, i]);
-        }
-      }
-    }
-    return listOfCommands;
-  }
-
-  // Associate each end point to the list of [geometryIdx, commandIdx] that have this end point
-  // key : string of {x, y} to represent the coordinates
-  // value : array of MLT or C Path commands, which are the only ones useful to have endpoints
-  function getPointsAndCoordinates() {
-    let to_ret: { [key: string]: [number, number][] } = {};
-    getCommandsWithEndPoints().forEach(commandTuple => {
-      let command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint;
-      const key = vectorToString(command.endPoint);
-      if (!to_ret[key]) {
-        to_ret[key] = [];
-      }
-      to_ret[key].push(commandTuple);
-    });
-    return to_ret;
   }
 
   let pointsAndCoordinates: { [key: string]: [number, number][] } = $derived.by(() => {
@@ -169,22 +143,79 @@
     return allCurves;
   })
 
-  // Register vector node
-  let canvasNode: CanvasNode = $state({
-    draw,
-    update,
-    node: node,
-    selected: false,
-    boundingBox: Rect.new(),
-    position: {x: 0, y: 0},
-  });
 
-  $inspect(canvasNode.position)
+  // -----------------------------------------------------------------------------------------------
+  // Reactivity
+  // -----------------------------------------------------------------------------------------------
 
-  registerCanvasNode(canvasNode);
+  // Force update when this variables change (trigger the redraw)
+  canvasContext.updateCanvas(() => [hovered, bbox, strokeGeometriesCommands])
 
+  // Update position of the node
+  $effect(() => {
+    canvasNode.position = {
+      x: roundFloat(navigation.toRealX(canvasNode.boundingBox.topLeft.x), 1),
+      y: roundFloat(navigation.toRealY(canvasNode.boundingBox.topLeft.y), 1),
+    };
+  })
+
+  // -----------------------------------------------------------------------------------------------
+  // Utility functions
+  // -----------------------------------------------------------------------------------------------
+
+  /**
+   * Get all commands with end points.
+   * Here a command is defined thanks to its geometryIdx and its own idx in the geometry
+   */
+  function getCommandsWithEndPoints() {
+    let listOfCommands: [number, number][] = [];
+    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
+      for (const [i, command] of geometry.entries()) {
+        if (commandHasEndPoint(command)) {
+          listOfCommands.push([gi, i]);
+        }
+      }
+    }
+    return listOfCommands;
+  }
+
+  /**
+   * Associate each end point to the list of [geometryIdx, commandIdx] that have this end point
+   * key : string of {x, y} to represent the coordinates
+   * value : array of MLT or C Path commands, which are the only ones useful to have endpoints
+   */
+  function getPointsAndCoordinates() {
+    let to_ret: { [key: string]: [number, number][] } = {};
+    getCommandsWithEndPoints().forEach(commandTuple => {
+      let command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint;
+      const key = vectorToString(command.endPoint);
+      if (!to_ret[key]) {
+        to_ret[key] = [];
+      }
+      to_ret[key].push(commandTuple);
+    });
+    return to_ret;
+  }
+
+  function isVectorHovered(): boolean {
+    for (const path of strokePathsSynchronization) {
+      if (canvasRenderingContext.ctx) {
+        // Threshold of line hover
+        canvasRenderingContext.ctx.lineWidth = stylizedStrokeWeight + getHoverMarginDistance();
+        if (canvasRenderingContext.ctx.isPointInStroke(path, cursorPosition.x, cursorPosition.y)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  // -----------------------------------------------------------------------------------------------
   // Several functions to get the different parts according to their type.
   // It allows to render them in a specific order (to kind of handle z-index)
+  // -----------------------------------------------------------------------------------------------
+
   function getVectorPoints(): VectorPart[] {
     let list: VectorPart[] = [];
     parts.forEach(part => {
@@ -225,9 +256,11 @@
     return list;
   }
 
-  // ######################################################
-  // BEGIN DRAW
-  // ######################################################
+
+  // -----------------------------------------------------------------------------------------------
+  // Drawing functions
+  // -----------------------------------------------------------------------------------------------
+
   function draw(ctx: CanvasRenderingContext2D) {
     // Draw bounding box
     if (!editMode && canvasNode.selected) {
@@ -299,30 +332,15 @@
     }
   }
 
-  // ######################################################
-  // END DRAW
-  // ######################################################
 
-  function isVectorHovered(): boolean {
-    for (const path of strokePathsSynchronization) {
-      if (canvasRenderingContext.ctx) {
-        // Threshold of line hover
-        canvasRenderingContext.ctx.lineWidth = stylizedStrokeWeight + getHoverMarginDistance();
-        if (canvasRenderingContext.ctx.isPointInStroke(path, cursorPosition.x, cursorPosition.y)) {
-          return true;
-        }
-      }
-    }
+  // -----------------------------------------------------------------------------------------------
+  // Update functions
+  // -----------------------------------------------------------------------------------------------
 
-    return false;
-  }
-
-  // ######################################################
-  // BEGIN UPDATE
-  // ######################################################
   function update() {
     // Update bounding box size and coordinates
     updateBoundingBox();
+
     // Updating hovered state
     hovered = isVectorHovered() && !selector.isPartMultiSelectionNodes(canvasNode);
 
@@ -338,7 +356,7 @@
       }
     }
 
-    // Add selection
+    // Add selection on click
     if (clicked) {
       if (keys.shiftPressed()) {
         selector.selectNode(canvasNode)
@@ -349,7 +367,7 @@
       selector.unselectNode(canvasNode);
     }
 
-    // Toggle edit mode when double click
+    // Toggle vector edit mode when double click
     if (dblclick && !editMode && editTimer.finished()) {
       editMode = true;
       editTimer.reset();
@@ -371,18 +389,10 @@
     // Update parts
     if (editMode) {
       // Update in this order to prioritize hover (points > lines)
-      getVectorPoints().forEach(part => {
-        part.update();
-      });
-      getVectorControlPoint().forEach(part => {
-        part.update();
-      });
-      getVectorLines().forEach(part => {
-        part.update();
-      });
-      getVectorCurves().forEach(part => {
-        part.update();
-      });
+      getVectorPoints().forEach(part => part.update());
+      getVectorControlPoint().forEach(part => part.update());
+      getVectorLines().forEach(part => part.update());
+      getVectorCurves().forEach(part => part.update());
     }
 
     // Move selected parts with arrow keys
@@ -401,10 +411,6 @@
     }
   }
 
-  // ######################################################
-  // END UPDATE
-  // ######################################################
-
   function updateBoundingBox() {
     canvasNode.boundingBox.update(
       navigation.toVirtualX(bbox.min.x),
@@ -413,6 +419,11 @@
       (bbox.height) * navigation.scale
     );
   }
+
+
+  // -----------------------------------------------------------------------------------------------
+  // Context functions
+  // -----------------------------------------------------------------------------------------------
 
   function register(part: VectorPart) {
     onMount(() => {
@@ -457,6 +468,11 @@
     triggerUpdate = !triggerUpdate;
   }
 
+
+  // -----------------------------------------------------------------------------------------------
+  // Render functions
+  // -----------------------------------------------------------------------------------------------
+
   function forceCommandWithEndPoint(command: PathCommand): PathCommandWithEndPoint {
     return command as PathCommandWithEndPoint;
   }
@@ -476,24 +492,24 @@
         <!-- Draw lines -->
         {#if (command.type === "Z")}
           <VectorLine
-                  startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
-                  endCommandTuplesList={getCommandTuplesList(gi, 0)}
-                  geometryIndex={gi}
-                  startIndex={i - 1}/>
+            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+            endCommandTuplesList={getCommandTuplesList(gi, 0)}
+            geometryIndex={gi}
+            startIndex={i - 1}/>
         {:else if (command.type === "L")}
           <VectorLine
-                  startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
-                  endCommandTuplesList={getCommandTuplesList(gi, i)}
-                  geometryIndex={gi}
-                  startIndex={i - 1}/>
+            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+            endCommandTuplesList={getCommandTuplesList(gi, i)}
+            geometryIndex={gi}
+            startIndex={i - 1}/>
         {/if}
 
         <!--  Draw cubic curves -->
         {#if (command.type === "C")}
           <VectorCurve
-                  startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
-                  endCommandTuplesList={getCommandTuplesList(gi, i)}
-                  geometryIndex={gi} startIndex={i - 1}
+            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+            endCommandTuplesList={getCommandTuplesList(gi, i)}
+            geometryIndex={gi} startIndex={i - 1}
           />
         {/if}
       {/each}

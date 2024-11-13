@@ -12,8 +12,21 @@
   import {ChevronDown} from "lucide-svelte";
   import {ColorPicker} from "$lib/components/color-picker/index.js"
   import {selector} from "@fig/canvas/components/Selector.svelte";
+  import {canvasPipeline} from "@fig/canvas/stores/canvasPipeline.svelte";
+  import {dev} from "$app/environment";
+  import {randomInt} from "@fig/functions/math";
+  import {randomColor} from "@fig/functions/color";
 
   let canvasBackgroundColor = $state("#1E1E1E")
+
+  // $effect.root(() => {
+  //   setTimeout(() => {
+  //     console.log("Creating vector")
+  //     canvasPipeline.createVector({
+  //       strokeGeometry: [{path: "M 100,100 L 200,100 L 640,300 Z"}],
+  //     })
+  //   }, 1000)
+  // })
 
   function handleKeyDown() {
     if (keys.isPressed('p')) {
@@ -21,6 +34,15 @@
     } else if (keys.isPressed('v')) {
       userMode.mode = 'SELECTOR';
     }
+  }
+
+  function createRandomRectangle() {
+    canvasPipeline.createRectangle({
+      x: randomInt(0, window.innerWidth - 400),
+      y: randomInt(0, window.innerHeight - 200),
+      width: 100,
+      height: 100
+    }, randomColor())
   }
 
 </script>
@@ -67,14 +89,28 @@
               <ColorPicker bind:color={canvasBackgroundColor}/>
             </PanelSection.Content>
           </PanelSection.Root>
+
+          {#if (dev)}
+            <PanelSection.Root>
+              <PanelSection.Header>
+                <PanelSection.Title>Debug</PanelSection.Title>
+              </PanelSection.Header>
+              <PanelSection.Content>
+                <Button variant="secondary" size="sm" onclick={createRandomRectangle}
+                        class="w-full">
+                  Create random rectangle
+                </Button>
+              </PanelSection.Content>
+            </PanelSection.Root>
+          {/if}
         {:else}
           <PanelSection.Root>
             <PanelSection.Header>
               <PanelSection.Title>Position</PanelSection.Title>
             </PanelSection.Header>
             <PanelSection.Content>
-              <div class="flex gap-2">
-                {#if (selector.selectedNode && !selector.hasMultipleSelectedNodes)}
+              {#if (selector.selectedNode && !selector.hasMultipleSelectedNodes)}
+                <div class="flex gap-2">
                   <!-- X position -->
                   <NumberInput inputSize="sm"
                                bind:value={selector.selectedNode.position.x}>
@@ -89,8 +125,8 @@
                       <span class="text-foreground/60">Y</span>
                     {/snippet}
                   </NumberInput>
-                {/if}
-              </div>
+                </div>
+              {/if}
             </PanelSection.Content>
           </PanelSection.Root>
         {/if}

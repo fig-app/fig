@@ -1,10 +1,15 @@
 <script>
   import Canvas from "$lib/Canvas.svelte";
   import Vector from "$lib/components/vector/Vector.svelte";
+  import {canvasPipeline, DEFAULT_PAINT} from "$lib/stores/canvasPipeline.svelte";
 </script>
 
-<Canvas fullscreen={true}>
+<button style="position: absolute; top: 0; left: 0;"
+        onclick={() => canvasPipeline.createRectangle({x: 400, y: 400, height: 100, width: 100})}>
+  Create vector
+</button>
 
+<Canvas fullscreen={true}>
   <Vector node={{
           id: "vector-id",
           name: "vector-name",

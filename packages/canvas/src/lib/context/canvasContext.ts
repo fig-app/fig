@@ -2,7 +2,7 @@ import type { CanvasContext } from "$lib/types/CanvasContext";
 import { getContext, onDestroy, setContext } from "svelte";
 import type { CanvasNode } from "$lib/types/CanvasNode";
 
-const CANVAS_KEY = Symbol("CANVAS");
+export const CANVAS_KEY = Symbol("CANVAS");
 
 export function setCanvasContext(context: CanvasContext) {
   setContext<CanvasContext>(CANVAS_KEY, context);

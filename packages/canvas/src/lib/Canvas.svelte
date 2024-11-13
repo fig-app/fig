@@ -1,23 +1,25 @@
 <script lang="ts">
-  import {onMount, type Snippet, tick, untrack} from "svelte";
+  import {getAllContexts, mount, onMount, type Snippet, tick, untrack} from "svelte";
   import type {CanvasNode} from "./types/CanvasNode";
   import {fillRect, rect} from "$lib/primitive/rect";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {canvasTime} from "$lib/stores/canvasTime.svelte";
   import {keys, cursorPosition} from "@fig/stores";
   import {navigation} from "$lib/stores/navigation.svelte";
-  import {setCanvasContext} from "$lib/context/canvasContext";
+  import {getCanvasContext, setCanvasContext} from "$lib/context/canvasContext";
   import {selector} from "$lib/components/Selector.svelte.js";
   import {
     canvasColors,
     DEFAULT_BACKGROUND_COLOR,
     DEFAULT_GRID_COLOR
   } from "$lib/stores/canvasColors";
-  import type {Vector} from "@fig/types/properties/Vector";
+  import type {Vector as VectorType} from "@fig/types/properties/Vector";
   import {canvasPipeline} from "$lib/stores/canvasPipeline.svelte";
   import {userMode} from "$lib/stores/userMode.svelte";
   import {canvasRenderingContext} from "$lib/stores/canvasRenderingContext.svelte";
   import {line} from "$lib/primitive/line";
+  import {watch} from "runed";
+  import Vector from "$lib/components/vector/Vector.svelte";
 
   type Props = {
     width?: number;
@@ -49,11 +51,11 @@
 
   let clickTimeout: NodeJS.Timeout;
   let isPanning: boolean = false;
-  let startPanningPos: Vector = {
+  let startPanningPos: VectorType = {
     x: 0,
     y: 0,
   }
-  let lastPanningPos: Vector = {
+  let lastPanningPos: VectorType = {
     x: 0,
     y: 0,
   }
@@ -106,6 +108,23 @@
       cancelAnimationFrame(frameId);
     }
   });
+
+
+  const contexts = getAllContexts();
+
+  $effect(() => {
+    if (canvasPipeline.creationPipeline.length > 0) {
+      for (let node of canvasPipeline.creationPipeline) {
+        mount(Vector, {
+          target: document.querySelector("#canvas") as HTMLElement,
+          props: {node},
+          context: contexts,
+        });
+      }
+
+      canvasPipeline.clearCreationPipeline();
+    }
+  })
 
   // Functions
   function updateCanvas(depts: () => any[]) {
@@ -326,7 +345,7 @@
   function handleMouseMove(e: MouseEvent) {
     if (isPanning) {
       // move delta between last post and current pos
-      let delta: Vector = {
+      let delta: VectorType = {
         x: e.x - lastPanningPos.x,
         y: e.y - lastPanningPos.y,
       }
@@ -461,3 +480,5 @@
 >
   {@render children()}
 </canvas>
+
+<div id="canvas"></div>
