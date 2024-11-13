@@ -1,23 +1,16 @@
-import type {CanvasNode} from "$lib/types/CanvasNode";
+import type { CanvasNode } from "$lib/types/CanvasNode";
 
 type pipelineClassStateType = {
   pipeline: Set<CanvasNode>;
 };
 
 class pipelineClass {
-  private states: pipelineClassStateType = $state({
-    pipeline: new Set<CanvasNode>(),
-  });
+  private pipeline = $state(new Set<CanvasNode>());
 
-  constructor() {
-  }
+  constructor() {}
 
-  get pipeline(): Set<CanvasNode> {
-    return this.states.pipeline;
-  }
-
-  set addToPipeline(value: CanvasNode) {
-    this.states.pipeline.add(value);
+  set addNode(node: CanvasNode) {
+    this.pipeline.add(node);
   }
 }
 

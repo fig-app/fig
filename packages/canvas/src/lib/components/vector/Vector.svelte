@@ -31,6 +31,7 @@
   import {serializeCommands} from "@fig/functions/path/serialize";
   import type {Line} from "@fig/types/shapes/Line";
   import {parsePathString} from "@fig/functions/path/index";
+  import {roundFloat} from "@fig/functions/math";
 
   let {node}: { node: Node } = $props();
 
@@ -67,6 +68,14 @@
 
   // Force update when this variables change (trigger the redraw)
   canvasContext.updateCanvas(() => [hovered, bbox, strokeGeometriesCommands])
+
+  // Update position of the node
+  $effect(() => {
+    canvasNode.position = {
+      x: roundFloat(navigation.toRealX(canvasNode.boundingBox.topLeft.x), 1),
+      y: roundFloat(navigation.toRealY(canvasNode.boundingBox.topLeft.y), 1),
+    };
+  })
 
   // Create vector context
   setVectorContext({
@@ -167,7 +176,10 @@
     node: node,
     selected: false,
     boundingBox: Rect.new(),
+    position: {x: 0, y: 0},
   });
+
+  $inspect(canvasNode.position)
 
   registerCanvasNode(canvasNode);
 
@@ -312,7 +324,7 @@
     // Update bounding box size and coordinates
     updateBoundingBox();
     // Updating hovered state
-    hovered = isVectorHovered() && !selector.isPartMultiSelectionNodes(node);
+    hovered = isVectorHovered() && !selector.isPartMultiSelectionNodes(canvasNode);
 
     clicked = hovered && canvasClick.single;
     dblclick = hovered && canvasClick.double;
@@ -464,24 +476,24 @@
         <!-- Draw lines -->
         {#if (command.type === "Z")}
           <VectorLine
-            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
-            endCommandTuplesList={getCommandTuplesList(gi, 0)}
-            geometryIndex={gi}
-            startIndex={i - 1}/>
+                  startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+                  endCommandTuplesList={getCommandTuplesList(gi, 0)}
+                  geometryIndex={gi}
+                  startIndex={i - 1}/>
         {:else if (command.type === "L")}
           <VectorLine
-            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
-            endCommandTuplesList={getCommandTuplesList(gi, i)}
-            geometryIndex={gi}
-            startIndex={i - 1}/>
+                  startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+                  endCommandTuplesList={getCommandTuplesList(gi, i)}
+                  geometryIndex={gi}
+                  startIndex={i - 1}/>
         {/if}
 
         <!--  Draw cubic curves -->
         {#if (command.type === "C")}
           <VectorCurve
-            startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
-            endCommandTuplesList={getCommandTuplesList(gi, i)}
-            geometryIndex={gi} startIndex={i - 1}
+                  startCommandTuplesList={getCommandTuplesList(gi, i - 1)}
+                  endCommandTuplesList={getCommandTuplesList(gi, i)}
+                  geometryIndex={gi} startIndex={i - 1}
           />
         {/if}
       {/each}

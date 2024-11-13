@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {Button} from "@fig/ui";
+  import {Button, NumberInput} from "@fig/ui";
   import Canvas from "@fig/canvas/Canvas.svelte"
   import Vector from "@fig/canvas/components/vector/Vector.svelte"
   import {keys} from "@fig/stores";
@@ -11,6 +11,7 @@
   import {Input} from "@fig/ui";
   import {ChevronDown} from "lucide-svelte";
   import {ColorPicker} from "$lib/components/color-picker/index.js"
+  import {selector} from "@fig/canvas/components/Selector.svelte";
 
   let canvasBackgroundColor = $state("#1E1E1E")
 
@@ -57,14 +58,42 @@
 
       <!-- Design -->
       <Tabs.Content value="design" class="divide-y divide-border">
-        <PanelSection.Root>
-          <PanelSection.Header>
-            <PanelSection.Title>Canvas</PanelSection.Title>
-          </PanelSection.Header>
-          <PanelSection.Content>
-            <ColorPicker bind:color={canvasBackgroundColor}/>
-          </PanelSection.Content>
-        </PanelSection.Root>
+        {#if (!selector.hasSelectedNodes())}
+          <PanelSection.Root>
+            <PanelSection.Header>
+              <PanelSection.Title>Canvas</PanelSection.Title>
+            </PanelSection.Header>
+            <PanelSection.Content>
+              <ColorPicker bind:color={canvasBackgroundColor}/>
+            </PanelSection.Content>
+          </PanelSection.Root>
+        {:else}
+          <PanelSection.Root>
+            <PanelSection.Header>
+              <PanelSection.Title>Position</PanelSection.Title>
+            </PanelSection.Header>
+            <PanelSection.Content>
+              <div class="flex gap-2">
+                {#if (selector.selectedNode && !selector.hasMultipleSelectedNodes)}
+                  <!-- X position -->
+                  <NumberInput inputSize="sm"
+                               bind:value={selector.selectedNode.position.x}>
+                    {#snippet left()}
+                      <span class="text-foreground/60">X</span>
+                    {/snippet}
+                  </NumberInput>
+                  <!-- Y position -->
+                  <NumberInput inputSize="sm"
+                               bind:value={selector.selectedNode.position.y}>
+                    {#snippet left()}
+                      <span class="text-foreground/60">Y</span>
+                    {/snippet}
+                  </NumberInput>
+                {/if}
+              </div>
+            </PanelSection.Content>
+          </PanelSection.Root>
+        {/if}
       </Tabs.Content>
 
       <!-- Prototype -->

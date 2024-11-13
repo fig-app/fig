@@ -97,13 +97,16 @@ class Selector {
   }
 
   // Nodes
-  // TODO - Change CanvasNode to all type of node
   isPartMultiSelectionNodes(node: CanvasNode): boolean {
     return this.nodes.includes(node) && this.nodes.length > 1;
   }
 
   hasSelectedNodes(): boolean {
     return this.nodes.length > 0;
+  }
+
+  get hasMultipleSelectedNodes(): boolean {
+    return this.nodes.length > 1;
   }
 
   selectNode(node: CanvasNode) {
@@ -137,6 +140,10 @@ class Selector {
 
   nodeIsSelected(node: CanvasNode) {
     return this.nodes.includes(node);
+  }
+
+  get selectedNode() {
+    return this.nodes.at(0);
   }
 
   // Vector parts

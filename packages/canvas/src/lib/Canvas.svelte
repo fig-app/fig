@@ -1,18 +1,23 @@
 <script lang="ts">
   import {onMount, type Snippet, tick, untrack} from "svelte";
   import type {CanvasNode} from "./types/CanvasNode";
-  import {fillRect} from "$lib/primitive/rect";
+  import {fillRect, rect} from "$lib/primitive/rect";
   import {canvasClick} from "$lib/stores/canvasClick.svelte";
   import {canvasTime} from "$lib/stores/canvasTime.svelte";
   import {keys, cursorPosition} from "@fig/stores";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {setCanvasContext} from "$lib/context/canvasContext";
   import {selector} from "$lib/components/Selector.svelte.js";
-  import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
+  import {
+    canvasColors,
+    DEFAULT_BACKGROUND_COLOR,
+    DEFAULT_GRID_COLOR
+  } from "$lib/stores/canvasColors";
   import type {Vector} from "@fig/types/properties/Vector";
   import {canvasPipeline} from "$lib/stores/canvasPipeline.svelte";
   import {userMode} from "$lib/stores/userMode.svelte";
   import {canvasRenderingContext} from "$lib/stores/canvasRenderingContext.svelte";
+  import {line} from "$lib/primitive/line";
 
   type Props = {
     width?: number;
@@ -138,6 +143,7 @@
     }
 
     drawNodes();
+    drawRulers();
 
     if (ctx) {
       selector.draw(ctx);
@@ -198,6 +204,111 @@
       }
 
       ctx.stroke();
+    }
+  }
+
+  // Draw rulers with pixel values on the sides of the canvas (top and left)
+  function drawRulers() {
+    if (ctx) {
+      ctx.fillStyle = canvasColors.darkGray1;
+      ctx.fillRect(0, 0, width, 20);
+      ctx.fillRect(0, 0, 20, height);
+
+      // If selected node draw bounding box
+      if (selector.selectedNode) {
+        const selectedNode = selector.selectedNode;
+        const boundingBox = selectedNode.boundingBox;
+        const topLeft = boundingBox.topLeft;
+        const bottomRight = boundingBox.corners[2];
+
+        ctx.fillStyle = "rgba(12, 140, 233, .4)";
+        ctx.fillRect(topLeft.x, 0, (navigation.toRealX(bottomRight.x) - navigation.toRealX(topLeft.x)) * navigation.scale, 20);
+        ctx.fillRect(0, topLeft.y, 20, (navigation.toRealY(bottomRight.y) - navigation.toRealY(topLeft.y)) * navigation.scale);
+      }
+
+      // Calculate cell size based on scale
+      let cellSize = 0;
+      if (navigation.percentScale < 5) {
+        cellSize = 5000;
+      } else if (navigation.percentScale < 5) {
+        cellSize = 2500;
+      } else if (navigation.percentScale < 10) {
+        cellSize = 1000;
+      } else if (navigation.percentScale < 25) {
+        cellSize = 500;
+      } else if (navigation.percentScale < 50) {
+        cellSize = 250;
+      }
+
+      if (navigation.percentScale > 5000) {
+        cellSize = 1;
+      } else if (navigation.percentScale > 3000) {
+        cellSize = 2;
+      } else if (navigation.percentScale > 1000) {
+        cellSize = 5;
+      } else if (navigation.percentScale > 500) {
+        cellSize = 10;
+      } else if (navigation.percentScale > 200) {
+        cellSize = 50;
+      } else if (navigation.percentScale > 50) {
+        cellSize = 100;
+      }
+
+      // Draw pixel values
+      ctx.font = "11px Arial";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      for (
+        let x = (navigation.offsetX % cellSize) * navigation.scale;
+        x <= width;
+        x += cellSize * navigation.scale
+      ) {
+        ctx.fillText(navigation.toRealX(x).toFixed(0).toString(), x, 10);
+      }
+
+      for (
+        let y = (navigation.offsetY % cellSize) * navigation.scale;
+        y <= height;
+        y += cellSize * navigation.scale
+      ) {
+        ctx.save()
+        ctx.textAlign = "center"
+
+        ctx.translate(11, y);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(navigation.toRealY(y).toFixed(0).toString(), 0, 0);
+        ctx.restore();
+      }
+
+      // Draw borders and top left corner
+      rect({
+        ctx,
+        x: 0,
+        y: 0,
+        width: 40,
+        height: 40,
+        colors: {
+          background: canvasColors.darkGray1
+        },
+      });
+
+      line({
+        ctx,
+        start: {x: 0, y: 20},
+        end: {x: width, y: 20},
+        color: canvasColors.darkGray2,
+        weight: 1,
+      });
+
+      line({
+        ctx,
+        start: {x: 20, y: 0},
+        end: {x: 20, y: height},
+        color: canvasColors.darkGray2,
+        weight: 1,
+      });
     }
   }
 
