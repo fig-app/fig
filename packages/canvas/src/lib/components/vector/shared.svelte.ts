@@ -10,6 +10,11 @@ import { navigation } from "$lib/stores/navigation.svelte";
 import type { PathCommandWithEndPoint } from "@fig/functions/path/PathCommand";
 
 /**
+ * File to handle all shared functionalities between vector parts with function
+ */
+
+
+/**
  * Handle the selection of a vector part
  * Disable / enable the selector depending on the state of the component
  */
@@ -100,7 +105,7 @@ export function handleVectorPartDragging(vectorContext: VectorContext) {
     let commandIndex = selectedCommandTuple[1];
     let selectedCommand = vectorContext.strokeGeometriesCommands[geometryIndex][
       commandIndex
-    ] as PathCommandWithEndPoint;
+      ] as PathCommandWithEndPoint;
     selectedCommand.endPoint.x += x;
     selectedCommand.endPoint.y += y;
   }

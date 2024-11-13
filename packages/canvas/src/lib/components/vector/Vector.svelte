@@ -2,32 +2,35 @@
   import type {CanvasNode} from "$lib/types/CanvasNode";
   import {onMount} from "svelte";
   import type {VectorPart} from "$lib/types/VectorPart";
-  import {parsePathString} from "@fig/functions/path/index";
-  import {normalize} from "@fig/functions/path/normalize";
-  import {serializeCommands} from "@fig/functions/path/serialize";
   import {drawPath} from "$lib/primitive/path";
-  import {colorToString} from "@fig/functions/color";
   import type {PathCommand, PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
   import {navigation} from "$lib/stores/navigation.svelte";
-  import {getGeometryBbox} from "@fig/functions/path/bBox";
-  import {Rect} from "$lib/Rect.svelte";
   import {rect, strokeRect} from "$lib/primitive/rect";
-  import type {Node} from "@fig/types/nodes/Node"
-  import {Timer} from "$lib/stores/canvasTime.svelte";
+  import {Timer} from "$lib/stores/canvasTime.svelte.js";
   import {getCanvasContext, registerCanvasNode} from "$lib/context/canvasContext";
   import {getVectorContext, setVectorContext} from "$lib/context/vectorContext";
+  import {canvasColors} from "$lib/stores/canvasColors";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte.js";
+  import {keys, cursorPosition} from "@fig/stores";
+  import VectorPoint from "$lib/components/vector/VectorPoint.svelte";
+  import VectorLine from "$lib/components/vector/VectorLine.svelte";
+  import VectorCurve from "$lib/components/vector/VectorCurve.svelte";
+  import {selector} from "$lib/components/Selector.svelte.js";
   import type {VectorNode} from "@fig/types/nodes/vector/VectorNode";
   import type {EmptyData} from "@fig/types/nodes/vector/EmptyData";
-  import {canvasColors} from "$lib/stores/canvasColors";
-  import {canvasClick} from "$lib/stores/canvasClick.svelte";
-  import {keys} from "@fig/stores";
+  import type {Node} from "@fig/types/nodes/Node";
+  import {getGeometryBbox} from "@fig/functions/path/bBox";
+  import {colorToString} from "@fig/functions/color";
+  import {normalize} from "@fig/functions/path/normalize";
   import {commandHasEndPoint} from "@fig/functions/path/typeCheck";
   import {vectorToString} from "@fig/functions/vector";
-  import VectorPoint from "$lib/components/VectorPoint.svelte";
-  import VectorLine from "$lib/components/VectorLine.svelte";
-  import VectorCurve from "$lib/components/VectorCurve.svelte";
-  import {selector} from "$lib/components/Selector.svelte";
-  import type {Line} from "$lib/types/Line";
+  import type {Curve} from "@fig/types/shapes/Curve";
+  import {Rect} from "$lib/Rect.svelte";
+  import {canvasRenderingContext} from "$lib/stores/canvasRenderingContext.svelte";
+  import {getHoverMarginDistance} from "@fig/functions/distance";
+  import {serializeCommands} from "@fig/functions/path/serialize";
+  import type {Line} from "@fig/types/shapes/Line";
+  import {parsePathString} from "@fig/functions/path/index";
 
   let {node}: { node: Node } = $props();
 
@@ -45,9 +48,9 @@
   let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
 
   let hovered: boolean = $state(false);
+  let clicked: boolean = $state(false);
   let dblclick: boolean = $state(false);
   let editMode: boolean = $state(false);
-  let fillMode: boolean = $state(false);
   let triggerUpdate: boolean = $state(false);
 
   let editTimer = new Timer(100, "Once");
@@ -56,7 +59,8 @@
   let draggedPart: VectorPart | null = $state(null);
 
   let strokeColor = colorToString(data.strokes[0].color);
-  let strokeWeight = $derived(data.strokeWeight * navigation.scale);
+  let strokeWeight = $state(data.strokeWeight);
+  let stylizedStrokeWeight = $derived(strokeWeight * navigation.scale);
 
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
@@ -111,27 +115,50 @@
     return to_ret;
   }
 
-  let pointsAndCoordinates: { [key: string]: [number, number][] } = $state({});
+  let pointsAndCoordinates: { [key: string]: [number, number][] } = $derived.by(() => {
+    return getPointsAndCoordinates();
+  });
 
-  function updateCommands() {
-    pointsAndCoordinates = getPointsAndCoordinates();
-  }
-
-  updateCommands();
-
-  // Get a representation of the vector through 'Lines', which are defined by : startCommand, endCommand, startControl, endControl
-  let allLines: Line[] = [];
-  for (const commandTuple of getCommandsWithEndPoints()) {
-    const command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]]
-    if (command.type == 'C') {
-      allLines.push({
-        startTuple: [commandTuple[0], commandTuple[1] - 1],
-        endTuple: [commandTuple[0], commandTuple[1]],
-        startControl: command.controlPoints.start,
-        endControl: command.controlPoints.end,
-      })
+  // TO KEEP EVEN IF USELESS FOR NOW : Get all vector parts' shape (lines & curve) of the vector (for the hover)
+  let allLines: Line[] = $derived.by(() => {
+    let allLines: Line[] = [];
+    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
+      for (const [i, command] of geometry.entries()) {
+        const prevCommand = strokeGeometriesCommands[gi][i - 1] as PathCommandWithEndPoint;
+        const firstCommand = strokeGeometriesCommands[gi][0] as PathCommandWithEndPoint;
+        if (command.type === 'L') {
+          allLines.push({
+            start: navigation.toVirtualPoint(prevCommand.endPoint),
+            end: navigation.toVirtualPoint(command.endPoint),
+          })
+        } else if (command.type === 'Z') {
+          allLines.push({
+            start: navigation.toVirtualPoint(prevCommand.endPoint),
+            end: navigation.toVirtualPoint(firstCommand.endPoint),
+          })
+        }
+      }
     }
-  }
+    return allLines;
+  })
+  let allCurves: Curve[] = $derived.by(() => {
+    let allCurves: Curve[] = [];
+    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
+      for (const [i, command] of geometry.entries()) {
+        const prevCommand = strokeGeometriesCommands[gi][i - 1] as PathCommandWithEndPoint;
+        const firstCommand = strokeGeometriesCommands[gi][0] as PathCommandWithEndPoint;
+        if (command.type === 'C') {
+          allCurves.push({
+            start: navigation.toVirtualPoint(prevCommand.endPoint),
+            end: navigation.toVirtualPoint(command.endPoint),
+            startControl: command.controlPoints.start,
+            endControl: command.controlPoints.end,
+          })
+        }
+      }
+    }
+    return allCurves;
+  })
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
@@ -186,8 +213,10 @@
     return list;
   }
 
+  // ######################################################
+  // BEGIN DRAW
+  // ######################################################
   function draw(ctx: CanvasRenderingContext2D) {
-
     // Draw bounding box
     if (!editMode && canvasNode.selected) {
       // Draw bounding box of the node
@@ -234,7 +263,7 @@
         ctx,
         path,
         colors: {stroke: strokeColor},
-        strokeWeight
+        strokeWeight: stylizedStrokeWeight
       });
     }
 
@@ -256,49 +285,75 @@
         part.draw(ctx);
       }
     }
-
-    // Update all subpaths in case the shape of the vector has changed
-    {
-    }
   }
 
+  // ######################################################
+  // END DRAW
+  // ######################################################
+
+  function isVectorHovered(): boolean {
+    for (const path of strokePathsSynchronization) {
+      if (canvasRenderingContext.ctx) {
+        // Threshold of line hover
+        canvasRenderingContext.ctx.lineWidth = stylizedStrokeWeight + getHoverMarginDistance();
+        if (canvasRenderingContext.ctx.isPointInStroke(path, cursorPosition.x, cursorPosition.y)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  // ######################################################
+  // BEGIN UPDATE
+  // ######################################################
   function update() {
     // Update bounding box size and coordinates
     updateBoundingBox();
-    // To rework -> only hover if one of the parts (still not drawn) is hovered
-    // ----------------------------------------
-    hovered = canvasNode.boundingBox.hovered();
-    // ----------------------------------------
+    // Updating hovered state
+    hovered = isVectorHovered() && !selector.isPartMultiSelectionNodes(node);
 
+    clicked = hovered && canvasClick.single;
     dblclick = hovered && canvasClick.double;
 
     // Check for selection with selector rectangle
     if (selector.rect && !selector.partsMode) {
-      canvasNode.selected = selector.rect.collide(canvasNode.boundingBox);
+      if (selector.rect.collide(canvasNode.boundingBox)) {
+        selector.selectNode(canvasNode);
+      } else {
+        selector.unselectNode(canvasNode);
+      }
+    }
+
+    // Add selection
+    if (clicked) {
+      if (keys.shiftPressed()) {
+        selector.selectNode(canvasNode)
+      } else {
+        selector.selectSingleNode(canvasNode);
+      }
+    } else if (!keys.shiftPressed() && canvasClick.single && canvasNode.selected && !editMode) {
+      selector.unselectNode(canvasNode);
     }
 
     // Toggle edit mode when double click
     if (dblclick && !editMode && editTimer.finished()) {
       editMode = true;
-      pointsAndCoordinates = getPointsAndCoordinates();
       editTimer.reset();
     } else if (canvasClick.double && editMode && editTimer.finished()) {
       editMode = false;
       editTimer.reset();
     }
 
-    // Toggle fill mode (IN WORK)
-    if (keys.isPressed("b") && editMode) {
-      fillMode = true;
-
-      // calculate subpaths once to initialize them...
-    }
-
-    // Exit edit & fill modes when pressing enter or escape
+    // Exit edit mode when pressing enter or escape
     if (editMode && keys.isPressed("Enter") || keys.isPressed("Escape")) {
+      if (!editMode && canvasNode.selected) {
+        selector.unselectNode(canvasNode);
+      }
+
+      selector.unselectAllParts();
       editMode = false;
-      fillMode = false;
-      updateCommands();
     }
 
     // Update parts
@@ -333,6 +388,10 @@
       }
     }
   }
+
+  // ######################################################
+  // END UPDATE
+  // ######################################################
 
   function updateBoundingBox() {
     canvasNode.boundingBox.update(
@@ -383,7 +442,6 @@
   }
 
   function updateVector() {
-    updateCommands();
     triggerUpdate = !triggerUpdate;
   }
 

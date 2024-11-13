@@ -6,6 +6,7 @@ import { canvasClick } from "$lib/stores/canvasClick.svelte";
 import { canvasColors } from "$lib/stores/canvasColors";
 import { keys } from "@fig/stores";
 import { removeArrayOfTupleDuplicates } from "@fig/functions/array";
+import type { Vector } from "@fig/types/properties/Vector";
 
 class Selector {
   mode: "node" | "vector" = $state("node");
@@ -18,6 +19,7 @@ class Selector {
   disabled: boolean = $state(false);
   inSelection: boolean = $state(false);
   rect: Rect | null = $state(null);
+  origin: Vector | null = $state(null);
 
   constructor() {}
 
@@ -33,22 +35,41 @@ class Selector {
     }
   }
 
+  // ################################
+  // BEGIN UPDATE
+  // ################################
+
   update() {
     if (this.disabled) return;
 
     // Check for dragging
     if (canvasClick.pressed) {
-      if (!this.rect) {
-        if (!keys.shiftPressed()) {
-          this.unselectAllParts();
-        }
-        this.inSelection = true;
-        this.rect = new Rect({
+      // Create this
+      if (this.origin == null) {
+        this.origin = {
           x: cursorPosition.x,
           y: cursorPosition.y,
-          width: 0,
-          height: 0,
-        });
+        };
+      }
+
+      if (!this.rect) {
+        // Only create a selector rect if clicked somewhere (origin) and moved
+        if (
+          this.origin.x != cursorPosition.x &&
+          this.origin.y != cursorPosition.y
+        ) {
+          // Allow to add selection with shift pressed
+          if (!keys.shiftPressed()) {
+            this.unselectAllParts();
+          }
+          this.inSelection = true;
+          this.rect = new Rect({
+            x: cursorPosition.x,
+            y: cursorPosition.y,
+            width: cursorPosition.x - this.origin.x,
+            height: cursorPosition.y - this.origin.y,
+          });
+        }
       } else {
         this.rect.width = cursorPosition.x - this.rect.x;
         this.rect.height = cursorPosition.y - this.rect.y;
@@ -56,11 +77,16 @@ class Selector {
     }
 
     // Remove the rect if not dragging anymore
-    if (!canvasClick.pressed && this.rect) {
+    if (!canvasClick.pressed) {
       this.inSelection = false;
       this.rect = null;
+      this.origin = null;
     }
   }
+
+  // ################################
+  // END UPDATE
+  // ################################
 
   disable() {
     this.disabled = true;
@@ -70,19 +96,36 @@ class Selector {
     this.disabled = false;
   }
 
-  // Nodes (for now not used functions)
+  // Nodes
+  // TODO - Change CanvasNode to all type of node
+  isPartMultiSelectionNodes(node: CanvasNode): boolean {
+    return this.nodes.includes(node) && this.nodes.length > 1;
+  }
+
+  hasSelectedNodes(): boolean {
+    return this.nodes.length > 0;
+  }
+
   selectNode(node: CanvasNode) {
+    node.selected = true;
     if (!this.nodeIsSelected(node)) {
-      node.selected = true;
       this.nodes.push(node);
     }
   }
 
+  selectSingleNode(node: CanvasNode) {
+    console.log("testouille");
+    for (const node of this.nodes) {
+      node.selected = false;
+    }
+    this.selectNode(node);
+  }
+
   unselectNode(node: CanvasNode) {
     if (this.nodeIsSelected(node)) {
-      node.selected = false;
       this.nodes.splice(this.nodes.indexOf(node), 1);
     }
+    node.selected = false;
   }
 
   unselectAllNodes() {
@@ -121,7 +164,7 @@ class Selector {
       part.selected = false;
       this.parts.splice(this.parts.indexOf(part), 1);
 
-      // check if a point in the selection to update point mode
+      // check if a point in the selection to update partsMode state
       if (part.type === "point") {
         let hasPoint =
           this.parts.filter((part) => part.type === "point").length > 0;

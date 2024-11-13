@@ -1,7 +1,7 @@
 <script lang="ts">
   import {Button} from "@fig/ui";
   import Canvas from "@fig/canvas/Canvas.svelte"
-  import Vector from "@fig/canvas/components/Vector.svelte"
+  import Vector from "@fig/canvas/components/vector/Vector.svelte"
   import {keys} from "@fig/stores";
   import {navigation} from "@fig/canvas/stores/navigation.svelte";
   import {userMode} from "@fig/canvas/stores/userMode.svelte";

@@ -7,11 +7,12 @@
   import {keys, cursorPosition} from "@fig/stores";
   import {navigation} from "$lib/stores/navigation.svelte";
   import {setCanvasContext} from "$lib/context/canvasContext";
-  import {selector} from "$lib/components/Selector.svelte";
+  import {selector} from "$lib/components/Selector.svelte.js";
   import {DEFAULT_BACKGROUND_COLOR, DEFAULT_GRID_COLOR} from "$lib/stores/canvasColors";
   import type {Vector} from "@fig/types/properties/Vector";
   import {canvasPipeline} from "$lib/stores/canvasPipeline.svelte";
   import {userMode} from "$lib/stores/userMode.svelte";
+  import {canvasRenderingContext} from "$lib/stores/canvasRenderingContext.svelte";
 
   type Props = {
     width?: number;
@@ -33,7 +34,7 @@
   let pipeline: Set<CanvasNode> = canvasPipeline.pipeline;
 
   let canvas: HTMLCanvasElement;
-  let ctx: CanvasRenderingContext2D | null = null;
+  let ctx: CanvasRenderingContext2D | null = canvasRenderingContext.ctx;
   let frameId: number;
 
   let windowWidth = $state(0);
@@ -77,6 +78,7 @@
 
   onMount(() => {
     ctx = canvas.getContext("2d");
+    canvasRenderingContext.ctx = canvas.getContext("2d");
 
     // Update loop
     function loop(timestamp: number) {
@@ -109,7 +111,7 @@
         if (scheduled) return;
         scheduled = true;
         tick().then(() => {
-          // console.log("Update canvas")
+          console.log("Update canvas")
           scheduled = false;
         });
         return draw();

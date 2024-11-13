@@ -1,6 +1,6 @@
 <script>
   import Canvas from "$lib/Canvas.svelte";
-  import Vector from "$lib/components/Vector.svelte";
+  import Vector from "$lib/components/vector/Vector.svelte";
 </script>
 
 <Canvas fullscreen={true}>

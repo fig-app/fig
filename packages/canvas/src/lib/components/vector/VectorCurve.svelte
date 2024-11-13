@@ -1,28 +1,22 @@
 <script lang="ts">
   import {getCanvasContext} from "$lib/context/canvasContext";
-  import {
-    getVectorContext,
-    registerVectorPart
-  } from "$lib/context/vectorContext";
+  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import type {VectorPart} from "$lib/types/VectorPart";
   import {useId} from "@fig/functions/id";
-  import {
-    commandHasEndPoint,
-    isCPathCommand
-  } from "@fig/functions/path/typeCheck";
+  import {commandHasEndPoint, isCPathCommand} from "@fig/functions/path/typeCheck";
   import {cubicCurve} from "$lib/primitive/cubicCurve";
-  import {navigation} from "$lib/stores/navigation.svelte";
-  import {Timer} from "$lib/stores/canvasTime.svelte";
+  import {navigation} from "$lib/stores/navigation.svelte.js";
+  import {Timer} from "$lib/stores/canvasTime.svelte.js";
   import {isCubicBezierHovered} from "@fig/functions/shape/curve/cubic";
   import {cursorPosition} from "@fig/stores";
   import {canvasColors} from "$lib/stores/canvasColors";
   import {
     handleVectorPartDrawing,
     handleVectorPartSelection
-  } from "$lib/components/shared.svelte";
-  import {canvasClick} from "$lib/stores/canvasClick.svelte";
+  } from "$lib/components/vector/shared.svelte.js";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte.js";
   import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
-  import VectorControlPoint from "$lib/components/VectorControlPoint.svelte";
+  import VectorControlPoint from "$lib/components/vector/VectorControlPoint.svelte";
 
   type Props = {
     geometryIndex: number;
