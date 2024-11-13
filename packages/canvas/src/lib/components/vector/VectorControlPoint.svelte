@@ -3,24 +3,18 @@
   import {rect as drawRect} from "$lib/primitive/rect";
   import {canvasColors} from "$lib/stores/canvasColors";
   import {line} from "$lib/primitive/line";
-  import {canvasClick} from "$lib/stores/canvasClick.svelte";
-  import {Timer} from "$lib/stores/canvasTime.svelte";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte.js";
+  import {Timer} from "$lib/stores/canvasTime.svelte.js";
   import type {VectorPart} from "$lib/types/VectorPart";
   import {useId} from "@fig/functions/id";
-  import {
-    getVectorContext,
-    registerVectorPart
-  } from "$lib/context/vectorContext";
+  import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
-  import type {
-    CPathCommand,
-    HasEndPoint
-  } from "@fig/functions/path/PathCommand";
+  import type {CPathCommand, HasEndPoint} from "@fig/functions/path/PathCommand";
   import {
     handleVectorPartDrawing,
     handleVectorPartSelection
-  } from "$lib/components/shared.svelte";
-  import {navigation} from "$lib/stores/navigation.svelte";
+  } from "$lib/components/vector/shared.svelte.js";
+  import {navigation} from "$lib/stores/navigation.svelte.js";
 
   type Props = {
     type: "start" | "end",

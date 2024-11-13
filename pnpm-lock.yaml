@@ -27,6 +27,9 @@ importers:
 
   .:
     devDependencies:
+      '@inlang/cli':
+        specifier: ^2.18.1
+        version: 2.18.1
       '@tauri-apps/cli':
         specifier: ^1.6.2
         version: 1.6.2
@@ -42,6 +45,9 @@ importers:
       '@fig/functions':
         specifier: workspace:*
         version: link:../packages/functions
+      '@fig/stores':
+        specifier: workspace:*
+        version: link:../packages/stores
       '@fig/types':
         specifier: workspace:*
         version: link:../packages/types
@@ -109,6 +115,9 @@ importers:
       '@fig/functions':
         specifier: workspace:*
         version: link:../functions
+      '@fig/stores':
+        specifier: workspace:*
+        version: link:../stores
       '@fig/types':
         specifier: workspace:*
         version: link:../types
@@ -192,6 +201,39 @@ importers:
       vitest:
         specifier: ^2.1.1
         version: 2.1.1(@types/node@22.5.5)
+
+  packages/stores:
+    devDependencies:
+      '@fig/types':
+        specifier: workspace:*
+        version: link:../types
+      '@sveltejs/adapter-auto':
+        specifier: ^3.0.0
+        version: 3.3.1(@sveltejs/kit@2.5.28(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))
+      '@sveltejs/kit':
+        specifier: ^2.0.0
+        version: 2.5.28(@sveltejs/vite-plugin-svelte@4.0.0(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5)))(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5))
+      '@sveltejs/package':
+        specifier: ^2.0.0
+        version: 2.3.7(svelte@5.1.9)(typescript@5.6.3)
+      '@sveltejs/vite-plugin-svelte':
+        specifier: ^4.0.0
+        version: 4.0.0(svelte@5.1.9)(vite@5.4.6(@types/node@22.5.5))
+      publint:
+        specifier: ^0.2.0
+        version: 0.2.12
+      svelte:
+        specifier: ^5.0.0
+        version: 5.1.9
+      svelte-check:
+        specifier: ^4.0.0
+        version: 4.0.2(svelte@5.1.9)(typescript@5.6.3)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.6.3
+      vite:
+        specifier: ^5.0.11
+        version: 5.4.6(@types/node@22.5.5)
 
   packages/types:
     dependencies:
@@ -510,6 +552,11 @@ packages:
   '@humanwhocodes/object-schema@1.2.1':
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     deprecated: Use @eslint/object-schema instead
+
+  '@inlang/cli@2.18.1':
+    resolution: {integrity: sha512-6C/w7M9PbIs43GTheitckZCsW8Qc6F//S0iWCVL4BY2yIMXJJq1MLv3QC3qPkAHy+wpkJAnLPMnzyCJZBW50EQ==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
 
   '@inlang/detect-json-formatting@1.0.0':
     resolution: {integrity: sha512-o0jeI8U4TgNlsPwI0y92jld8/18Loh2KEgHCYCJ42rCOdxFrA8R60cydlEd2/6jkdHFn5DxKj8rOyiKv3z9uOw==}
@@ -1823,6 +1870,11 @@ packages:
     resolution: {integrity: sha512-H2/S7Pm8a9CL1uhp9OvjwrBh5Pvx0H8qVOxNu8Wed9Y7qv56MPtq+GGM8RJpq6glYJn9Wspr8uw7l55uyinNeg==}
     peerDependencies:
       esbuild: '>=0.12 <1'
+
+  esbuild-wasm@0.19.12:
+    resolution: {integrity: sha512-Zmc4hk6FibJZBcTx5/8K/4jT3/oG1vkGTEeKJUQFCUQKimD6Q7+adp/bdVQyYJFolMKaXkQnVZdV4O5ZaTYmyQ==}
+    engines: {node: '>=12'}
+    hasBin: true
 
   esbuild@0.21.5:
     resolution: {integrity: sha512-mg3OPMV4hXywwpoDxu3Qda5xCKQi+vCTZq8S9J/EpkhB2HzKXq4SNFZE3+NK93JYxc8VMSep+lOUSC/RVKaBqw==}
@@ -3372,6 +3424,10 @@ snapshots:
 
   '@humanwhocodes/object-schema@1.2.1': {}
 
+  '@inlang/cli@2.18.1':
+    dependencies:
+      esbuild-wasm: 0.19.12
+
   '@inlang/detect-json-formatting@1.0.0':
     dependencies:
       guess-json-indent: 2.0.0
@@ -4125,11 +4181,11 @@ snapshots:
       magic-string: 0.30.12
       storybook: 8.4.1(prettier@3.3.3)
       svelte: 5.1.9
-      svelte-preprocess: 5.1.4(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(svelte@5.1.9)(typescript@5.6.2)
-      svelte2tsx: 0.7.22(svelte@5.1.9)(typescript@5.6.2)
+      svelte-preprocess: 5.1.4(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(svelte@5.1.9)(typescript@5.6.3)
+      svelte2tsx: 0.7.22(svelte@5.1.9)(typescript@5.6.3)
       sveltedoc-parser: 4.2.1
       ts-dedent: 2.2.0
-      typescript: 5.6.2
+      typescript: 5.6.3
       vite: 5.4.6(@types/node@22.5.5)
     transitivePeerDependencies:
       - '@babel/core'
@@ -4885,6 +4941,8 @@ snapshots:
       esbuild: 0.21.5
     transitivePeerDependencies:
       - supports-color
+
+  esbuild-wasm@0.19.12: {}
 
   esbuild@0.21.5:
     optionalDependencies:
@@ -5870,7 +5928,7 @@ snapshots:
     transitivePeerDependencies:
       - picomatch
 
-  svelte-preprocess@5.1.4(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(svelte@5.1.9)(typescript@5.6.2):
+  svelte-preprocess@5.1.4(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(svelte@5.1.9)(typescript@5.6.3):
     dependencies:
       '@types/pug': 2.0.10
       detect-indent: 6.1.0
@@ -5881,7 +5939,7 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.47
       postcss-load-config: 4.0.2(postcss@8.4.47)
-      typescript: 5.6.2
+      typescript: 5.6.3
 
   svelte-toolbelt@0.4.6(svelte@5.1.9):
     dependencies:
@@ -5890,13 +5948,6 @@ snapshots:
       svelte: 5.1.9
 
   svelte2tsx@0.7.19(svelte@5.1.9)(typescript@5.6.2):
-    dependencies:
-      dedent-js: 1.0.1
-      pascal-case: 3.1.2
-      svelte: 5.1.9
-      typescript: 5.6.2
-
-  svelte2tsx@0.7.22(svelte@5.1.9)(typescript@5.6.2):
     dependencies:
       dedent-js: 1.0.1
       pascal-case: 3.1.2

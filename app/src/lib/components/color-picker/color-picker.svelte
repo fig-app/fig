@@ -10,7 +10,7 @@
   import {Percent} from "lucide-svelte";
   import {watch} from "runed";
   import {cn} from "@fig/ui/utils";
-  import {Input, InputGroup} from "@fig/ui";
+  import {Input, InputGroup, Tooltip} from "@fig/ui";
   import {NumberInput, Window} from "@fig/ui/editor";
   import type {Vector} from "@fig/types/properties/Vector";
   import {ColorControls} from "$lib/components/color-picker/index";
@@ -67,7 +67,7 @@
 <div class={cn(className)}>
   <InputGroup>
     <Input bind:value={inputColor} class="pl-1 py-1" inputSize="sm" selectOnFocus
-           onblur={autoCompleteColor} onkeydown={blurOnEnter}>
+           onblur={autoCompleteColor} onkeydown={blurOnEnter} spellcheck="false">
       {#snippet left()}
         <!-- Color preview -->
         <button class="w-5 h-4 rounded relative overflow-hidden"
@@ -79,11 +79,16 @@
       {/snippet}
     </Input>
 
-    <NumberInput min="0" max="100" bind:value={opacity} class="w-[100px]" inputSize="sm">
-      {#snippet right()}
-        <Percent/>
-      {/snippet}
-    </NumberInput>
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        <NumberInput min="0" max="100" bind:value={opacity} class="w-[100px]" inputSize="sm">
+          {#snippet right()}
+            <Percent/>
+          {/snippet}
+        </NumberInput>
+      </Tooltip.Trigger>
+      <Tooltip.Content>Opacity</Tooltip.Content>
+    </Tooltip.Root>
   </InputGroup>
 </div>
 

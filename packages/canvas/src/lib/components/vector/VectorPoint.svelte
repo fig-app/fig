@@ -1,20 +1,20 @@
 <script lang="ts">
   import type {VectorPart} from "$lib/types/VectorPart";
-  import {canvasClick} from "$lib/stores/canvasClick.svelte";
-  import {useId} from "@fig/functions/id";
-  import {navigation} from "$lib/stores/navigation.svelte";
+  import {canvasClick} from "$lib/stores/canvasClick.svelte.js";
+  import {navigation} from "$lib/stores/navigation.svelte.js";
   import {getVectorContext, registerVectorPart} from "$lib/context/vectorContext";
   import {getCanvasContext} from "$lib/context/canvasContext";
-  import {EditPoint} from "$lib/components/EditPoint.svelte";
+  import {EditPoint} from "$lib/components/vector/EditPoint.svelte";
   import {Timer} from "$lib/stores/canvasTime.svelte"
   import {selector} from "$lib/components/Selector.svelte";
-  import {keys} from "$lib/stores/keys.svelte";
+  import {keys} from "@fig/stores";
   import {cursorHover} from "$lib/stores/cursorHover.svelte";
   import {
     handleVectorPartDragging,
     handleVectorPartDrawing,
     handleVectorPartSelection
-  } from "$lib/components/shared.svelte";
+  } from "$lib/components/vector/shared.svelte.js";
+  import {useId} from "@fig/functions/id";
   import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
 
   type Props = {
@@ -93,8 +93,10 @@
       cursorHover.hoveredPart = null;
     }
 
+    // Check if dragged
     dragged = ((dragged && canvasClick.pressed) || (point.hovered && canvasClick.pressed && !vectorContext.isDragged(part))) && !selector.inSelection;
 
+    // Update selected state
     if (selector.rect) {
       if (selector.rect.containPoint(virtualCommandsList[0].endPoint)) {
         selector.selectPart(part);

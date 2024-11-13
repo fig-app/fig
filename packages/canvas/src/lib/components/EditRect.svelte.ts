@@ -1,6 +1,6 @@
-import { Rect } from "$lib/Rect.svelte";
-import type { Vector } from "@fig/types/properties/Vector";
-import { canvasColors } from "$lib/stores/canvasColors";
+import {Rect} from "../Rect.svelte.js";
+import type {Vector} from "@fig/types/properties/Vector";
+import {canvasColors} from "$lib/stores/canvasColors";
 
 const RECT_SIZE: number = 6;
 
@@ -15,7 +15,7 @@ export class EditRect {
   private states: EditRectStates = $state({
     hovered: false,
     clicked: false,
-    center: { x: 0, y: 0 },
+    center: {x: 0, y: 0},
   });
 
   constructor(center: Vector) {
@@ -47,5 +47,6 @@ export class EditRect {
     return this.rect.clicked();
   }
 
-  update() {}
+  update() {
+  }
 }

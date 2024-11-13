@@ -12,12 +12,14 @@
     "build:internal-tauri": "pnpm --filter @fig/app build",
     "all:package": "turbo package",
     "storybook:ui": "pnpm --filter @fig/ui storybook",
-    "storybook:canvas": "pnpm --filter @fig/canvas storybook"
+    "storybook:canvas": "pnpm --filter @fig/canvas storybook",
+    "translate": "inlang machine translate --project ./app/project.inlang"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@inlang/cli": "^2.18.1",
     "@tauri-apps/cli": "^1.6.2",
     "turbo": "^2.1.2"
   }

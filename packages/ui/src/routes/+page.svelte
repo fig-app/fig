@@ -581,14 +581,12 @@
     <Tooltip.Root>
       <Tooltip.Trigger>Hover to show a tooltip</Tooltip.Trigger>
       <Tooltip.Content>
-        <Tooltip.Arrow/>
         <p>Hi I'm a tooltip</p>
       </Tooltip.Content>
     </Tooltip.Root>
     <Tooltip.Root>
       <Tooltip.Trigger>Hover to show a long tooltip</Tooltip.Trigger>
       <Tooltip.Content>
-        <Tooltip.Arrow/>
         <p class="w-[300px]">Lorem ipsum dolor sit amet, consectetur adipiscing
           elit, sed do eiusmod tempor incididunt ut labore et dolore magna
           aliqua.</p>

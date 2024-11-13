@@ -1,13 +1,18 @@
 import type { VectorPart } from "$lib/types/VectorPart";
 import { getVectorContext } from "$lib/context/vectorContext";
-import { keys } from "$lib/stores/keys.svelte";
+import { keys } from "@fig/stores";
 import { canvasClick } from "$lib/stores/canvasClick.svelte";
 import { selector } from "$lib/components/Selector.svelte";
 import type { CanvasDrawFunction } from "$lib/types/CanvasFunction";
 import type { VectorContext } from "$lib/types/VectorContext";
-import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
+import { cursorPosition } from "@fig/stores";
 import { navigation } from "$lib/stores/navigation.svelte";
 import type { PathCommandWithEndPoint } from "@fig/functions/path/PathCommand";
+
+/**
+ * File to handle all shared functionalities between vector parts with function
+ */
+
 
 /**
  * Handle the selection of a vector part
@@ -100,7 +105,7 @@ export function handleVectorPartDragging(vectorContext: VectorContext) {
     let commandIndex = selectedCommandTuple[1];
     let selectedCommand = vectorContext.strokeGeometriesCommands[geometryIndex][
       commandIndex
-    ] as PathCommandWithEndPoint;
+      ] as PathCommandWithEndPoint;
     selectedCommand.endPoint.x += x;
     selectedCommand.endPoint.y += y;
   }

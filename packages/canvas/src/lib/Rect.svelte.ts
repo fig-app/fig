@@ -1,10 +1,10 @@
-import type {Vector} from "@fig/types/properties/Vector";
-import type {Line} from "@fig/types/shapes/Line";
-import {cursorPosition} from "$lib/stores/cursorPosition.svelte";
-import {hoverRect} from "@fig/functions/shape/rect";
-import {canvasClick} from "$lib/stores/canvasClick.svelte";
-import {rect} from "$lib/primitive/rect";
-import {linesIntersection} from "@fig/functions/shape/line";
+import type { Vector } from "@fig/types/properties/Vector";
+import type { Line } from "@fig/types/shapes/Line";
+import { cursorPosition } from "@fig/stores";
+import { hoverRect } from "@fig/functions/shape/rect";
+import { canvasClick } from "$lib/stores/canvasClick.svelte";
+import { rect } from "$lib/primitive/rect";
+import { linesIntersection } from "@fig/functions/shape/line";
 
 type RectConstructorArgs = {
   x?: number;
@@ -23,11 +23,11 @@ type RectDrawArgs = {
 };
 
 export class Rect {
-  topLeft: Vector = $state({x: 0, y: 0});
+  topLeft: Vector = $state({ x: 0, y: 0 });
   width = $state(0);
   height = $state(0);
 
-  constructor({x = 0, y = 0, width = 0, height = 0}: RectConstructorArgs) {
+  constructor({ x = 0, y = 0, width = 0, height = 0 }: RectConstructorArgs) {
     this.topLeft.x = x;
     this.topLeft.y = y;
     this.width = width;

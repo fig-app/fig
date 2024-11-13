@@ -3,6 +3,8 @@ export const canvasColors = {
   lightBlue: "rgb(193, 223, 244)",
   white: "rgb(255, 255, 255)",
   gray: "rgb(170, 170, 170)",
+  darkGray1: "rgb(60, 56, 54)",
+  darkGray2: "rgb(109, 109, 109)",
   orange: "rgb(211, 83, 64)",
 };
 

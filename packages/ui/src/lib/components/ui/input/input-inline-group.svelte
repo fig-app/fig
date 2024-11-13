@@ -20,6 +20,6 @@
 
 <div
   bind:this={ref}
-  class={cn("h-fit flex rounded-md ring-primary overflow-hidden divide-x-2 divide-background has-[:focus]:ring-1 *:border-0 *:rounded-none *:has-[:focus]:ring-0", className)}>
+  class={cn("h-fit flex rounded-md ring-primary overflow-hidden divide-x-2 divide-background has-[:focus]:ring-1 [&_.input]:border-0 [&_.input]:rounded-none [&_.input]:has-[:focus]:ring-0", className)}>
   {@render children()}
 </div>

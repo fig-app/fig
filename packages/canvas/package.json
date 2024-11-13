@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "@fig/functions": "workspace:*",
-    "@fig/types": "workspace:*"
+    "@fig/types": "workspace:*",
+    "@fig/stores": "workspace:*"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.2",

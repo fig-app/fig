@@ -5,7 +5,7 @@
   import type {Snippet} from "svelte";
 
   export const inputVariants = tv({
-    base: "flex items-center gap-2 border-input bg-input ring-offset-0 placeholder:text-muted-foreground has-[:focus]:ring-primary flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium has-[:focus]:outline-none has-[:focus]:ring-1 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-1",
+    base: "input flex items-center gap-2 border-input bg-input ring-offset-0 placeholder:text-muted-foreground has-[:focus]:ring-primary flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium has-[:focus]:outline-none has-[:focus]:ring-1 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-1",
     variants: {
       size: {
         default: "h-10 w-full",

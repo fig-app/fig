@@ -1,8 +1,8 @@
 <script lang="ts">
-  import {Button} from "@fig/ui";
+  import {Button, NumberInput} from "@fig/ui";
   import Canvas from "@fig/canvas/Canvas.svelte"
-  import Vector from "@fig/canvas/components/Vector.svelte"
-  import {keys} from "@fig/canvas/stores/keys.svelte";
+  import Vector from "@fig/canvas/components/vector/Vector.svelte"
+  import {keys} from "@fig/stores";
   import {navigation} from "@fig/canvas/stores/navigation.svelte";
   import {userMode} from "@fig/canvas/stores/userMode.svelte";
   import {Panel, PanelSection} from "$lib/components";
@@ -11,10 +11,11 @@
   import {Input} from "@fig/ui";
   import {ChevronDown} from "lucide-svelte";
   import {ColorPicker} from "$lib/components/color-picker/index.js"
+  import {selector} from "@fig/canvas/components/Selector.svelte";
 
   let canvasBackgroundColor = $state("#1E1E1E")
 
-  function handleKeyDown(e: KeyboardEvent) {
+  function handleKeyDown() {
     if (keys.isPressed('p')) {
       userMode.mode = 'PEN';
     } else if (keys.isPressed('v')) {
@@ -33,15 +34,15 @@
     <Tabs.Root value="design" class="w-[275px]">
       <div class="p-2 flex items-center justify-between">
         <Tabs.List>
-          <Tabs.Trigger value="design">Design</Tabs.Trigger>
-          <Tabs.Trigger value="prototype">Prototype</Tabs.Trigger>
+          <Tabs.Trigger value="design">{m.editor_right_panel_design()}</Tabs.Trigger>
+          <Tabs.Trigger value="prototype">{m.editor_right_panel_prototype()}</Tabs.Trigger>
         </Tabs.List>
 
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <Button variant="ghost" size="sm" class="text-xs">
               {navigation.percentScale.toFixed(0)} %
-              <ChevronDown/>
+              <ChevronDown class="!size-3"/>
             </Button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content>
@@ -57,14 +58,42 @@
 
       <!-- Design -->
       <Tabs.Content value="design" class="divide-y divide-border">
-        <PanelSection.Root>
-          <PanelSection.Header>
-            <PanelSection.Title>Canvas</PanelSection.Title>
-          </PanelSection.Header>
-          <PanelSection.Content>
-            <ColorPicker bind:color={canvasBackgroundColor}/>
-          </PanelSection.Content>
-        </PanelSection.Root>
+        {#if (!selector.hasSelectedNodes())}
+          <PanelSection.Root>
+            <PanelSection.Header>
+              <PanelSection.Title>Canvas</PanelSection.Title>
+            </PanelSection.Header>
+            <PanelSection.Content>
+              <ColorPicker bind:color={canvasBackgroundColor}/>
+            </PanelSection.Content>
+          </PanelSection.Root>
+        {:else}
+          <PanelSection.Root>
+            <PanelSection.Header>
+              <PanelSection.Title>Position</PanelSection.Title>
+            </PanelSection.Header>
+            <PanelSection.Content>
+              <div class="flex gap-2">
+                {#if (selector.selectedNode && !selector.hasMultipleSelectedNodes)}
+                  <!-- X position -->
+                  <NumberInput inputSize="sm"
+                               bind:value={selector.selectedNode.position.x}>
+                    {#snippet left()}
+                      <span class="text-foreground/60">X</span>
+                    {/snippet}
+                  </NumberInput>
+                  <!-- Y position -->
+                  <NumberInput inputSize="sm"
+                               bind:value={selector.selectedNode.position.y}>
+                    {#snippet left()}
+                      <span class="text-foreground/60">Y</span>
+                    {/snippet}
+                  </NumberInput>
+                {/if}
+              </div>
+            </PanelSection.Content>
+          </PanelSection.Root>
+        {/if}
       </Tabs.Content>
 
       <!-- Prototype -->

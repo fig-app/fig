@@ -1,11 +1,13 @@
 <script lang="ts">
   import {Tooltip as TooltipPrimitive} from "bits-ui";
   import {cn} from "$lib/utils.js";
+  import {TooltipArrow} from "$lib/components/ui/tooltip";
 
   let {
     ref = $bindable(null),
     class: className,
     sideOffset = 4,
+    children,
     ...restProps
   }: TooltipPrimitive.ContentProps = $props();
 </script>
@@ -18,4 +20,7 @@
 		className
 	)}
   {...restProps}
-/>
+>
+  <TooltipArrow/>
+  {@render children?.()}
+</TooltipPrimitive.Content>

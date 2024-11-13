@@ -31,6 +31,7 @@
     "@fig/functions": "workspace:*",
     "@fig/types": "workspace:*",
     "@fig/ui": "workspace:*",
+    "@fig/stores": "workspace:*",
     "@inlang/paraglide-sveltekit": "^0.11.1",
     "lucide-svelte": "^0.454.0",
     "runed": "^0.15.3"

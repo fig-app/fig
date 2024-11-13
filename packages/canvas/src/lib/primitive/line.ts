@@ -1,4 +1,4 @@
-import type { Vector } from "@fig/types/properties/Vector";
+import type {Vector} from "@fig/types/properties/Vector";
 
 type LineArgs = {
   ctx: CanvasRenderingContext2D;
@@ -12,15 +12,15 @@ type LineArgs = {
 };
 
 export function line({
-  ctx,
-  start,
-  end,
-  color = "#fff",
-  weight = 1,
-  cap = "butt",
-  join = "miter",
-  dash = [],
-}: LineArgs) {
+                       ctx,
+                       start,
+                       end,
+                       color = "#fff",
+                       weight = 1,
+                       cap = "butt",
+                       join = "miter",
+                       dash = [],
+                     }: LineArgs) {
   ctx.save();
 
   ctx.strokeStyle = color;

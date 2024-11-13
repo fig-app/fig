@@ -1,4 +1,4 @@
-import Vector from "$lib/components/Vector.svelte";
+import Vector from "$lib/components/vector/Vector.svelte";
 
 type CubicCurveArgs = {
   ctx: CanvasRenderingContext2D;

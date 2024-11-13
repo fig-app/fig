@@ -1,9 +1,9 @@
-import type { Vector } from "@fig/types/properties/Vector";
-import { arc } from "$lib/primitive/arc";
-import { isCursorHoveringArc } from "@fig/functions/shape/arc";
-import { cursorPosition } from "$lib/stores/cursorPosition.svelte";
-import { canvasClick } from "$lib/stores/canvasClick.svelte";
-import { canvasColors } from "$lib/stores/canvasColors";
+import type {Vector} from "@fig/types/properties/Vector";
+import {arc} from "$lib/primitive/arc";
+import {isCursorHoveringArc} from "@fig/functions/shape/arc";
+import {cursorPosition} from "@fig/stores";
+import {canvasClick} from "$lib/stores/canvasClick.svelte.js";
+import {canvasColors} from "$lib/stores/canvasColors";
 
 const RADIUS_DEFAULT: number = 4;
 const RADIUS_SELECTED: number = 5;
@@ -13,9 +13,10 @@ const PRIMITIVE_WHITE: string = canvasColors.white;
 export class EditPoint {
   hovered: boolean = $state(false);
   clicked: boolean = $state(false);
-  centerPoint: Vector = $state({ x: 0, y: 0 });
+  centerPoint: Vector = $state({x: 0, y: 0});
 
-  constructor() {}
+  constructor() {
+  }
 
   updateCenterPoint(centerPoint: Vector) {
     this.centerPoint = centerPoint;

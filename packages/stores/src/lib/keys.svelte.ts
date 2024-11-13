@@ -7,8 +7,8 @@ class Keys {
 
   constructor() {
     if (typeof window !== "undefined") {
-      document.body.addEventListener("keydown", this.handleKeyDown.bind(this));
-      document.body.addEventListener("keyup", this.handleKeyUp.bind(this));
+      window.addEventListener("keydown", this.handleKeyDown.bind(this));
+      window.addEventListener("keyup", this.handleKeyUp.bind(this));
     }
   }
 
