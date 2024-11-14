@@ -111,7 +111,7 @@ fillGeometry: Array<Path>,
  * overriden, you must use the geometry=paths option. Each path returned may have an
  * overrideId which maps to this table.
  */
-fillOverrideTable: { [key in number]?: PaintOverride }, 
+fillOverrideTable?: { [key in number]?: PaintOverride }, 
 /**
  * An array of stroke paints applied to the node
  */
@@ -158,9 +158,9 @@ strokeAlign: StrokeAlign,
  * A mapping of a StyleType to style ID (see Style) of styles present on this node. The style
  * ID can be used to look up more information about the style in the top-level styles field.
  */
-styles: { [key in StyleType]?: string }, 
+styles?: { [key in StyleType]?: string }, 
 /**
  * An array of annotations displaying notes and pinned properties of nodes in Dev Mode.
  * Currently a maximum of 1 annotation is supported.
  */
-annotations: Array<Annotation>, addidionalData: Data, };
+annotations: Array<Annotation>, additionalData: Data, };

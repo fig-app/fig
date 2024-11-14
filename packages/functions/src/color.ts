@@ -18,10 +18,7 @@ export function rgbColorToString(color: Color): string {
  * Convert rgb color to hex color
  */
 export function rgbToHex(r: number, g: number, b: number) {
-  return (
-    "#" +
-    ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()
-  );
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
 }
 
 /**
@@ -176,11 +173,7 @@ export function hslToHsv(h: number, s: number, l: number) {
 /**
  * Convert hue rotation to hex color
  */
-export function hueRotationToHex(
-  hue: number,
-  saturation = 100,
-  lightness = 50,
-) {
+export function hueRotationToHex(hue: number, saturation = 100, lightness = 50) {
   const { r, g, b } = hslToRgb(hue % 360, saturation, lightness);
   return rgbToHex(r, g, b);
 }
@@ -190,4 +183,13 @@ export function hueRotationToHex(
  */
 export function hueRotationToHsl(rotation: number) {
   return { h: rotation, s: 100, l: 50 };
+}
+
+export function randomColor() {
+  return {
+    r: Math.floor(Math.random() * 256),
+    g: Math.floor(Math.random() * 256),
+    b: Math.floor(Math.random() * 256),
+    a: 1,
+  };
 }

@@ -45,9 +45,6 @@ importers:
       '@fig/functions':
         specifier: workspace:*
         version: link:../packages/functions
-      '@fig/stores':
-        specifier: workspace:*
-        version: link:../packages/stores
       '@fig/types':
         specifier: workspace:*
         version: link:../packages/types
@@ -115,12 +112,12 @@ importers:
       '@fig/functions':
         specifier: workspace:*
         version: link:../functions
-      '@fig/stores':
-        specifier: workspace:*
-        version: link:../stores
       '@fig/types':
         specifier: workspace:*
         version: link:../types
+      runed:
+        specifier: ^0.15.3
+        version: 0.15.3(svelte@5.1.9)
     devDependencies:
       '@chromatic-com/storybook':
         specifier: ^3.2.2

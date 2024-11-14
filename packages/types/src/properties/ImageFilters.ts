@@ -7,28 +7,28 @@ export type ImageFilters = {
 /**
  * default: 0
  */
-exposureNumber: number, 
+exposure: number, 
 /**
  * default: 0
  */
-contrastNumber: number, 
+contrast: number, 
 /**
  * default: 0
  */
-saturationNumber: number, 
+saturation: number, 
 /**
  * default: 0
  */
-temperatureNumber: number, 
+temperature: number, 
 /**
  * default: 0
  */
-tintNumber: number, 
+tint: number, 
 /**
  * default: 0
  */
-highlightsNumber: number, 
+highlights: number, 
 /**
  * default: 0
  */
-shadowsNumber: number, };
+shadows: number, };

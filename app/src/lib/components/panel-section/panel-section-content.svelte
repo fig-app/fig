@@ -18,6 +18,6 @@
   }: PanelSectionContentProps = $props();
 </script>
 
-<div bind:this={ref} class={cn("px-4", className)}>
+<div bind:this={ref} class={cn("px-4 pb-4", className)}>
   {@render children?.()}
 </div>
