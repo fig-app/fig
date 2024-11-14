@@ -359,6 +359,8 @@
   }
 
   function handleResize() {
+    console.log("resize");
+
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
       width = availableWidth;
@@ -433,12 +435,13 @@
     } else {
     }
   }
+
 </script>
 
-<svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}/>
+<svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
+               onresize={handleResize}/>
 
-<div class="h-full" bind:clientWidth={availableWidth} bind:clientHeight={availableHeight}
-     onresize={handleResize}>
+<div class="h-full" bind:clientWidth={availableWidth} bind:clientHeight={availableHeight}>
   <canvas bind:this={canvas}
           {width}
           {height}
