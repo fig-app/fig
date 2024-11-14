@@ -1,18 +1,18 @@
 <script lang="ts">
   import {Button, NumberInput} from "@fig/ui";
-  import Canvas from "@fig/canvas/Canvas.svelte"
-  import Vector from "@fig/canvas/components/vector/Vector.svelte"
-  import {keys} from "@fig/stores";
-  import {navigation} from "@fig/canvas/stores/navigation.svelte";
-  import {userMode} from "@fig/canvas/stores/userMode.svelte";
+  import Canvas from "$lib/canvas/Canvas.svelte"
+  import Vector from "$lib/canvas/components/vector/Vector.svelte"
+  import {keys} from "$lib/stores";
+  import {navigation} from "$lib/canvas/stores/navigation.svelte";
+  import {userMode} from "$lib/canvas/stores/userMode.svelte";
   import {Panel, PanelSection} from "$lib/components";
   import * as m from "$lib/paraglide/messages"
   import {Tabs, DropdownMenu} from "@fig/ui/editor";
   import {Input} from "@fig/ui";
   import {ChevronDown} from "lucide-svelte";
   import {ColorPicker} from "$lib/components/color-picker/index.js"
-  import {selector} from "@fig/canvas/components/Selector.svelte";
-  import {canvasPipeline} from "@fig/canvas/stores/canvasPipeline.svelte";
+  import {selector} from "$lib/canvas/components/Selector.svelte";
+  import {canvasPipeline} from "$lib/canvas/stores/canvasPipeline.svelte";
   import {dev} from "$app/environment";
   import {randomInt} from "@fig/functions/math";
   import {randomColor} from "@fig/functions/color";

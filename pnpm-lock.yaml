@@ -45,9 +45,6 @@ importers:
       '@fig/functions':
         specifier: workspace:*
         version: link:../packages/functions
-      '@fig/stores':
-        specifier: workspace:*
-        version: link:../packages/stores
       '@fig/types':
         specifier: workspace:*
         version: link:../packages/types
@@ -115,9 +112,6 @@ importers:
       '@fig/functions':
         specifier: workspace:*
         version: link:../functions
-      '@fig/stores':
-        specifier: workspace:*
-        version: link:../stores
       '@fig/types':
         specifier: workspace:*
         version: link:../types
