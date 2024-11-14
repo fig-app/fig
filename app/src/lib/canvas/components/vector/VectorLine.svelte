@@ -134,7 +134,7 @@
         start: virtualStartCommandsList[0].endPoint,
         end: virtualEndCommandsList[0].endPoint
       },
-      cursorPosition,
+      cursorPosition: cursorPosition.offsetPos,
       distance: getHoverMarginDistance()
     }) && !selector.inSelection && (!cursorHover.hoveredPart || cursorHover.hoveredPart === part);
     clicked = hovered && canvasClick.single;

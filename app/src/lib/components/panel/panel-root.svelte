@@ -5,6 +5,7 @@
 
   export type PanelRootProps = WithElementRef<HTMLAttributes<HTMLDivElement>> & {
     side: "left" | "right";
+    width?: number;
     minWidth?: number;
     children: Snippet
   }
@@ -17,11 +18,11 @@
     ref = $bindable(undefined),
     class: className,
     side,
+    width = $bindable(275),
     minWidth = 275,
     children
   }: PanelRootProps = $props();
 
-  let width = $state(minWidth);
   let resizing = $state(false);
 
   $inspect(resizing, width)
@@ -41,7 +42,7 @@
 
 <div
   bind:this={ref}
-  class={cn("h-full absolute block bg-background border-border transition-none", side === "left" ? "left-0 border-r-2" : "right-0 border-l-2", className)}
+  class={cn("h-full relative block bg-background border-border transition-none", side === "left" ? "left-0 border-r-2" : "right-0 border-l-2", className)}
   style:width={width + "px"}
 >
   {@render children()}

@@ -23,7 +23,7 @@ export class EditPoint {
 
   update() {
     this.hovered = isCursorHoveringArc({
-      cursorPosition,
+      cursorPosition: cursorPosition.offsetPos,
       arc: {
         centerPosition: this.centerPoint,
         radius: RADIUS_DEFAULT + 2,
