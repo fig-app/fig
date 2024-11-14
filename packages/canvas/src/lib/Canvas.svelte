@@ -18,13 +18,13 @@
   import {userMode} from "$lib/stores/userMode.svelte";
   import {canvasRenderingContext} from "$lib/stores/canvasRenderingContext.svelte";
   import {line} from "$lib/primitive/line";
-  import {watch} from "runed";
   import Vector from "$lib/components/vector/Vector.svelte";
 
   type Props = {
     width?: number;
     height?: number;
     fullscreen?: boolean;
+    fitAvailableSpace?: boolean;
     backgroundColor?: string;
     children: Snippet
   }
@@ -34,6 +34,7 @@
     width = 100,
     height = 100,
     fullscreen = false,
+    fitAvailableSpace = false,
     backgroundColor = $bindable(DEFAULT_BACKGROUND_COLOR),
     children
   }: Props = $props();
@@ -46,6 +47,8 @@
 
   let windowWidth = $state(0);
   let windowHeight = $state(0);
+  let availableWidth = $state(0);
+  let availableHeight = $state(0);
   let resizeTimeout: NodeJS.Timeout;
   let drawTimeout: NodeJS.Timeout;
 
@@ -100,6 +103,11 @@
       height = windowHeight;
     }
 
+    if (fitAvailableSpace) {
+      width = availableWidth;
+      height = availableHeight;
+    }
+
     setTimeout(() => {
       draw();
     }, 100)
@@ -108,7 +116,6 @@
       cancelAnimationFrame(frameId);
     }
   });
-
 
   const contexts = getAllContexts();
 
@@ -361,11 +368,11 @@
   }
 
   function handleWindowResize() {
-    if (fullscreen) {
+    if (fullscreen || fitAvailableSpace) {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        width = windowWidth;
-        height = windowHeight;
+        width = fullscreen ? windowWidth : availableWidth;
+        height = fullscreen ? windowHeight : availableHeight;
 
         console.log(`Resizing canvas to ${width}x${height}`);
       }, 100);
@@ -399,8 +406,8 @@
     // positive if zoomed, negative if de-zoomed, hence the 1
     const scaleAmount = 1 - zoomRatio;
 
-    const zoomRatioX = cursorPosition.x / canvas.clientWidth;
-    const zoomRatioY = cursorPosition.y / canvas.clientHeight;
+    const zoomRatioX = cursorPosition.offsetX / canvas.clientWidth;
+    const zoomRatioY = cursorPosition.offsetY / canvas.clientHeight;
 
     // Amount zoomed from each edge of the screen
     const unitsZoomedX = (canvas.width / navigation.scale) * scaleAmount;
@@ -440,45 +447,50 @@
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
-               on:resize={handleWindowResize}/>
+               on:resize={() => fullscreen && handleWindowResize()}/>
 
-<canvas bind:this={canvas}
-        {width}
-        {height}
-        onwheel={handleWheel}
-        onmousemove={handleMouseMove}
-        onclick={handleCanvasClick}
-        ondblclick={(e: MouseEvent) => {
-          if (e.button === 0) {
-            canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
-          }
-        }}
-        onmousedown={(e: MouseEvent) => {
-          // Left click
-          if (e.button === 0) {
-            canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
-          }
-          // Middle click -> panning
-          else if (e.button === 1) {
-            isPanning = true;
-            startPanningPos = {x: e.x, y: e.y};
-            lastPanningPos = {x: e.x, y: e.y};
-            canvas.style.cursor = 'grabbing';
-          }
-        }}
-        onmouseup={(e: MouseEvent) => {
-          canvasClick.resetClick();
-          if (e.button === 1) {
+<div class="h-full" bind:clientWidth={availableWidth} bind:clientHeight={availableHeight}
+     onresize={() => fitAvailableSpace && handleWindowResize()}>
+  <canvas bind:this={canvas}
+          {width}
+          {height}
+          style:width={width + "px"}
+          style:height={height + "px"}
+          onwheel={handleWheel}
+          onmousemove={handleMouseMove}
+          onclick={handleCanvasClick}
+          ondblclick={(e: MouseEvent) => {
+            if (e.button === 0) {
+              canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
+            }
+          }}
+          onmousedown={(e: MouseEvent) => {
+            // Left click
+            if (e.button === 0) {
+              canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
+            }
+            // Middle click -> panning
+            else if (e.button === 1) {
+              isPanning = true;
+              startPanningPos = {x: e.x, y: e.y};
+              lastPanningPos = {x: e.x, y: e.y};
+              canvas.style.cursor = 'grabbing';
+            }
+          }}
+          onmouseup={(e: MouseEvent) => {
+            canvasClick.resetClick();
+            if (e.button === 1) {
+              isPanning = false;
+              canvas.style.cursor = "default";
+            }
+          }}
+          onmouseleave={(_) => {
             isPanning = false;
             canvas.style.cursor = "default";
-          }
-        }}
-        onmouseleave={(_) => {
-          isPanning = false;
-          canvas.style.cursor = "default";
-        }}
->
-  {@render children()}
-</canvas>
+          }}
+  >
+    {@render children()}
+  </canvas>
+</div>
 
 <div id="canvas"></div>

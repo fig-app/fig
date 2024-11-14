@@ -13,7 +13,6 @@ import type { PathCommandWithEndPoint } from "@fig/functions/path/PathCommand";
  * File to handle all shared functionalities between vector parts with function
  */
 
-
 /**
  * Handle the selection of a vector part
  * Disable / enable the selector depending on the state of the component
@@ -93,9 +92,9 @@ export function handleVectorPartDrawing(
  * Handle the dragging of a vector part
  */
 export function handleVectorPartDragging(vectorContext: VectorContext) {
-  let x = (cursorPosition.x - canvasClick.realClickPoint.x) / navigation.scale;
-  let y = (cursorPosition.y - canvasClick.realClickPoint.y) / navigation.scale;
-  canvasClick.setClickPoint(cursorPosition.pos);
+  let x = (cursorPosition.offsetX - canvasClick.realClickPoint.x) / navigation.scale;
+  let y = (cursorPosition.offsetY - canvasClick.realClickPoint.y) / navigation.scale;
+  canvasClick.setClickPoint(cursorPosition.offsetPos);
 
   // Move the current point and all the other selected ones
   let selectedCommandTuples = selector.selectedPartsCommandTuples();
@@ -105,7 +104,7 @@ export function handleVectorPartDragging(vectorContext: VectorContext) {
     let commandIndex = selectedCommandTuple[1];
     let selectedCommand = vectorContext.strokeGeometriesCommands[geometryIndex][
       commandIndex
-      ] as PathCommandWithEndPoint;
+    ] as PathCommandWithEndPoint;
     selectedCommand.endPoint.x += x;
     selectedCommand.endPoint.y += y;
   }

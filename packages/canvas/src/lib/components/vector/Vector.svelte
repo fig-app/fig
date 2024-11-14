@@ -202,7 +202,7 @@
       if (canvasRenderingContext.ctx) {
         // Threshold of line hover
         canvasRenderingContext.ctx.lineWidth = stylizedStrokeWeight + getHoverMarginDistance();
-        if (canvasRenderingContext.ctx.isPointInStroke(path, cursorPosition.x, cursorPosition.y)) {
+        if (canvasRenderingContext.ctx.isPointInStroke(path, cursorPosition.offsetX, cursorPosition.offsetY)) {
           return true;
         }
       }

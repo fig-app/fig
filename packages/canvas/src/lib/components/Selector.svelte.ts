@@ -47,32 +47,29 @@ class Selector {
       // Create this
       if (this.origin == null) {
         this.origin = {
-          x: cursorPosition.x,
-          y: cursorPosition.y,
+          x: cursorPosition.offsetX,
+          y: cursorPosition.offsetY,
         };
       }
 
       if (!this.rect) {
         // Only create a selector rect if clicked somewhere (origin) and moved
-        if (
-          this.origin.x != cursorPosition.x &&
-          this.origin.y != cursorPosition.y
-        ) {
+        if (this.origin.x != cursorPosition.offsetX && this.origin.y != cursorPosition.offsetY) {
           // Allow to add selection with shift pressed
           if (!keys.shiftPressed()) {
             this.unselectAllParts();
           }
           this.inSelection = true;
           this.rect = new Rect({
-            x: cursorPosition.x,
-            y: cursorPosition.y,
-            width: cursorPosition.x - this.origin.x,
-            height: cursorPosition.y - this.origin.y,
+            x: cursorPosition.offsetX,
+            y: cursorPosition.offsetY,
+            width: cursorPosition.offsetX - this.origin.x,
+            height: cursorPosition.offsetY - this.origin.y,
           });
         }
       } else {
-        this.rect.width = cursorPosition.x - this.rect.x;
-        this.rect.height = cursorPosition.y - this.rect.y;
+        this.rect.width = cursorPosition.offsetX - this.rect.x;
+        this.rect.height = cursorPosition.offsetY - this.rect.y;
       }
     }
 
@@ -173,8 +170,7 @@ class Selector {
 
       // check if a point in the selection to update partsMode state
       if (part.type === "point") {
-        let hasPoint =
-          this.parts.filter((part) => part.type === "point").length > 0;
+        let hasPoint = this.parts.filter((part) => part.type === "point").length > 0;
 
         if (!hasPoint) {
           this.partsMode = false;
@@ -200,9 +196,7 @@ class Selector {
    * It is used to move all the selected parts
    */
   selectedPartsCommandTuples(): [number, number][] {
-    return removeArrayOfTupleDuplicates(
-      this.parts.map((part) => part.commandTuplesList).flat(),
-    );
+    return removeArrayOfTupleDuplicates(this.parts.map((part) => part.commandTuplesList).flat());
   }
 }
 
