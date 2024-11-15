@@ -1,2 +1,2 @@
-# figmomo
-the figma killer
+# Fig
+The figma killer
