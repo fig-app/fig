@@ -23,8 +23,6 @@
   type Props = {
     width?: number;
     height?: number;
-    fullscreen?: boolean;
-    fitAvailableSpace?: boolean;
     backgroundColor?: string;
     children: Snippet
   }
@@ -33,8 +31,6 @@
   let {
     width = 100,
     height = 100,
-    fullscreen = false,
-    fitAvailableSpace = false,
     backgroundColor = $bindable(DEFAULT_BACKGROUND_COLOR),
     children
   }: Props = $props();
@@ -76,6 +72,8 @@
     canvasClick.realClickPoint,
     selector.rect?.width,
     selector.rect?.height,
+    availableWidth,
+    availableHeight
   ]);
 
   // Set canvas context
@@ -98,15 +96,8 @@
 
     frameId = requestAnimationFrame(loop);
 
-    if (fullscreen) {
-      width = windowWidth;
-      height = windowHeight;
-    }
-
-    if (fitAvailableSpace) {
-      width = availableWidth;
-      height = availableHeight;
-    }
+    width = availableWidth;
+    height = availableHeight;
 
     setTimeout(() => {
       draw();
@@ -367,21 +358,21 @@
     }
   }
 
-  function handleWindowResize() {
-    if (fullscreen || fitAvailableSpace) {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        width = fullscreen ? windowWidth : availableWidth;
-        height = fullscreen ? windowHeight : availableHeight;
+  function handleResize() {
+    console.log("resize");
 
-        console.log(`Resizing canvas to ${width}x${height}`);
-      }, 100);
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      width = availableWidth;
+      height = availableHeight;
 
-      clearTimeout(drawTimeout);
-      drawTimeout = setTimeout(() => {
-        draw();
-      }, 100);
-    }
+      console.log(`Resizing canvas to ${width}x${height}`);
+    }, 100);
+
+    clearTimeout(drawTimeout);
+    drawTimeout = setTimeout(() => {
+      draw();
+    }, 100);
   }
 
   function handleWheel(event: WheelEvent) {
@@ -430,7 +421,7 @@
   }
 
   function handleCanvasClick(event: MouseEvent) {
-    canvasClick.setSingleClick(true, {x: event.clientX, y: event.clientY});
+    canvasClick.setSingleClick(true, {x: event.offsetX, y: event.offsetY});
     clearTimeout(clickTimeout);
     clickTimeout = setTimeout(() => {
       canvasClick.resetClick()
@@ -444,13 +435,13 @@
     } else {
     }
   }
+
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
-               on:resize={() => fullscreen && handleWindowResize()}/>
+               onresize={handleResize}/>
 
-<div class="h-full" bind:clientWidth={availableWidth} bind:clientHeight={availableHeight}
-     onresize={() => fitAvailableSpace && handleWindowResize()}>
+<div class="h-full" bind:clientWidth={availableWidth} bind:clientHeight={availableHeight}>
   <canvas bind:this={canvas}
           {width}
           {height}
@@ -461,13 +452,13 @@
           onclick={handleCanvasClick}
           ondblclick={(e: MouseEvent) => {
             if (e.button === 0) {
-              canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
+              canvasClick.setDoubleClick(true, {x: e.offsetX, y: e.offsetY});
             }
           }}
           onmousedown={(e: MouseEvent) => {
             // Left click
             if (e.button === 0) {
-              canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
+              canvasClick.setPress(true, {x: e.offsetX, y: e.offsetY});
             }
             // Middle click -> panning
             else if (e.button === 1) {

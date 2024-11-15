@@ -18,6 +18,9 @@
   import {randomColor} from "@fig/functions/color";
 
   let canvasBackgroundColor = $state("#1E1E1E")
+  let leftPanelSize = $state(275);
+  let rightPanelSize = $state(275);
+  let panelsSize = $derived(leftPanelSize + rightPanelSize);
 
   // $effect.root(() => {
   //   setTimeout(() => {
@@ -45,19 +48,19 @@
     }, randomColor())
   }
 
+  $inspect(leftPanelSize, rightPanelSize, panelsSize)
 </script>
 
 <svelte:window onkeydown={handleKeyDown}/>
 
-
 <div class="overflow-hidden w-[100vw] h-[100vh] flex">
   <!-- Panel left -->
-  <!--  <Panel side="left" minWidth={250}>-->
-  <!--    <p></p>-->
-  <!--  </Panel>-->
+  <Panel side="left" minWidth={250} bind:width={leftPanelSize}>
+    <p></p>
+  </Panel>
 
   <!-- Canvas -->
-  <Canvas fullscreen backgroundColor={canvasBackgroundColor}>
+  <Canvas backgroundColor={canvasBackgroundColor} width={window.innerWidth - panelsSize}>
     <Vector node={{
               id: "vector-id",
               name: "vector-name",
@@ -85,7 +88,7 @@
 
 
   <!-- Panel right -->
-  <Panel side="right">
+  <Panel side="right" bind:width={rightPanelSize}>
     <Tabs.Root value="design" class="w-full">
       <div class="p-2 flex items-center justify-between">
         <Tabs.List>

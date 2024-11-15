@@ -123,7 +123,7 @@
         virtualEndCommand.controlPoints.start,
         virtualEndCommand.controlPoints.end,
         virtualEndCommand.endPoint,
-        cursorPosition.pos,
+        cursorPosition.offsetPos,
       );
       clicked = hovered && canvasClick.pressed;
       dragged = hovered && canvasClick.pressed && !vectorContext.isDragged(part);

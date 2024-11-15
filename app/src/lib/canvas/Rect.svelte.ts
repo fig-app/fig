@@ -85,7 +85,7 @@ export class Rect {
 
   // Functions
   hovered(): boolean {
-    return hoverRect(cursorPosition, this.topLeft, this.width, this.height);
+    return hoverRect(cursorPosition.offsetPos, this.topLeft, this.width, this.height);
   }
 
   clicked(): boolean {
