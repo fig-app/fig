@@ -1,10 +1,9 @@
 import type {VectorPart} from "$lib/canvas/types/VectorPart";
 import type {CanvasNode} from "$lib/canvas/types/CanvasNode";
 import {Rect} from "$lib/canvas/Rect.svelte";
-import {cursorPosition} from "$lib/stores";
+import {cursorPosition, keys} from "$lib/stores";
 import {canvasClick} from "$lib/canvas/stores/canvasClick.svelte";
 import {canvasColors} from "$lib/canvas/stores/canvasColors";
-import {keys} from "$lib/stores";
 import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
 import type {Vector} from "@fig/types/properties/Vector";
 

@@ -4,9 +4,9 @@
   import {fillRect, rect} from "$lib/canvas/primitive/rect";
   import {canvasClick} from "$lib/canvas/stores/canvasClick.svelte";
   import {canvasTime} from "$lib/canvas/stores/canvasTime.svelte";
-  import {keys, cursorPosition} from "$lib/stores";
+  import {cursorPosition, keys} from "$lib/stores";
   import {navigation} from "$lib/canvas/stores/navigation.svelte";
-  import {getCanvasContext, setCanvasContext} from "$lib/canvas/context/canvasContext";
+  import {setCanvasContext} from "$lib/canvas/context/canvasContext";
   import {selector} from "$lib/canvas/components/Selector.svelte.js";
   import {
     canvasColors,
@@ -50,10 +50,6 @@
 
   let clickTimeout: NodeJS.Timeout;
   let isPanning: boolean = false;
-  let startPanningPos: VectorType = {
-    x: 0,
-    y: 0,
-  }
   let lastPanningPos: VectorType = {
     x: 0,
     y: 0,
@@ -467,7 +463,6 @@
             // Middle click -> panning
             else if (e.button === 1) {
               isPanning = true;
-              startPanningPos = {x: e.x, y: e.y};
               lastPanningPos = {x: e.x, y: e.y};
               canvas.style.cursor = 'grabbing';
             }

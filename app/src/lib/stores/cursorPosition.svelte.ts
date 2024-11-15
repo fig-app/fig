@@ -1,8 +1,8 @@
-import type { Vector } from "@fig/types/dist/properties/Vector";
+import type {Vector} from "@fig/types/properties/Vector";
 
 class CursorPosition {
-  clientPos: Vector = $state({ x: 0, y: 0 });
-  offsetPos: Vector = $state({ x: 0, y: 0 });
+  clientPos: Vector = $state({x: 0, y: 0});
+  offsetPos: Vector = $state({x: 0, y: 0});
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -11,8 +11,12 @@ class CursorPosition {
   }
 
   private handleMouseMove(e: MouseEvent) {
-    this.clientPos = { x: e.clientX, y: e.clientY };
-    this.offsetPos = { x: e.offsetX, y: e.offsetY };
+    this.clientPos = {x: e.clientX, y: e.clientY};
+    this.offsetPos = {x: e.offsetX, y: e.offsetY};
+
+    // When dragging and the cursor goes out of the window, bring it back to the other side
+    if (this.clientPos.x > window.innerWidth - 5) {
+    }
   }
 
   get x() {

@@ -1,13 +1,12 @@
-import type { VectorPart } from "$lib/canvas/types/VectorPart";
-import { getVectorContext } from "$lib/canvas/context/vectorContext";
-import { keys } from "$lib/stores";
-import { canvasClick } from "$lib/canvas/stores/canvasClick.svelte";
-import { selector } from "$lib/canvas/components/Selector.svelte";
-import type { CanvasDrawFunction } from "$lib/canvas/types/CanvasFunction";
-import type { VectorContext } from "$lib/canvas/types/VectorContext";
-import { cursorPosition } from "$lib/stores";
-import { navigation } from "$lib/canvas/stores/navigation.svelte";
-import type { PathCommandWithEndPoint } from "@fig/functions/path/PathCommand";
+import type {VectorPart} from "$lib/canvas/types/VectorPart";
+import {getVectorContext} from "$lib/canvas/context/vectorContext";
+import {cursorPosition, keys} from "$lib/stores";
+import {canvasClick} from "$lib/canvas/stores/canvasClick.svelte";
+import {selector} from "$lib/canvas/components/Selector.svelte";
+import type {CanvasDrawFunction} from "$lib/canvas/types/CanvasFunction";
+import type {VectorContext} from "$lib/canvas/types/VectorContext";
+import {navigation} from "$lib/canvas/stores/navigation.svelte";
+import type {PathCommandWithEndPoint} from "@fig/functions/path/PathCommand";
 
 /**
  * File to handle all shared functionalities between vector parts with function
@@ -30,7 +29,7 @@ export function handleVectorPartSelection(
       selector.disable();
       vectorContext.setDraggedPart(part());
 
-      if (dragged() && !part().selected && vectorContext.isDragged(part())) {
+      if (!part().selected && vectorContext.isDragged(part())) {
         if (keys.shiftPressed()) {
           selector.selectPart(part());
         } else {
@@ -98,13 +97,12 @@ export function handleVectorPartDragging(vectorContext: VectorContext) {
 
   // Move the current point and all the other selected ones
   let selectedCommandTuples = selector.selectedPartsCommandTuples();
-  // console.log(selectedCommandTuples);
   for (const selectedCommandTuple of selectedCommandTuples) {
     let geometryIndex = selectedCommandTuple[0];
     let commandIndex = selectedCommandTuple[1];
     let selectedCommand = vectorContext.strokeGeometriesCommands[geometryIndex][
       commandIndex
-    ] as PathCommandWithEndPoint;
+      ] as PathCommandWithEndPoint;
     selectedCommand.endPoint.x += x;
     selectedCommand.endPoint.y += y;
   }
