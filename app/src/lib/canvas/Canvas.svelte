@@ -421,7 +421,11 @@
   }
 
   function handleCanvasClick(event: MouseEvent) {
-    canvasClick.setSingleClick(true, {x: event.offsetX, y: event.offsetY});
+    // Do not consider click if in selection with the selector rectangle
+    if (!selector.rect) {
+      canvasClick.setSingleClick(true, {x: event.offsetX, y: event.offsetY});
+    }
+
     clearTimeout(clickTimeout);
     clickTimeout = setTimeout(() => {
       canvasClick.resetClick()
