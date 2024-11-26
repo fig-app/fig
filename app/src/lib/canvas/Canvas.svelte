@@ -4,9 +4,9 @@
   import {fillRect, rect} from "$lib/canvas/primitive/rect";
   import {canvasClick} from "$lib/canvas/stores/canvasClick.svelte";
   import {canvasTime} from "$lib/canvas/stores/canvasTime.svelte";
-  import {keys, cursorPosition} from "$lib/stores";
+  import {cursorPosition, keys} from "$lib/stores";
   import {navigation} from "$lib/canvas/stores/navigation.svelte";
-  import {getCanvasContext, setCanvasContext} from "$lib/canvas/context/canvasContext";
+  import {setCanvasContext} from "$lib/canvas/context/canvasContext";
   import {selector} from "$lib/canvas/components/Selector.svelte.js";
   import {
     canvasColors,
@@ -50,10 +50,6 @@
 
   let clickTimeout: NodeJS.Timeout;
   let isPanning: boolean = false;
-  let startPanningPos: VectorType = {
-    x: 0,
-    y: 0,
-  }
   let lastPanningPos: VectorType = {
     x: 0,
     y: 0,
@@ -69,7 +65,7 @@
     windowWidth,
     windowHeight,
     keys.keyPressed,
-    canvasClick.realClickPoint,
+    canvasClick.clickPoint,
     selector.rect?.width,
     selector.rect?.height,
     availableWidth,
@@ -164,6 +160,75 @@
 
     if (ctx) {
       selector.draw(ctx);
+      drawLineIndicators(ctx);
+    }
+  }
+
+  function drawLineIndicators(ctx: CanvasRenderingContext2D) {
+    if (!selector.selectedNode) {
+      return;
+    }
+
+    let selectedNode = selector.selectedNode;
+    // right side
+    if (navigation.toVirtualX(selectedNode.position.x) > canvas.width) {
+      line({
+        ctx,
+        start: {
+          x: canvas.width,
+          y: navigation.toVirtualY(selectedNode.position.y),
+        },
+        end: {
+          x: canvas.width,
+          y: navigation.toVirtualY(selectedNode.position.y) + selectedNode.boundingBox.height
+        },
+        color: canvasColors.white,
+      });
+    }
+    // left side
+    else if (navigation.toVirtualX(selectedNode.position.x + selectedNode.boundingBox.width) < 0) {
+      line({
+        ctx,
+        start: {
+          x: 20,
+          y: navigation.toVirtualY(selectedNode.position.y),
+        },
+        end: {
+          x: 20,
+          y: navigation.toVirtualY(selectedNode.position.y) + selectedNode.boundingBox.height
+        },
+        color: canvasColors.white,
+      });
+    }
+    // top side
+    if (navigation.toVirtualY(selectedNode.position.y) < 0) {
+      line({
+        ctx,
+        start: {
+          x: navigation.toVirtualX(selectedNode.position.x),
+          y: 20,
+        },
+        end: {
+          x: navigation.toVirtualX(selectedNode.position.x) + selectedNode.boundingBox.width,
+          y: 20,
+        },
+        color: canvasColors.white,
+      })
+    }
+    // bottom side
+    else if (navigation.toVirtualY(selectedNode.position.y + selectedNode.boundingBox.height) > canvas.height) {
+      line({
+        ctx,
+        start: {
+          x: navigation.toVirtualX(selectedNode.position.x),
+          y: canvas.height,
+        },
+        end: {
+          x: navigation.toVirtualX(selectedNode.position.x) + selectedNode.boundingBox.width,
+          y: canvas.height,
+        },
+        color: canvasColors.white,
+      })
     }
   }
 
@@ -421,7 +486,11 @@
   }
 
   function handleCanvasClick(event: MouseEvent) {
-    canvasClick.setSingleClick(true, {x: event.offsetX, y: event.offsetY});
+    // Do not consider click if in selection with the selector rectangle
+    if (!selector.rect) {
+      canvasClick.setSingleClick(true, {x: event.offsetX, y: event.offsetY});
+    }
+
     clearTimeout(clickTimeout);
     clickTimeout = setTimeout(() => {
       canvasClick.resetClick()
@@ -452,18 +521,17 @@
           onclick={handleCanvasClick}
           ondblclick={(e: MouseEvent) => {
             if (e.button === 0) {
-              canvasClick.setDoubleClick(true, {x: e.offsetX, y: e.offsetY});
+              canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
             }
           }}
           onmousedown={(e: MouseEvent) => {
             // Left click
             if (e.button === 0) {
-              canvasClick.setPress(true, {x: e.offsetX, y: e.offsetY});
+              canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
             }
             // Middle click -> panning
             else if (e.button === 1) {
               isPanning = true;
-              startPanningPos = {x: e.x, y: e.y};
               lastPanningPos = {x: e.x, y: e.y};
               canvas.style.cursor = 'grabbing';
             }

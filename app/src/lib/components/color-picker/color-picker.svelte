@@ -30,7 +30,6 @@
   })
 
   watch(() => inputColor, () => {
-    console.log('inputColor', inputColor);
     color = '#' + inputColor;
   })
 

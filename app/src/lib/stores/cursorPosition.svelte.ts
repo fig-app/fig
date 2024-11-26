@@ -1,8 +1,8 @@
-import type { Vector } from "@fig/types/dist/properties/Vector";
+import type {Vector} from "@fig/types/properties/Vector";
 
 class CursorPosition {
-  clientPos: Vector = $state({ x: 0, y: 0 });
-  offsetPos: Vector = $state({ x: 0, y: 0 });
+  clientPos: Vector = $state({x: 0, y: 0});
+  offsetPos: Vector = $state({x: 0, y: 0});
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -11,8 +11,8 @@ class CursorPosition {
   }
 
   private handleMouseMove(e: MouseEvent) {
-    this.clientPos = { x: e.clientX, y: e.clientY };
-    this.offsetPos = { x: e.offsetX, y: e.offsetY };
+    this.clientPos = {x: e.clientX, y: e.clientY};
+    this.offsetPos = {x: e.offsetX, y: e.offsetY};
   }
 
   get x() {
@@ -29,14 +29,6 @@ class CursorPosition {
 
   get offsetY() {
     return this.offsetPos.y;
-  }
-
-  set pos(value: Vector) {
-    this.clientPos = value;
-  }
-
-  get pos() {
-    return this.clientPos;
   }
 }
 

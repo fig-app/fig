@@ -25,8 +25,6 @@
 
   let resizing = $state(false);
 
-  $inspect(resizing, width)
-
   function resize(e: MouseEvent) {
     if (resizing && ref) {
       let bbox = ref.getBoundingClientRect();

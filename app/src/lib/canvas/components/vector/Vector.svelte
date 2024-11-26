@@ -11,7 +11,7 @@
   import {getVectorContext, setVectorContext} from "$lib/canvas/context/vectorContext";
   import {canvasColors} from "$lib/canvas/stores/canvasColors";
   import {canvasClick} from "$lib/canvas/stores/canvasClick.svelte.js";
-  import {keys, cursorPosition} from "$lib/stores";
+  import {cursorPosition, keys} from "$lib/stores";
   import VectorPoint from "$lib/canvas/components/vector/VectorPoint.svelte";
   import VectorLine from "$lib/canvas/components/vector/VectorLine.svelte";
   import VectorCurve from "$lib/canvas/components/vector/VectorCurve.svelte";
@@ -31,11 +31,11 @@
   import {serializeCommands} from "@fig/functions/path/serialize";
   import type {Line} from "@fig/types/shapes/Line";
   import {parsePathString} from "@fig/functions/path/index";
+  import {userState} from "$lib/canvas/stores/userState.svelte";
   import {roundFloat} from "@fig/functions/math";
 
   let {node}: { node: Node } = $props();
 
-  console.log(node.name, node.id);
   if (node.node.type !== "vector") {
     console.error(`${node.name} isn't a vector.`);
   }
@@ -66,8 +66,6 @@
 
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
-
-  console.log(canvasContext)
 
   // Create vector context
   setVectorContext({
@@ -332,7 +330,6 @@
     }
   }
 
-
   // -----------------------------------------------------------------------------------------------
   // Update functions
   // -----------------------------------------------------------------------------------------------
@@ -341,50 +338,82 @@
     // Update bounding box size and coordinates
     updateBoundingBox();
 
-    // Updating hovered state
-    hovered = isVectorHovered() && !selector.isPartMultiSelectionNodes(canvasNode);
-
-    clicked = hovered && canvasClick.single;
+    // Updating main states
+    hovered = isVectorHovered() && !userState.isEditing;
+    clicked = hovered && canvasClick.pressed;
     dblclick = hovered && canvasClick.double;
 
-    // Check for selection with selector rectangle
+    // Check for selection with SELECTOR RECTANGLE
     if (selector.rect && !selector.partsMode) {
       if (selector.rect.collide(canvasNode.boundingBox)) {
         selector.selectNode(canvasNode);
       } else {
         selector.unselectNode(canvasNode);
       }
-    }
-
-    // Add selection on click
-    if (clicked) {
-      if (keys.shiftPressed()) {
-        selector.selectNode(canvasNode)
-      } else {
-        selector.selectSingleNode(canvasNode);
+    } else {
+      // Check for selection with CLICK
+      if (clicked) {
+        if (keys.shiftPressed()) {
+          selector.selectNode(canvasNode)
+        } else {
+          selector.selectSingleNode(canvasNode);
+        }
+      } else if (!keys.shiftPressed() && canvasClick.single && canvasNode.selected && !editMode && !canvasNode.boundingBox.containPoint(cursorPosition.offsetPos)) {
+        selector.unselectNode(canvasNode);
       }
-    } else if (!keys.shiftPressed() && canvasClick.single && canvasNode.selected && !editMode) {
-      selector.unselectNode(canvasNode);
     }
 
-    // Toggle vector edit mode when double click
+    // Move when dragged
+    if (!userState.isEditing && !selector.rect && canvasNode.selected && canvasClick.pressed &&
+      (
+        // If not exactly on the shape of the vector or if the cursor goes outside of the bounding box
+        canvasNode.boundingBox.containPoint(cursorPosition.offsetPos) ||
+        userState.isDragging
+      )
+    ) {
+      if (!userState.isDragging) {
+        selector.disable();
+        userState.isDragging = true;
+        canvasClick.setClickPoint(cursorPosition.clientPos);
+      }
+      // When it is dragged, let's say it's always hovered
+      hovered = true;
+
+      // move delta between last post and current pos
+      console.log(cursorPosition.x, canvasClick.clickPoint.x);
+      let deltaX = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
+      let deltaY = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
+      canvasClick.setClickPoint(cursorPosition.clientPos);
+      moveVector(deltaX, deltaY);
+    }
+    // Reactivate selector rectangle
+    if (userState.isDragging && !canvasClick.pressed) {
+      userState.isDragging = false;
+      selector.enable();
+    }
+
+    // Toggle vector EDIT MODE when double click
     if (dblclick && !editMode && editTimer.finished()) {
       editMode = true;
+      userState.isEditing = true;
       editTimer.reset();
     } else if (canvasClick.double && editMode && editTimer.finished()) {
       editMode = false;
+      userState.isEditing = false;
       editTimer.reset();
     }
 
-    // Exit edit mode when pressing enter or escape
-    if (editMode && keys.isPressed("Enter") || keys.isPressed("Escape")) {
+    // Exit edit & select modes when pressing "Enter" or "Escape"
+    if ((keys.isPressed("Enter") || keys.isPressed("Escape")) && keyTimer.finished()) {
       if (!editMode && canvasNode.selected) {
         selector.unselectNode(canvasNode);
       }
 
       selector.unselectAllParts();
       editMode = false;
+      userState.isEditing = false;
     }
+
 
     // Update parts
     if (editMode) {
@@ -407,6 +436,17 @@
         let selectedCommand = strokeGeometriesCommands[selectedCommandTuple[0]][selectedCommandTuple[1]] as PathCommandWithEndPoint;
         selectedCommand.endPoint.x += xShift;
         selectedCommand.endPoint.y += yShift;
+      }
+    }
+  }
+
+  function moveVector(xDelta: number, yDelta: number) {
+    for (const geometry of strokeGeometriesCommands) {
+      for (const command of geometry) {
+        if (commandHasEndPoint(command)) {
+          command.endPoint.x += xDelta;
+          command.endPoint.y += yDelta;
+        }
       }
     }
   }

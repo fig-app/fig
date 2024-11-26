@@ -1,11 +1,11 @@
-import type { CanvasNode } from "$lib/canvas/types/CanvasNode";
-import type { VectorNode } from "@fig/types/nodes/vector/VectorNode";
-import type { EmptyData } from "@fig/types/nodes/vector/EmptyData";
-import type { Node } from "@fig/types/nodes/Node";
-import { useLongId } from "@fig/functions/id";
-import type { Paint } from "@fig/types/properties/paint/Paint";
-import type { Rectangle } from "@fig/types/properties/Rectangle";
-import type { Color } from "@fig/types/properties/color/Color";
+import type {CanvasNode} from "$lib/canvas/types/CanvasNode";
+import type {VectorNode} from "@fig/types/nodes/vector/VectorNode";
+import type {EmptyData} from "@fig/types/nodes/vector/EmptyData";
+import type {Node} from "@fig/types/nodes/Node";
+import {useLongId} from "@fig/functions/id";
+import type {Paint} from "@fig/types/properties/paint/Paint";
+import type {Rectangle} from "@fig/types/properties/Rectangle";
+import type {Color} from "@fig/types/properties/color/Color";
 
 class CanvasPipeline {
   pipeline = $state(new Set<CanvasNode>());
@@ -16,9 +16,7 @@ class CanvasPipeline {
   }
 
   createVector(vectorData: Partial<VectorNode<EmptyData>>) {
-    console.log("Create vector", vectorData);
-
-    let allVectorData: VectorNode<EmptyData> = { ...DEFAULT_VECTOR_DATA, ...vectorData };
+    let allVectorData: VectorNode<EmptyData> = {...DEFAULT_VECTOR_DATA, ...vectorData};
     let node: Node = {
       id: useLongId(),
       name: "Vector",
@@ -33,7 +31,7 @@ class CanvasPipeline {
     this.creationPipeline.push(node);
   }
 
-  createRectangle(size: Rectangle, strokeColor: Color = { r: 0, g: 0, b: 0, a: 1 }) {
+  createRectangle(size: Rectangle, strokeColor: Color = {r: 0, g: 0, b: 0, a: 1}) {
     this.createVector({
       strokeGeometry: [
         {
@@ -120,8 +118,8 @@ export const DEFAULT_VECTOR_DATA: VectorNode<EmptyData> = {
     vertical: "Top",
     horizontal: "Left",
   },
-  size: { width: 0, height: 0 },
-  absoluteBoundingBox: { x: 0, y: 0, width: 0, height: 0 },
+  size: {width: 0, height: 0},
+  absoluteBoundingBox: {x: 0, y: 0, width: 0, height: 0},
   relativeTransform: {
     matrix: [
       [0, 0, 0],
