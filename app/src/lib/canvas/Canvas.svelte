@@ -160,70 +160,75 @@
 
     if (ctx) {
       selector.draw(ctx);
+      drawLineIndicators(ctx);
+    }
+  }
 
-      // Draw line indicators when dragging a node outside of visible canvas
-      if (selector.selectedNode) {
-        let selectedNode = selector.selectedNode;
+  function drawLineIndicators(ctx: CanvasRenderingContext2D) {
+    if (!selector.selectedNode) {
+      return;
+    }
 
-        // right side
-        if (navigation.toVirtualX(selectedNode.position.x) > canvas.width) {
-          line({
-            ctx,
-            start: {
-              x: canvas.width,
-              y: navigation.toVirtualY(selectedNode.position.y),
-            },
-            end: {
-              x: canvas.width,
-              y: navigation.toVirtualY(selectedNode.position.y) + selectedNode.boundingBox.height
-            },
-            color: canvasColors.white,
-          });
-        }
-        // left side
-        else if (navigation.toVirtualX(selectedNode.position.x + selectedNode.boundingBox.width) < 0) {
-          line({
-            ctx,
-            start: {
-              x: 20,
-              y: navigation.toVirtualY(selectedNode.position.y),
-            },
-            end: {
-              x: 20,
-              y: navigation.toVirtualY(selectedNode.position.y) + selectedNode.boundingBox.height
-            },
-            color: canvasColors.white,
-          });
-        }
-        // top side
-        if (navigation.toVirtualY(selectedNode.position.y) < 0) {
-          line({
-            ctx,
-            start: {
-              x: navigation.toVirtualX(selectedNode.position.x),
-              y: 20,
-            },
-            end: {
-              x: navigation.toVirtualX(selectedNode.position.x) + selectedNode.boundingBox.width,
-              y: 20,
-            },
-            color: canvasColors.white,
-          })
-        } else if (navigation.toVirtualY(selectedNode.position.y + selectedNode.boundingBox.height) > canvas.height) {
-          line({
-            ctx,
-            start: {
-              x: navigation.toVirtualX(selectedNode.position.x),
-              y: canvas.height,
-            },
-            end: {
-              x: navigation.toVirtualX(selectedNode.position.x) + selectedNode.boundingBox.width,
-              y: canvas.height,
-            },
-            color: canvasColors.white,
-          })
-        }
-      }
+    let selectedNode = selector.selectedNode;
+    // right side
+    if (navigation.toVirtualX(selectedNode.position.x) > canvas.width) {
+      line({
+        ctx,
+        start: {
+          x: canvas.width,
+          y: navigation.toVirtualY(selectedNode.position.y),
+        },
+        end: {
+          x: canvas.width,
+          y: navigation.toVirtualY(selectedNode.position.y) + selectedNode.boundingBox.height
+        },
+        color: canvasColors.white,
+      });
+    }
+    // left side
+    else if (navigation.toVirtualX(selectedNode.position.x + selectedNode.boundingBox.width) < 0) {
+      line({
+        ctx,
+        start: {
+          x: 20,
+          y: navigation.toVirtualY(selectedNode.position.y),
+        },
+        end: {
+          x: 20,
+          y: navigation.toVirtualY(selectedNode.position.y) + selectedNode.boundingBox.height
+        },
+        color: canvasColors.white,
+      });
+    }
+    // top side
+    if (navigation.toVirtualY(selectedNode.position.y) < 0) {
+      line({
+        ctx,
+        start: {
+          x: navigation.toVirtualX(selectedNode.position.x),
+          y: 20,
+        },
+        end: {
+          x: navigation.toVirtualX(selectedNode.position.x) + selectedNode.boundingBox.width,
+          y: 20,
+        },
+        color: canvasColors.white,
+      })
+    }
+    // bottom side
+    else if (navigation.toVirtualY(selectedNode.position.y + selectedNode.boundingBox.height) > canvas.height) {
+      line({
+        ctx,
+        start: {
+          x: navigation.toVirtualX(selectedNode.position.x),
+          y: canvas.height,
+        },
+        end: {
+          x: navigation.toVirtualX(selectedNode.position.x) + selectedNode.boundingBox.width,
+          y: canvas.height,
+        },
+        color: canvasColors.white,
+      })
     }
   }
 
