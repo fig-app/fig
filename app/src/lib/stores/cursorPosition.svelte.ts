@@ -13,10 +13,6 @@ class CursorPosition {
   private handleMouseMove(e: MouseEvent) {
     this.clientPos = {x: e.clientX, y: e.clientY};
     this.offsetPos = {x: e.offsetX, y: e.offsetY};
-
-    // When dragging and the cursor goes out of the window, bring it back to the other side
-    if (this.clientPos.x > window.innerWidth - 5) {
-    }
   }
 
   get x() {
@@ -33,14 +29,6 @@ class CursorPosition {
 
   get offsetY() {
     return this.offsetPos.y;
-  }
-
-  set pos(value: Vector) {
-    this.clientPos = value;
-  }
-
-  get pos() {
-    return this.clientPos;
   }
 }
 

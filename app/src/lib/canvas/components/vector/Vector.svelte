@@ -32,7 +32,6 @@
   import type {Line} from "@fig/types/shapes/Line";
   import {parsePathString} from "@fig/functions/path/index";
   import {userState} from "$lib/canvas/stores/userState.svelte";
-  import type {Vector} from "@fig/types/properties/Vector";
   import {roundFloat} from "@fig/functions/math";
 
   let {node}: { node: Node } = $props();
@@ -60,7 +59,6 @@
   let keyTimer = new Timer(100, "Repeating");
 
   let draggedPart: VectorPart | null = $state(null);
-  let lastDragPos: Vector = $state({x: 0, y: 0});
 
   let strokeColor = colorToString(data.strokes[0].color);
   let strokeWeight = $state(data.strokeWeight);
@@ -340,10 +338,9 @@
     // Update bounding box size and coordinates
     updateBoundingBox();
 
-    // Updating hovered state
+    // Updating main states
     hovered = isVectorHovered() && !userState.isEditing;
-
-    clicked = hovered && canvasClick.pressed && !userState.isDragging;
+    clicked = hovered && canvasClick.pressed;
     dblclick = hovered && canvasClick.double;
 
     // Check for selection with SELECTOR RECTANGLE
@@ -364,6 +361,35 @@
       } else if (!keys.shiftPressed() && canvasClick.single && canvasNode.selected && !editMode && !canvasNode.boundingBox.containPoint(cursorPosition.offsetPos)) {
         selector.unselectNode(canvasNode);
       }
+    }
+
+    // Move when dragged
+    if (!userState.isEditing && !selector.rect && canvasNode.selected && canvasClick.pressed &&
+      (
+        // If not exactly on the shape of the vector or if the cursor goes outside of the bounding box
+        canvasNode.boundingBox.containPoint(cursorPosition.offsetPos) ||
+        userState.isDragging
+      )
+    ) {
+      if (!userState.isDragging) {
+        selector.disable();
+        userState.isDragging = true;
+        canvasClick.setClickPoint(cursorPosition.clientPos);
+      }
+      // When it is dragged, let's say it's always hovered
+      hovered = true;
+
+      // move delta between last post and current pos
+      console.log(cursorPosition.x, canvasClick.clickPoint.x);
+      let deltaX = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
+      let deltaY = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
+      canvasClick.setClickPoint(cursorPosition.clientPos);
+      moveVector(deltaX, deltaY);
+    }
+    // Reactivate selector rectangle
+    if (userState.isDragging && !canvasClick.pressed) {
+      userState.isDragging = false;
+      selector.enable();
     }
 
     // Toggle vector EDIT MODE when double click
@@ -388,29 +414,6 @@
       userState.isEditing = false;
     }
 
-    // Move when dragged
-    if (!userState.isEditing && !selector.rect &&
-      (
-        canvasNode.selected && canvasClick.pressed && canvasNode.boundingBox.containPoint(cursorPosition.offsetPos) ||
-        canvasNode.selected && canvasClick.pressed && userState.isDragging
-      )
-    ) {
-      userState.isDragging = true;
-      if (userState.isDragging) {
-        selector.disable();
-      }
-      // move delta between last post and current pos
-      let deltaX = (cursorPosition.offsetX - canvasClick.realClickPoint.x) / navigation.scale;
-      let deltaY = (cursorPosition.offsetY - canvasClick.realClickPoint.y) / navigation.scale;
-      // For next move
-      canvasClick.setClickPoint(cursorPosition.offsetPos);
-      moveVector(deltaX, deltaY);
-    }
-    // Reactivate selector rectangle
-    if (userState.isDragging && !canvasClick.pressed) {
-      userState.isDragging = false;
-      selector.enable();
-    }
 
     // Update parts
     if (editMode) {

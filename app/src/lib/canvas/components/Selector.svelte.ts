@@ -110,9 +110,7 @@ class Selector {
   }
 
   selectSingleNode(node: CanvasNode) {
-    for (const node of this.nodes) {
-      node.selected = false;
-    }
+    this.unselectAllNodes();
     this.selectNode(node);
   }
 

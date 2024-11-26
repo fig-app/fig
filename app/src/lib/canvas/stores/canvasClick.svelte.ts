@@ -1,5 +1,4 @@
-import type { Vector } from "@fig/types/properties/Vector";
-import { navigation } from "$lib/canvas/stores/navigation.svelte";
+import type {Vector} from "@fig/types/properties/Vector";
 
 type CanvasClickStates = {
   single: boolean;
@@ -16,7 +15,8 @@ class CanvasClickSvelte {
     clickPoint: null,
   });
 
-  constructor() {}
+  constructor() {
+  }
 
   get single() {
     return this.states.single;
@@ -30,14 +30,9 @@ class CanvasClickSvelte {
     return this.states.pressed;
   }
 
-  get realClickPoint() {
+  get clickPoint() {
     let point = this.states.clickPoint;
-    return point ? point : { x: 0, y: 0 };
-  }
-
-  get virtualClickPoint() {
-    let point = this.states.clickPoint ? this.states.clickPoint : { x: 0, y: 0 };
-    return navigation.toVirtualPoint(point);
+    return point ? point : {x: 0, y: 0};
   }
 
   public setClickPoint(point: Vector) {
@@ -46,15 +41,18 @@ class CanvasClickSvelte {
 
   public setSingleClick(click: boolean, point: Vector) {
     this.states.single = click;
+    console.log("1");
     this.states.clickPoint = point;
   }
 
   public setDoubleClick(click: boolean, point: Vector) {
     this.states.double = click;
+    console.log("2");
     this.states.clickPoint = point;
   }
 
   public setPress(click: boolean, point: Vector) {
+    console.log("3");
     this.states.pressed = click;
     this.states.clickPoint = point;
   }

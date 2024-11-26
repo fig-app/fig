@@ -65,7 +65,7 @@
     windowWidth,
     windowHeight,
     keys.keyPressed,
-    canvasClick.realClickPoint,
+    canvasClick.clickPoint,
     selector.rect?.width,
     selector.rect?.height,
     availableWidth,
@@ -160,6 +160,70 @@
 
     if (ctx) {
       selector.draw(ctx);
+
+      // Draw line indicators when dragging a node outside of visible canvas
+      if (selector.selectedNode) {
+        let selectedNode = selector.selectedNode;
+
+        // right side
+        if (navigation.toVirtualX(selectedNode.position.x) > canvas.width) {
+          line({
+            ctx,
+            start: {
+              x: canvas.width,
+              y: navigation.toVirtualY(selectedNode.position.y),
+            },
+            end: {
+              x: canvas.width,
+              y: navigation.toVirtualY(selectedNode.position.y) + selectedNode.boundingBox.height
+            },
+            color: canvasColors.white,
+          });
+        }
+        // left side
+        else if (navigation.toVirtualX(selectedNode.position.x + selectedNode.boundingBox.width) < 0) {
+          line({
+            ctx,
+            start: {
+              x: 20,
+              y: navigation.toVirtualY(selectedNode.position.y),
+            },
+            end: {
+              x: 20,
+              y: navigation.toVirtualY(selectedNode.position.y) + selectedNode.boundingBox.height
+            },
+            color: canvasColors.white,
+          });
+        }
+        // top side
+        if (navigation.toVirtualY(selectedNode.position.y) < 0) {
+          line({
+            ctx,
+            start: {
+              x: navigation.toVirtualX(selectedNode.position.x),
+              y: 20,
+            },
+            end: {
+              x: navigation.toVirtualX(selectedNode.position.x) + selectedNode.boundingBox.width,
+              y: 20,
+            },
+            color: canvasColors.white,
+          })
+        } else if (navigation.toVirtualY(selectedNode.position.y + selectedNode.boundingBox.height) > canvas.height) {
+          line({
+            ctx,
+            start: {
+              x: navigation.toVirtualX(selectedNode.position.x),
+              y: canvas.height,
+            },
+            end: {
+              x: navigation.toVirtualX(selectedNode.position.x) + selectedNode.boundingBox.width,
+              y: canvas.height,
+            },
+            color: canvasColors.white,
+          })
+        }
+      }
     }
   }
 
@@ -452,13 +516,13 @@
           onclick={handleCanvasClick}
           ondblclick={(e: MouseEvent) => {
             if (e.button === 0) {
-              canvasClick.setDoubleClick(true, {x: e.offsetX, y: e.offsetY});
+              canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
             }
           }}
           onmousedown={(e: MouseEvent) => {
             // Left click
             if (e.button === 0) {
-              canvasClick.setPress(true, {x: e.offsetX, y: e.offsetY});
+              canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
             }
             // Middle click -> panning
             else if (e.button === 1) {

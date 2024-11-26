@@ -91,8 +91,8 @@ export function handleVectorPartDrawing(
  * Handle the dragging of a vector part
  */
 export function handleVectorPartDragging(vectorContext: VectorContext) {
-  let x = (cursorPosition.offsetX - canvasClick.realClickPoint.x) / navigation.scale;
-  let y = (cursorPosition.offsetY - canvasClick.realClickPoint.y) / navigation.scale;
+  let x = (cursorPosition.offsetX - canvasClick.clickPoint.x) / navigation.scale;
+  let y = (cursorPosition.offsetY - canvasClick.clickPoint.y) / navigation.scale;
   canvasClick.setClickPoint(cursorPosition.offsetPos);
 
   // Move the current point and all the other selected ones
