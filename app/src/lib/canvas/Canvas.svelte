@@ -15,7 +15,7 @@
   } from "$lib/canvas/stores/canvasColors";
   import type {Vector as VectorType} from "@fig/types/properties/Vector";
   import {canvasPipeline} from "$lib/canvas/stores/canvasPipeline.svelte";
-  import {userMode} from "$lib/canvas/stores/userMode.svelte";
+  import {canvasSettings} from "$lib/canvas/stores/canvasSettings.svelte.js";
   import {canvasRenderingContext} from "$lib/canvas/stores/canvasRenderingContext.svelte";
   import {line} from "$lib/canvas/primitive/line";
   import Vector from "$lib/canvas/components/vector/Vector.svelte";
@@ -23,7 +23,6 @@
   type Props = {
     width?: number;
     height?: number;
-    backgroundColor?: string;
     children: Snippet
   }
 
@@ -31,7 +30,6 @@
   let {
     width = 100,
     height = 100,
-    backgroundColor = $bindable(DEFAULT_BACKGROUND_COLOR),
     children
   }: Props = $props();
 
@@ -58,7 +56,7 @@
   const ZOOM_AMOUNT: number = 1.15;
 
   updateCanvas(() => [
-    backgroundColor,
+    canvasSettings.backgroundColor,
     navigation.scale,
     navigation.offsetX,
     navigation.offsetY,
@@ -156,7 +154,6 @@
     }
 
     drawNodes();
-    drawRulers();
 
     if (ctx) {
       selector.draw(ctx);
@@ -230,6 +227,8 @@
         color: canvasColors.white,
       })
     }
+
+    drawRulers();
   }
 
   function drawBackground() {
@@ -241,7 +240,7 @@
         y: height / 2,
         width,
         height,
-        color: backgroundColor
+        color: canvasSettings.backgroundColor
       });
     }
   }
@@ -348,6 +347,7 @@
         x += cellSize * navigation.scale
       ) {
         ctx.fillText(navigation.toRealX(x).toFixed(0).toString(), x, 10);
+        line({ctx, start: {x, y: 16}, end: {x, y: 20}, color: canvasColors.darkGray2})
       }
 
       for (
@@ -362,6 +362,8 @@
         ctx.rotate(-Math.PI / 2);
         ctx.fillText(navigation.toRealY(y).toFixed(0).toString(), 0, 0);
         ctx.restore();
+
+        line({ctx, start: {x: 16, y}, end: {x: 20, y}, color: canvasColors.darkGray2})
       }
 
       // Draw borders and top left corner
@@ -500,7 +502,7 @@
     // Add new vector when clicking on canvas
     // If nothing is actually selected
     // And if in pen mode
-    if (userMode.mode === 'PEN' && !selector.hasSelectedParts()) {
+    if (canvasSettings.mode === 'PEN' && !selector.hasSelectedParts()) {
     } else {
     }
   }

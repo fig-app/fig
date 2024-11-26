@@ -80,7 +80,7 @@
 
 </script>
 
-<Input type="number" bind:value={value} class={className} selectOnFocus
+<Input type="text" bind:value={value} class={className} selectOnFocus
        {...restProps}>
   {#snippet left()}
     {#if (leftPart)}

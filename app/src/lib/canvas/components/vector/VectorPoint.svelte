@@ -34,7 +34,7 @@
   // Real and virtual commands
   let commandsList: PathCommandWithEndPoint[] = [];
   for (const commandTuple of commandTuplesList) {
-    commandsList.push(vectorContext.strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint);
+    commandsList.push(vectorContext.strokeGeometries.at(commandTuple[0], commandTuple[1]) as PathCommandWithEndPoint);
   }
   let virtualCommandsList = $state<PathCommandWithEndPoint[]>([]);
   $effect(() => {

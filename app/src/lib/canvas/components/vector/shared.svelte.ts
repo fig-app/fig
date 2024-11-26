@@ -100,9 +100,10 @@ export function handleVectorPartDragging(vectorContext: VectorContext) {
   for (const selectedCommandTuple of selectedCommandTuples) {
     let geometryIndex = selectedCommandTuple[0];
     let commandIndex = selectedCommandTuple[1];
-    let selectedCommand = vectorContext.strokeGeometriesCommands[geometryIndex][
-      commandIndex
-      ] as PathCommandWithEndPoint;
+    let selectedCommand = vectorContext.strokeGeometries.at(
+      geometryIndex,
+      commandIndex,
+    ) as PathCommandWithEndPoint;
     selectedCommand.endPoint.x += x;
     selectedCommand.endPoint.y += y;
   }

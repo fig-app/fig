@@ -55,9 +55,9 @@
 
   // Curve commands
   // start command can be line or cubic command
-  let realStartCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][startIndex]);
+  let realStartCommand = $state(vectorContext.strokeGeometries.at(geometryIndex, startIndex));
   // end command must be a cubic command
-  let realEndCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][startIndex + 1]);
+  let realEndCommand = $state(vectorContext.strokeGeometries.at(geometryIndex, startIndex + 1));
 
   let virtualStartCommand = $state({...realStartCommand});
   let virtualEndCommand = $state({...realEndCommand});

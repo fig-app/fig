@@ -39,8 +39,8 @@
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
 
-  let previousCommand = $state(vectorContext.strokeGeometriesCommands[geometryIndex][commandIndex - 1] as HasEndPoint);
-  let controlledCurve = $state(vectorContext.strokeGeometriesCommands[geometryIndex][commandIndex]) as CPathCommand;
+  let previousCommand = $state(vectorContext.strokeGeometries.at(geometryIndex, commandIndex - 1) as HasEndPoint);
+  let controlledCurve = $state(vectorContext.strokeGeometries.at(geometryIndex, commandIndex) as CPathCommand);
 
   // End point of the control point
   let controlledPoint = $state(type === "start" ? navigation.toVirtualPoint(previousCommand.endPoint) : navigation.toVirtualPoint(controlledCurve.endPoint));

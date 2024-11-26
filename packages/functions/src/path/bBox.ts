@@ -1,7 +1,7 @@
 import type { PathCommand } from "./PathCommand";
 import { Vector } from "@fig/types/properties/Vector";
 
-type GetBboxReturn = {
+type BoundingBox = {
   min: Vector;
   max: Vector;
   center: Vector;
@@ -9,7 +9,7 @@ type GetBboxReturn = {
   height: number;
 };
 
-export function getGeometryBbox(geometries: PathCommand[][]): GetBboxReturn {
+export function getGeometryBbox(geometries: PathCommand[][]): BoundingBox {
   let overallMinX = Infinity,
     overallMinY = Infinity,
     overallMaxX = -Infinity,
@@ -37,7 +37,7 @@ export function getGeometryBbox(geometries: PathCommand[][]): GetBboxReturn {
   };
 }
 
-export function getPathBbox(commands: PathCommand[]): GetBboxReturn {
+export function getPathBbox(commands: PathCommand[]): BoundingBox {
   let minX = Infinity,
     minY = Infinity,
     maxX = -Infinity,
@@ -61,11 +61,7 @@ export function getPathBbox(commands: PathCommand[]): GetBboxReturn {
       case "M":
       case "L":
       case "T": {
-        const { x, y } = applyRelative(
-          command,
-          command.endPoint.x,
-          command.endPoint.y,
-        );
+        const { x, y } = applyRelative(command, command.endPoint.x, command.endPoint.y);
         updateBounds(x, y);
         currentX = x;
         currentY = y;
@@ -94,11 +90,7 @@ export function getPathBbox(commands: PathCommand[]): GetBboxReturn {
           command.controlPoints.end.x,
           command.controlPoints.end.y,
         );
-        const ep = applyRelative(
-          command,
-          command.endPoint.x,
-          command.endPoint.y,
-        );
+        const ep = applyRelative(command, command.endPoint.x, command.endPoint.y);
 
         updateBounds(cp1.x, cp1.y);
         updateBounds(cp2.x, cp2.y);
@@ -110,16 +102,8 @@ export function getPathBbox(commands: PathCommand[]): GetBboxReturn {
       }
       case "S":
       case "Q": {
-        const cp = applyRelative(
-          command,
-          command.controlPoint.x,
-          command.controlPoint.y,
-        );
-        const ep = applyRelative(
-          command,
-          command.endPoint.x,
-          command.endPoint.y,
-        );
+        const cp = applyRelative(command, command.controlPoint.x, command.controlPoint.y);
+        const ep = applyRelative(command, command.endPoint.x, command.endPoint.y);
 
         updateBounds(cp.x, cp.y);
         updateBounds(ep.x, ep.y);
@@ -129,11 +113,7 @@ export function getPathBbox(commands: PathCommand[]): GetBboxReturn {
         break;
       }
       case "A": {
-        const ep = applyRelative(
-          command,
-          command.endPoint.x,
-          command.endPoint.y,
-        );
+        const ep = applyRelative(command, command.endPoint.x, command.endPoint.y);
         // Approximation of bounding box based on radii and end points.
         const rx = command.radii.x;
         const ry = command.radii.y;

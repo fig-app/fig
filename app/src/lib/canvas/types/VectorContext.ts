@@ -1,5 +1,5 @@
 import type { VectorPart } from "$lib/canvas/types/VectorPart";
-import type { PathCommand } from "@fig/functions/path/PathCommand";
+import type { Geometries } from "$lib/canvas/Geometries.svelte";
 
 export type VectorContext = {
   register: (part: VectorPart) => void;
@@ -10,7 +10,7 @@ export type VectorContext = {
   isDragged: (part: VectorPart) => boolean | null;
 
   // Array of geometries that contains path commands
-  strokeGeometriesCommands: PathCommand[][];
+  strokeGeometries: Geometries;
 
   updateVector: () => void;
 };
