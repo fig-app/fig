@@ -4,22 +4,10 @@ import { canvasColors } from "$lib/canvas/stores/canvasColors";
 
 const RECT_SIZE: number = 6;
 
-type EditRectStates = {
-  hovered: boolean;
-  clicked: boolean;
-  center: Vector;
-};
-
 export class EditRect {
   rect: Rect;
-  private states: EditRectStates = $state({
-    hovered: false,
-    clicked: false,
-    center: { x: 0, y: 0 },
-  });
 
   constructor(center: Vector) {
-    this.states.center = center;
     this.rect = new Rect({
       x: center.x,
       y: center.y,

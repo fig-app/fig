@@ -19,6 +19,7 @@
   import {canvasRenderingContext} from "$lib/canvas/stores/canvasRenderingContext.svelte";
   import {line} from "$lib/canvas/primitive/line";
   import Vector from "$lib/canvas/components/vector/Vector.svelte";
+  import type {TransformCorner} from "$lib/canvas/components/vector/TransformCorner.svelte";
 
   type Props = {
     width?: number;
@@ -32,6 +33,9 @@
     height = 100,
     children
   }: Props = $props();
+
+  const ZOOM_AMOUNT: number = 1.15;
+  const contexts = getAllContexts();
 
   let pipeline: Set<CanvasNode> = canvasPipeline.pipeline;
 
@@ -53,7 +57,8 @@
     y: 0,
   }
 
-  const ZOOM_AMOUNT: number = 1.15;
+  // Corners which is grafted onto the selected node or nodes
+  let transformCorners: TransformCorner[] = $state([]);
 
   updateCanvas(() => [
     canvasSettings.backgroundColor,
@@ -102,16 +107,18 @@
     }
   });
 
-  const contexts = getAllContexts();
-
+  // Mount nodes from the creation pipeline data
+  // View `CanvasPipeline` store for more information on how to add nodes to the pipeline
   $effect(() => {
     if (canvasPipeline.creationPipeline.length > 0) {
       for (let node of canvasPipeline.creationPipeline) {
-        mount(Vector, {
-          target: document.querySelector("#canvas") as HTMLElement,
-          props: {node},
-          context: contexts,
-        });
+        if (node.node.type === "vector") {
+          mount(Vector, {
+            target: document.querySelector("#canvas") as HTMLElement,
+            props: {node},
+            context: contexts,
+          });
+        }
       }
 
       canvasPipeline.clearCreationPipeline();
@@ -119,6 +126,23 @@
   })
 
   // Functions
+  function register(node: CanvasNode) {
+    onMount(() => {
+      pipeline.add(node);
+      return () => pipeline.delete(node);
+    });
+  }
+
+  function unregister(node: CanvasNode) {
+    pipeline.delete(node);
+  }
+
+
+  // -------------------------------------------------------------------------------------------- //
+  // Update
+  // -------------------------------------------------------------------------------------------- //
+
+  // Redraw canvas when dependencies change
   function updateCanvas(depts: () => any[]) {
     let scheduled = false;
     $effect(() => {
@@ -135,16 +159,28 @@
     });
   }
 
-  function register(node: CanvasNode) {
-    onMount(() => {
-      pipeline.add(node);
-      return () => pipeline.delete(node);
-    });
+  function update(timestamp: number) {
+    canvasTime.updateTimestamp(timestamp);
+    canvasTime.updateTimers();
+
+    selector.update();
+
+    for (const node of pipeline) {
+      node.update();
+    }
+
+    // Update transform corners
+    if (selector.selectedNode) {
+      for (let corner of transformCorners) {
+        corner.update();
+      }
+    }
   }
 
-  function unregister(node: CanvasNode) {
-    pipeline.delete(node);
-  }
+
+  // -------------------------------------------------------------------------------------------- //
+  // Drawing
+  // -------------------------------------------------------------------------------------------- //
 
   function draw() {
     drawBackground();
@@ -158,6 +194,14 @@
     if (ctx) {
       selector.draw(ctx);
       drawLineIndicators(ctx);
+      drawRulers();
+
+      // Draw transform corners
+      if (selector.selectedNode) {
+        for (let corner of transformCorners) {
+          corner.draw(ctx);
+        }
+      }
     }
   }
 
@@ -227,8 +271,6 @@
         color: canvasColors.white,
       })
     }
-
-    drawRulers();
   }
 
   function drawBackground() {
@@ -396,16 +438,10 @@
     }
   }
 
-  function update(timestamp: number) {
-    canvasTime.updateTimestamp(timestamp);
-    canvasTime.updateTimers();
 
-    selector.update();
-
-    for (const node of pipeline) {
-      node.update();
-    }
-  }
+  // -------------------------------------------------------------------------------------------- //
+  // Event handlers
+  // -------------------------------------------------------------------------------------------- //
 
   function handleMouseMove(e: MouseEvent) {
     if (isPanning) {
@@ -509,49 +545,56 @@
 
 </script>
 
-<svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
-               onresize={handleResize}/>
+<svelte:window
+  bind:innerWidth={windowWidth}
+  bind:innerHeight={windowHeight}
+  onresize={handleResize}
+/>
 
-<div class="h-full" bind:clientWidth={availableWidth} bind:clientHeight={availableHeight}>
-  <canvas bind:this={canvas}
-          {width}
-          {height}
-          style:width={width + "px"}
-          style:height={height + "px"}
-          onwheel={handleWheel}
-          onmousemove={handleMouseMove}
-          onclick={handleCanvasClick}
-          ondblclick={(e: MouseEvent) => {
-            if (e.button === 0) {
-              canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
-            }
-          }}
-          onmousedown={(e: MouseEvent) => {
-            // Left click
-            if (e.button === 0) {
-              canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
-            }
-            // Middle click -> panning
-            else if (e.button === 1) {
-              isPanning = true;
-              lastPanningPos = {x: e.x, y: e.y};
-              canvas.style.cursor = 'grabbing';
-            }
-          }}
-          onmouseup={(e: MouseEvent) => {
-            canvasClick.resetClick();
-            if (e.button === 1) {
-              isPanning = false;
-              canvas.style.cursor = "default";
-            }
-          }}
-          onmouseleave={(_) => {
-            isPanning = false;
-            canvas.style.cursor = "default";
-          }}
+<div
+  id="canvas"
+  class="h-full"
+  bind:clientWidth={availableWidth}
+  bind:clientHeight={availableHeight}>
+
+  <canvas
+    bind:this={canvas}
+    {width}
+    {height}
+    style:width={width + "px"}
+    style:height={height + "px"}
+    onwheel={handleWheel}
+    onmousemove={handleMouseMove}
+    onclick={handleCanvasClick}
+    ondblclick={(e: MouseEvent) => {
+      if (e.button === 0) {
+        canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
+      }
+    }}
+    onmousedown={(e: MouseEvent) => {
+      // Left click
+      if (e.button === 0) {
+        canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
+      }
+      // Middle click -> panning
+      else if (e.button === 1) {
+        isPanning = true;
+        lastPanningPos = {x: e.x, y: e.y};
+        canvas.style.cursor = 'grabbing';
+      }
+    }}
+    onmouseup={(e: MouseEvent) => {
+      canvasClick.resetClick();
+      if (e.button === 1) {
+        isPanning = false;
+        canvas.style.cursor = "default";
+      }
+    }}
+    onmouseleave={(_) => {
+      isPanning = false;
+      canvas.style.cursor = "default";
+    }}
   >
     {@render children()}
   </canvas>
 </div>
-
-<div id="canvas"></div>

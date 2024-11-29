@@ -34,6 +34,7 @@
   import {userState} from "$lib/canvas/stores/userState.svelte";
   import {roundFloat} from "@fig/functions/math";
   import {Geometries} from "$lib/canvas/Geometries.svelte";
+  import type {TransformCorner} from "$lib/canvas/components/vector/TransformCorner.svelte";
 
   let {node}: { node: Node } = $props();
 
@@ -410,7 +411,6 @@
       editMode = false;
       userState.isEditing = false;
     }
-
 
     // Update parts
     if (editMode) {

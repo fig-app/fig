@@ -54,6 +54,11 @@ export class Rect {
     };
   }
 
+  set center(value: Vector) {
+    this.topLeft.x = value.x - this.width / 2;
+    this.topLeft.y = value.y - this.height / 2;
+  }
+
   set centerX(value: number) {
     this.topLeft.x = value - this.width;
   }
