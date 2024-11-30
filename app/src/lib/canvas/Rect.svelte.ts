@@ -1,10 +1,12 @@
 import type { Vector } from "@fig/types/properties/Vector";
+import type { Size } from "@fig/types/properties/Size";
 import type { Line } from "@fig/types/shapes/Line";
 import { cursorPosition } from "$lib/stores";
 import { hoverRect } from "@fig/functions/shape/rect";
 import { canvasClick } from "$lib/canvas/stores/canvasClick.svelte";
 import { rect } from "$lib/canvas/primitive/rect";
 import { linesIntersection } from "@fig/functions/shape/line";
+import type { Horizontal, Vertical } from "$lib/canvas/types/Axis";
 
 type RectConstructorArgs = {
   x?: number;
@@ -26,6 +28,7 @@ export class Rect {
   topLeft: Vector = $state({ x: 0, y: 0 });
   width = $state(0);
   height = $state(0);
+  hoverDistance = $state(0);
 
   constructor({ x = 0, y = 0, width = 0, height = 0 }: RectConstructorArgs) {
     this.topLeft.x = x;
@@ -52,6 +55,11 @@ export class Rect {
       x: this.x + this.width / 2,
       y: this.y + this.height / 2,
     };
+  }
+
+  set center(value: Vector) {
+    this.topLeft.x = value.x - this.width / 2;
+    this.topLeft.y = value.y - this.height / 2;
   }
 
   set centerX(value: number) {
@@ -83,13 +91,31 @@ export class Rect {
     ];
   }
 
-  // Functions
-  hovered(): boolean {
-    return hoverRect(cursorPosition.offsetPos, this.topLeft, this.width, this.height);
+  get size(): Size {
+    return {
+      width: this.width,
+      height: this.height,
+    };
   }
 
-  clicked(): boolean {
-    return this.hovered() && canvasClick.pressed;
+  set size(value: Size) {
+    this.width = value.width;
+    this.height = value.height;
+  }
+
+  // Functions
+  get hovered(): boolean {
+    return hoverRect(
+      cursorPosition.offsetPos,
+      this.topLeft,
+      this.width,
+      this.height,
+      this.hoverDistance,
+    );
+  }
+
+  get clicked(): boolean {
+    return this.hovered && canvasClick.pressed;
   }
 
   draw({ ctx, colors, strokeWeight }: RectDrawArgs) {
@@ -177,5 +203,33 @@ export class Rect {
 
   containLine(line: Line) {
     return this.containPoint(line.start) && this.containPoint(line.end);
+  }
+
+  corner(vertical: Vertical, horizontal: Horizontal) {
+    switch (vertical) {
+      case "top":
+        switch (horizontal) {
+          case "left":
+            return this.topLeft;
+          case "right":
+            return {
+              x: this.x + this.width,
+              y: this.y,
+            };
+        }
+      case "bottom":
+        switch (horizontal) {
+          case "left":
+            return {
+              x: this.x,
+              y: this.y + this.height,
+            };
+          case "right":
+            return {
+              x: this.x + this.width,
+              y: this.y + this.height,
+            };
+        }
+    }
   }
 }

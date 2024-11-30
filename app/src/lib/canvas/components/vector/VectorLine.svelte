@@ -50,7 +50,7 @@
   // Line real and virtual commands calculated with command tuples (gi, i)[]
   let startCommandList: PathCommandWithEndPoint[] = [];
   for (const commandTuple of startCommandTuplesList) {
-    startCommandList.push(vectorContext.strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint);
+    startCommandList.push(vectorContext.strokeGeometries.at(commandTuple[0], commandTuple[1]) as PathCommandWithEndPoint);
   }
   let virtualStartCommandsList = $state<PathCommandWithEndPoint[]>([]);
   $effect(() => {
@@ -63,7 +63,7 @@
 
   let endCommandsList: PathCommandWithEndPoint[] = [];
   for (const commandTuple of endCommandTuplesList) {
-    endCommandsList.push(vectorContext.strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint);
+    endCommandsList.push(vectorContext.strokeGeometries.at(commandTuple[0], commandTuple[1]) as PathCommandWithEndPoint);
   }
   let virtualEndCommandsList = $state<PathCommandWithEndPoint[]>([]);
   $effect(() => {
@@ -172,7 +172,7 @@
 
       // Add a new point when clicking on the center point
       if (centerPoint.clicked && vectorContext.isDragged(part) === null && !selector.inSelection) {
-        vectorContext.strokeGeometriesCommands[geometryIndex].splice(startIndex + 1, 0, {
+        vectorContext.strokeGeometries.geometryAt(geometryIndex).commands.splice(startIndex + 1, 0, {
           type: "L",
           relative: false,
           endPoint: navigation.toRealPoint(center),

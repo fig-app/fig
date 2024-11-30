@@ -4,17 +4,22 @@
   import Vector from "$lib/canvas/components/vector/Vector.svelte"
   import {keys} from "$lib/stores";
   import {navigation} from "$lib/canvas/stores/navigation.svelte";
-  import {userMode} from "$lib/canvas/stores/userMode.svelte";
   import {Panel, PanelSection} from "$lib/components";
   import * as m from "$lib/paraglide/messages"
   import {DropdownMenu, Tabs} from "@fig/ui/editor";
   import {ChevronDown} from "lucide-svelte";
   import {ColorPicker} from "$lib/components/color-picker/index.js"
   import {selector} from "$lib/canvas/components/Selector.svelte";
-  import {canvasPipeline} from "$lib/canvas/stores/canvasPipeline.svelte";
+  import {
+    canvasPipeline,
+    DEFAULT_PAINT,
+    DEFAULT_VECTOR_DATA
+  } from "$lib/canvas/stores/canvasPipeline.svelte";
   import {dev} from "$app/environment";
   import {randomInt} from "@fig/functions/math";
   import {randomColor} from "@fig/functions/color";
+  import {canvasSettings} from "$lib/canvas/stores/canvasSettings.svelte";
+  import PanelRight from "$lib/panels/panel-right.svelte"
 
   // Util line to remove 'unused import' effect
   [Tabs, DropdownMenu, Input, PanelSection];
@@ -26,23 +31,19 @@
 
   function handleKeyDown() {
     if (keys.isPressed('p')) {
-      userMode.mode = 'PEN';
+      canvasSettings.mode = 'PEN';
     } else if (keys.isPressed('v')) {
-      userMode.mode = 'SELECTOR';
+      canvasSettings.mode = 'SELECTOR';
     }
   }
 
-  function createRandomRectangle() {
-    canvasPipeline.createRectangle({
-      x: randomInt(0, window.innerWidth - 400),
-      y: randomInt(0, window.innerHeight - 200),
-      width: 100,
-      height: 100
-    }, randomColor())
+  function handleResize() {
+    leftPanelSize = 275;
+    rightPanelSize = 275;
   }
 </script>
 
-<svelte:window onkeydown={handleKeyDown}/>
+<svelte:window onkeydown={handleKeyDown} onresize={handleResize}/>
 
 <div class="overflow-hidden w-[100vw] h-[100vh] flex">
   <!-- Panel left -->
@@ -51,7 +52,7 @@
   </Panel>
 
   <!-- Canvas -->
-  <Canvas backgroundColor={canvasBackgroundColor} width={window.innerWidth - panelsSize}>
+  <Canvas width={window.innerWidth - panelsSize}>
     <Vector node={{
               id: "vector-1",
               name: "etoile-1",
@@ -77,11 +78,9 @@
               node: {
                 type: "vector",
                 data: {
+                  ...DEFAULT_VECTOR_DATA,
                   strokes: [{
-                    paintType: "Solid",
-                    visible: true,
-                    opacity: 1,
-                    blendMode: "Normal",
+                    ...DEFAULT_PAINT,
                     color: {r: 255, g: 220, b: 64, a: 1},
                   }],
                   strokeWeight: 2,
@@ -96,90 +95,6 @@
     class="fixed rounded-lg bottom-4 left-1/2 -translate-x-1/2 h-[48px] w-[420px] bg-background"></div>
 
   <!-- Panel right -->
-  <Panel side="right" bind:width={rightPanelSize}>
-    <Tabs.Root value="design" class="w-full">
-      <div class="p-2 flex items-center justify-between">
-        <Tabs.List>
-          <Tabs.Trigger value="design">{m.editor_right_panel_design()}</Tabs.Trigger>
-          <Tabs.Trigger value="prototype">{m.editor_right_panel_prototype()}</Tabs.Trigger>
-        </Tabs.List>
-
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger>
-            <Button variant="ghost" size="sm" class="text-xs">
-              {navigation.percentScale.toFixed(0)} %
-              <ChevronDown class="!size-3"/>
-            </Button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content>
-            <DropdownMenu.Item>
-              Zoom in
-            </DropdownMenu.Item>
-            <DropdownMenu.Item>
-              Zoom out
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      </div>
-
-      <!-- Design -->
-      <Tabs.Content value="design" class="divide-y-2 divide-border">
-        {#if (!selector.hasSelectedNodes())}
-          <PanelSection.Root>
-            <PanelSection.Header>
-              <PanelSection.Title>Canvas</PanelSection.Title>
-            </PanelSection.Header>
-            <PanelSection.Content>
-              <ColorPicker bind:color={canvasBackgroundColor}/>
-            </PanelSection.Content>
-          </PanelSection.Root>
-
-          {#if (dev)}
-            <PanelSection.Root>
-              <PanelSection.Header>
-                <PanelSection.Title>Debug</PanelSection.Title>
-              </PanelSection.Header>
-              <PanelSection.Content>
-                <Button variant="secondary" size="sm" onclick={createRandomRectangle}
-                        class="w-full">
-                  Create random rectangle
-                </Button>
-              </PanelSection.Content>
-            </PanelSection.Root>
-          {/if}
-        {:else}
-          <PanelSection.Root>
-            <PanelSection.Header>
-              <PanelSection.Title>Position</PanelSection.Title>
-            </PanelSection.Header>
-            <PanelSection.Content>
-              {#if (selector.selectedNode && !selector.hasMultipleSelectedNodes)}
-                <div class="flex gap-2">
-                  <!-- X position -->
-                  <NumberInput inputSize="sm"
-                               bind:value={selector.selectedNode.position.x}>
-                    {#snippet left()}
-                      <span class="text-foreground/60">X</span>
-                    {/snippet}
-                  </NumberInput>
-                  <!-- Y position -->
-                  <NumberInput inputSize="sm"
-                               bind:value={selector.selectedNode.position.y}>
-                    {#snippet left()}
-                      <span class="text-foreground/60">Y</span>
-                    {/snippet}
-                  </NumberInput>
-                </div>
-              {/if}
-            </PanelSection.Content>
-          </PanelSection.Root>
-        {/if}
-      </Tabs.Content>
-
-      <!-- Prototype -->
-      <Tabs.Content value="prototype">
-      </Tabs.Content>
-    </Tabs.Root>
-  </Panel>
+  <PanelRight bind:panelSize={rightPanelSize}/>
 
 </div>

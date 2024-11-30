@@ -33,6 +33,9 @@
   import {parsePathString} from "@fig/functions/path/index";
   import {userState} from "$lib/canvas/stores/userState.svelte";
   import {roundFloat} from "@fig/functions/math";
+  import {Geometries} from "$lib/canvas/components/vector/Geometries.svelte.js";
+  import type {TransformCorner} from "$lib/canvas/components/TransformCorner.svelte.js";
+  import type {Vector} from "@fig/types/dist/properties/Vector";
 
   let {node}: { node: Node } = $props();
 
@@ -45,9 +48,10 @@
   let parts: Set<VectorPart> = $state(new Set());
 
   let strokePathsSynchronization: Path2D[] = $state([]);
-  let strokeGeometriesCommands: PathCommand[][] = $state([]);
+  let strokePaths = data.strokeGeometry.map(g => g.path);
+  let strokeGeometries: Geometries = $state(new Geometries(strokePaths));
 
-  let bbox = $derived(getGeometryBbox(strokeGeometriesCommands));
+  let bbox = $derived(strokeGeometries.boundingBox);
 
   let hovered: boolean = $state(false);
   let clicked: boolean = $state(false);
@@ -60,10 +64,6 @@
 
   let draggedPart: VectorPart | null = $state(null);
 
-  let strokeColor = colorToString(data.strokes[0].color);
-  let strokeWeight = $state(data.strokeWeight);
-  let stylizedStrokeWeight = $derived(strokeWeight * navigation.scale);
-
   let canvasContext = getCanvasContext();
   let vectorContext = getVectorContext();
 
@@ -75,13 +75,14 @@
     resetDraggedPart,
     isDragged,
     updateVector,
-    strokeGeometriesCommands: strokeGeometriesCommands,
+    strokeGeometries: strokeGeometries,
   });
 
   // Register vector node
   let canvasNode: CanvasNode = $state({
     draw,
     update,
+    move: moveVector,
     node: node,
     selected: false,
     boundingBox: Rect.new(),
@@ -90,11 +91,10 @@
 
   registerCanvasNode(canvasNode);
 
-  // Parse all geometries path to an array of PathCommand
-  let strokeGeometry = data.strokeGeometry;
-  for (const geometry of strokeGeometry) {
-    strokeGeometriesCommands.push(parsePathString(normalize(geometry.path)))
-  }
+  // Create variables for vector properties
+  let strokeColor = $derived(colorToString(data.strokes[0].color));
+  let strokeWeight = $state(data.strokeWeight);
+  let stylizedStrokeWeight = $derived(strokeWeight * navigation.scale);
 
   let pointsAndCoordinates: { [key: string]: [number, number][] } = $derived.by(() => {
     return getPointsAndCoordinates();
@@ -103,10 +103,10 @@
   // TO KEEP EVEN IF USELESS FOR NOW : Get all vector parts' shape (lines & curve) of the vector (for the hover)
   let allLines: Line[] = $derived.by(() => {
     let allLines: Line[] = [];
-    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
-      for (const [i, command] of geometry.entries()) {
-        const prevCommand = strokeGeometriesCommands[gi][i - 1] as PathCommandWithEndPoint;
-        const firstCommand = strokeGeometriesCommands[gi][0] as PathCommandWithEndPoint;
+    for (const [gi, geometry] of strokeGeometries.geometries.entries()) {
+      for (const [i, command] of geometry.commands.entries()) {
+        const prevCommand = strokeGeometries.at(gi, i - 1) as PathCommandWithEndPoint;
+        const firstCommand = strokeGeometries.at(gi, 0) as PathCommandWithEndPoint;
         if (command.type === 'L') {
           allLines.push({
             start: navigation.toVirtualPoint(prevCommand.endPoint),
@@ -124,10 +124,10 @@
   })
   let allCurves: Curve[] = $derived.by(() => {
     let allCurves: Curve[] = [];
-    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
-      for (const [i, command] of geometry.entries()) {
-        const prevCommand = strokeGeometriesCommands[gi][i - 1] as PathCommandWithEndPoint;
-        const firstCommand = strokeGeometriesCommands[gi][0] as PathCommandWithEndPoint;
+    for (const [gi, geometry] of strokeGeometries.geometries.entries()) {
+      for (const [i, command] of geometry.commands.entries()) {
+        const prevCommand = strokeGeometries.at(gi, i - 1) as PathCommandWithEndPoint;
+        const firstCommand = strokeGeometries.at(gi, 0) as PathCommandWithEndPoint;
         if (command.type === 'C') {
           allCurves.push({
             start: navigation.toVirtualPoint(prevCommand.endPoint),
@@ -147,7 +147,7 @@
   // -----------------------------------------------------------------------------------------------
 
   // Force update when this variables change (trigger the redraw)
-  canvasContext.updateCanvas(() => [hovered, bbox, strokeGeometriesCommands])
+  canvasContext.updateCanvas(() => [hovered, bbox, strokeGeometries, editMode,])
 
   // Update position of the node
   $effect(() => {
@@ -167,8 +167,8 @@
    */
   function getCommandsWithEndPoints() {
     let listOfCommands: [number, number][] = [];
-    for (const [gi, geometry] of strokeGeometriesCommands.entries()) {
-      for (const [i, command] of geometry.entries()) {
+    for (const [gi, geometry] of strokeGeometries.geometries.entries()) {
+      for (const [i, command] of geometry.commands.entries()) {
         if (commandHasEndPoint(command)) {
           listOfCommands.push([gi, i]);
         }
@@ -185,7 +185,7 @@
   function getPointsAndCoordinates() {
     let to_ret: { [key: string]: [number, number][] } = {};
     getCommandsWithEndPoints().forEach(commandTuple => {
-      let command = strokeGeometriesCommands[commandTuple[0]][commandTuple[1]] as PathCommandWithEndPoint;
+      let command = strokeGeometries.at(commandTuple[0], commandTuple[1]) as PathCommandWithEndPoint;
       const key = vectorToString(command.endPoint);
       if (!to_ret[key]) {
         to_ret[key] = [];
@@ -272,31 +272,13 @@
         color: canvasColors.blue,
         strokeWidth: 2,
       });
-
-      // Draw 4 drag squares to corners of the bounding rect
-      for (const corner of canvasNode.boundingBox.corners) {
-        rect({
-          ctx,
-          x: corner.x,
-          y: corner.y,
-          width: 10,
-          height: 10,
-          colors: {
-            stroke: canvasColors.blue,
-            background: canvasColors.white,
-          },
-          radius: 0,
-          rotation: 0,
-          strokeWeight: 2,
-        });
-      }
     }
 
     // Update string paths commands of node
     // This is necessary to update stylized and skeleton drawings
     strokePathsSynchronization = [];
-    for (const geometriesCommand of strokeGeometriesCommands) {
-      let path = new Path2D(serializeCommands(navigation.toVirtualGeometryCommand(geometriesCommand)));
+    for (const geometriesCommand of strokeGeometries.geometries) {
+      let path = new Path2D(geometriesCommand.toVirtual().serialize());
       strokePathsSynchronization.push(path)
     }
 
@@ -343,53 +325,33 @@
     clicked = hovered && canvasClick.pressed;
     dblclick = hovered && canvasClick.double;
 
-    // Check for selection with SELECTOR RECTANGLE
-    if (selector.rect && !selector.partsMode) {
-      if (selector.rect.collide(canvasNode.boundingBox)) {
-        selector.selectNode(canvasNode);
-      } else {
-        selector.unselectNode(canvasNode);
-      }
-    } else {
-      // Check for selection with CLICK
-      if (clicked) {
-        if (keys.shiftPressed()) {
-          selector.selectNode(canvasNode)
-        } else {
-          selector.selectSingleNode(canvasNode);
+    if (!userState.isResizingNode && !userState.isDragging) {
+      // Check for selection with SELECTOR RECTANGLE
+      if (selector.rect && !selector.partsMode) {
+        if (selector.rect.collide(canvasNode.boundingBox)) {
+          selector.selectNode(canvasNode);
+        } else if (selector.enabled) {
+          selector.unselectNode(canvasNode);
         }
-      } else if (!keys.shiftPressed() && canvasClick.single && canvasNode.selected && !editMode && !canvasNode.boundingBox.containPoint(cursorPosition.offsetPos)) {
-        selector.unselectNode(canvasNode);
+      } else {
+        // Check for selection with CLICK
+        if (clicked) {
+          if (keys.shiftPressed()) {
+            selector.selectNode(canvasNode)
+          } else {
+            selector.selectSingleNode(canvasNode);
+          }
+        } else if (
+          selector.enabled &&
+          !keys.shiftPressed() &&
+          canvasClick.single &&
+          canvasNode.selected &&
+          !editMode &&
+          !canvasNode.boundingBox.containPoint(cursorPosition.offsetPos)
+        ) {
+          selector.unselectNode(canvasNode);
+        }
       }
-    }
-
-    // Move when dragged
-    if (!userState.isEditing && !selector.rect && canvasNode.selected && canvasClick.pressed &&
-      (
-        // If not exactly on the shape of the vector or if the cursor goes outside of the bounding box
-        canvasNode.boundingBox.containPoint(cursorPosition.offsetPos) ||
-        userState.isDragging
-      )
-    ) {
-      if (!userState.isDragging) {
-        selector.disable();
-        userState.isDragging = true;
-        canvasClick.setClickPoint(cursorPosition.clientPos);
-      }
-      // When it is dragged, let's say it's always hovered
-      hovered = true;
-
-      // move delta between last post and current pos
-      console.log(cursorPosition.x, canvasClick.clickPoint.x);
-      let deltaX = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
-      let deltaY = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
-      canvasClick.setClickPoint(cursorPosition.clientPos);
-      moveVector(deltaX, deltaY);
-    }
-    // Reactivate selector rectangle
-    if (userState.isDragging && !canvasClick.pressed) {
-      userState.isDragging = false;
-      selector.enable();
     }
 
     // Toggle vector EDIT MODE when double click
@@ -414,7 +376,6 @@
       userState.isEditing = false;
     }
 
-
     // Update parts
     if (editMode) {
       // Update in this order to prioritize hover (points > lines)
@@ -433,19 +394,22 @@
       // Move the current point or all the points if several are selected
       let selectedCommandTuples = selector.selectedPartsCommandTuples();
       for (const selectedCommandTuple of selectedCommandTuples) {
-        let selectedCommand = strokeGeometriesCommands[selectedCommandTuple[0]][selectedCommandTuple[1]] as PathCommandWithEndPoint;
+        let selectedCommand = strokeGeometries.at(selectedCommandTuple[0], selectedCommandTuple[1]) as PathCommandWithEndPoint;
         selectedCommand.endPoint.x += xShift;
         selectedCommand.endPoint.y += yShift;
       }
     }
   }
 
-  function moveVector(xDelta: number, yDelta: number) {
-    for (const geometry of strokeGeometriesCommands) {
-      for (const command of geometry) {
+  function moveVector(delta: Vector) {
+    // When it is dragged, let's say it's always hovered
+    hovered = true;
+
+    for (const geometry of strokeGeometries.geometries) {
+      for (const command of geometry.commands) {
         if (commandHasEndPoint(command)) {
-          command.endPoint.x += xDelta;
-          command.endPoint.y += yDelta;
+          command.endPoint.x += delta.x;
+          command.endPoint.y += delta.y;
         }
       }
     }
@@ -518,7 +482,8 @@
   }
 
   function getCommandTuplesList(geometryIndex: number, commandIndex: number): [number, number][] {
-    return pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometriesCommands[geometryIndex][commandIndex]).endPoint)];
+    console.log(strokeGeometries.at(geometryIndex, commandIndex));
+    return pointsAndCoordinates[vectorToString(forceCommandWithEndPoint(strokeGeometries.at(geometryIndex, commandIndex)).endPoint)];
   }
 
 </script>
@@ -526,8 +491,8 @@
 {#if (editMode)}
   {#key (triggerUpdate)}
 
-    {#each strokeGeometriesCommands as path_commands, gi}
-      {#each path_commands as command, i}
+    {#each strokeGeometries.geometries as geometry, gi}
+      {#each geometry.commands as command, i}
 
         <!-- Draw lines -->
         {#if (command.type === "Z")}

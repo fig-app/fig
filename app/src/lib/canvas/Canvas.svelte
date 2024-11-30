@@ -15,15 +15,16 @@
   } from "$lib/canvas/stores/canvasColors";
   import type {Vector as VectorType} from "@fig/types/properties/Vector";
   import {canvasPipeline} from "$lib/canvas/stores/canvasPipeline.svelte";
-  import {userMode} from "$lib/canvas/stores/userMode.svelte";
+  import {canvasSettings} from "$lib/canvas/stores/canvasSettings.svelte.js";
   import {canvasRenderingContext} from "$lib/canvas/stores/canvasRenderingContext.svelte";
   import {line} from "$lib/canvas/primitive/line";
   import Vector from "$lib/canvas/components/vector/Vector.svelte";
+  import {canvasTransform} from "$lib/canvas/stores/canvasTransform.svelte";
+  import {userState} from "$lib/canvas/stores/userState.svelte";
 
   type Props = {
     width?: number;
     height?: number;
-    backgroundColor?: string;
     children: Snippet
   }
 
@@ -31,9 +32,11 @@
   let {
     width = 100,
     height = 100,
-    backgroundColor = $bindable(DEFAULT_BACKGROUND_COLOR),
     children
   }: Props = $props();
+
+  const ZOOM_AMOUNT: number = 1.15;
+  const contexts = getAllContexts();
 
   let pipeline: Set<CanvasNode> = canvasPipeline.pipeline;
 
@@ -55,10 +58,8 @@
     y: 0,
   }
 
-  const ZOOM_AMOUNT: number = 1.15;
-
   updateCanvas(() => [
-    backgroundColor,
+    canvasSettings.backgroundColor,
     navigation.scale,
     navigation.offsetX,
     navigation.offsetY,
@@ -71,6 +72,12 @@
     availableWidth,
     availableHeight
   ]);
+
+  for (let corner of canvasTransform.transformCorners) {
+    updateCanvas(() => [corner.rect.hovered, corner.dragged]);
+  }
+
+  $inspect(selector.disabled)
 
   // Set canvas context
   setCanvasContext({
@@ -104,16 +111,18 @@
     }
   });
 
-  const contexts = getAllContexts();
-
+  // Mount nodes from the creation pipeline data
+  // View creation pipeline in `CanvasPipeline` store for more information on how to add nodes to the pipeline
   $effect(() => {
     if (canvasPipeline.creationPipeline.length > 0) {
       for (let node of canvasPipeline.creationPipeline) {
-        mount(Vector, {
-          target: document.querySelector("#canvas") as HTMLElement,
-          props: {node},
-          context: contexts,
-        });
+        if (node.node.type === "vector") {
+          mount(Vector, {
+            target: document.querySelector("#canvas") as HTMLElement,
+            props: {node},
+            context: contexts,
+          });
+        }
       }
 
       canvasPipeline.clearCreationPipeline();
@@ -121,6 +130,23 @@
   })
 
   // Functions
+  function register(node: CanvasNode) {
+    onMount(() => {
+      pipeline.add(node);
+      return () => pipeline.delete(node);
+    });
+  }
+
+  function unregister(node: CanvasNode) {
+    pipeline.delete(node);
+  }
+
+
+  // -------------------------------------------------------------------------------------------- //
+  // Update
+  // -------------------------------------------------------------------------------------------- //
+
+  // Redraw canvas when dependencies change
   function updateCanvas(depts: () => any[]) {
     let scheduled = false;
     $effect(() => {
@@ -137,16 +163,60 @@
     });
   }
 
-  function register(node: CanvasNode) {
-    onMount(() => {
-      pipeline.add(node);
-      return () => pipeline.delete(node);
-    });
+  function update(timestamp: number) {
+    canvasTime.updateTimestamp(timestamp);
+    canvasTime.updateTimers();
+
+    selector.update();
+    canvasTransform.update();
+
+    for (const node of pipeline) {
+      node.update();
+    }
+
+    if (selector.selectedNode) {
+      let canvasNode = selector.selectedNode;
+
+      // Move node when dragged
+      if (
+        !userState.isResizingNode &&
+        !userState.isEditing &&
+        !selector.rect &&
+        canvasNode.selected &&
+        canvasClick.pressed &&
+        (
+          // If not exactly on the shape of the vector or if the cursor goes outside of the bounding box
+          canvasNode.boundingBox.containPoint(cursorPosition.offsetPos) ||
+          userState.isDragging
+        )
+      ) {
+        if (!userState.isDragging) {
+          selector.disable();
+          userState.isDragging = true;
+          canvasClick.setClickPoint(cursorPosition.clientPos);
+        }
+
+        // Move delta between last post and current pos
+        // console.log(cursorPosition.x, canvasClick.clickPoint.x);
+        let deltaX = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
+        let deltaY = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
+        canvasClick.setClickPoint(cursorPosition.clientPos);
+
+        canvasNode.move({x: deltaX, y: deltaY});
+      }
+
+      // Reactivate selector rectangle
+      if (userState.isDragging && !canvasClick.pressed) {
+        userState.isDragging = false;
+        selector.enable();
+      }
+    }
   }
 
-  function unregister(node: CanvasNode) {
-    pipeline.delete(node);
-  }
+
+  // -------------------------------------------------------------------------------------------- //
+  // Drawing
+  // -------------------------------------------------------------------------------------------- //
 
   function draw() {
     drawBackground();
@@ -156,11 +226,13 @@
     }
 
     drawNodes();
-    drawRulers();
 
     if (ctx) {
       selector.draw(ctx);
       drawLineIndicators(ctx);
+      drawRulers();
+
+      canvasTransform.draw(ctx);
     }
   }
 
@@ -241,7 +313,7 @@
         y: height / 2,
         width,
         height,
-        color: backgroundColor
+        color: canvasSettings.backgroundColor
       });
     }
   }
@@ -348,6 +420,7 @@
         x += cellSize * navigation.scale
       ) {
         ctx.fillText(navigation.toRealX(x).toFixed(0).toString(), x, 10);
+        line({ctx, start: {x, y: 16}, end: {x, y: 20}, color: canvasColors.darkGray2})
       }
 
       for (
@@ -362,6 +435,8 @@
         ctx.rotate(-Math.PI / 2);
         ctx.fillText(navigation.toRealY(y).toFixed(0).toString(), 0, 0);
         ctx.restore();
+
+        line({ctx, start: {x: 16, y}, end: {x: 20, y}, color: canvasColors.darkGray2})
       }
 
       // Draw borders and top left corner
@@ -394,16 +469,10 @@
     }
   }
 
-  function update(timestamp: number) {
-    canvasTime.updateTimestamp(timestamp);
-    canvasTime.updateTimers();
 
-    selector.update();
-
-    for (const node of pipeline) {
-      node.update();
-    }
-  }
+  // -------------------------------------------------------------------------------------------- //
+  // Event handlers
+  // -------------------------------------------------------------------------------------------- //
 
   function handleMouseMove(e: MouseEvent) {
     if (isPanning) {
@@ -500,56 +569,63 @@
     // Add new vector when clicking on canvas
     // If nothing is actually selected
     // And if in pen mode
-    if (userMode.mode === 'PEN' && !selector.hasSelectedParts()) {
+    if (canvasSettings.mode === 'PEN' && !selector.hasSelectedParts()) {
     } else {
     }
   }
 
 </script>
 
-<svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}
-               onresize={handleResize}/>
+<svelte:window
+  bind:innerWidth={windowWidth}
+  bind:innerHeight={windowHeight}
+  onresize={handleResize}
+/>
 
-<div class="h-full" bind:clientWidth={availableWidth} bind:clientHeight={availableHeight}>
-  <canvas bind:this={canvas}
-          {width}
-          {height}
-          style:width={width + "px"}
-          style:height={height + "px"}
-          onwheel={handleWheel}
-          onmousemove={handleMouseMove}
-          onclick={handleCanvasClick}
-          ondblclick={(e: MouseEvent) => {
-            if (e.button === 0) {
-              canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
-            }
-          }}
-          onmousedown={(e: MouseEvent) => {
-            // Left click
-            if (e.button === 0) {
-              canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
-            }
-            // Middle click -> panning
-            else if (e.button === 1) {
-              isPanning = true;
-              lastPanningPos = {x: e.x, y: e.y};
-              canvas.style.cursor = 'grabbing';
-            }
-          }}
-          onmouseup={(e: MouseEvent) => {
-            canvasClick.resetClick();
-            if (e.button === 1) {
-              isPanning = false;
-              canvas.style.cursor = "default";
-            }
-          }}
-          onmouseleave={(_) => {
-            isPanning = false;
-            canvas.style.cursor = "default";
-          }}
+<div
+  id="canvas"
+  class="h-full"
+  bind:clientWidth={availableWidth}
+  bind:clientHeight={availableHeight}>
+
+  <canvas
+    bind:this={canvas}
+    {width}
+    {height}
+    style:width={width + "px"}
+    style:height={height + "px"}
+    onwheel={handleWheel}
+    onmousemove={handleMouseMove}
+    onclick={handleCanvasClick}
+    ondblclick={(e: MouseEvent) => {
+      if (e.button === 0) {
+        canvasClick.setDoubleClick(true, {x: e.clientX, y: e.clientY});
+      }
+    }}
+    onmousedown={(e: MouseEvent) => {
+      // Left click
+      if (e.button === 0) {
+        canvasClick.setPress(true, {x: e.clientX, y: e.clientY});
+      }
+      // Middle click -> panning
+      else if (e.button === 1) {
+        isPanning = true;
+        lastPanningPos = {x: e.x, y: e.y};
+        canvas.style.cursor = 'grabbing';
+      }
+    }}
+    onmouseup={(e: MouseEvent) => {
+      canvasClick.resetClick();
+      if (e.button === 1) {
+        isPanning = false;
+        canvas.style.cursor = "default";
+      }
+    }}
+    onmouseleave={(_) => {
+      isPanning = false;
+      canvas.style.cursor = "default";
+    }}
   >
     {@render children()}
   </canvas>
 </div>
-
-<div id="canvas"></div>
