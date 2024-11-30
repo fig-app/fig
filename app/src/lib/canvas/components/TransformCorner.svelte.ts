@@ -61,11 +61,6 @@ export class TransformCorner {
       this.rect.height = SIZE;
     }
 
-    // Disable selector on drag
-    if (this.dragged) {
-      selector.disable();
-    }
-
     // Check for dragging
     if (this.rect.clicked) {
       this.dragged = true;
@@ -73,10 +68,13 @@ export class TransformCorner {
       this.dragged = false;
     }
 
-    // Update the position of the corner
     if (this.dragged) {
+      // Update the position of the corner
       this.position.x = cursorPosition.offsetX;
       this.position.y = cursorPosition.offsetY;
+
+      // Disable selector
+      selector.disable();
     }
   }
 }
@@ -85,7 +83,7 @@ export function initializeTransformCorners(): TransformCorner[] {
   return [
     new TransformCorner("top", "left"),
     new TransformCorner("top", "right"),
-    new TransformCorner("bottom", "left"),
     new TransformCorner("bottom", "right"),
+    new TransformCorner("bottom", "left"),
   ];
 }

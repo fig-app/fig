@@ -24,6 +24,7 @@
     TransformCorner
   } from "$lib/canvas/components/TransformCorner.svelte.js";
   import {canvasTransform} from "$lib/canvas/stores/canvasTransform.svelte";
+  import {userState} from "$lib/canvas/stores/userState.svelte";
 
   type Props = {
     width?: number;
@@ -173,6 +174,39 @@
 
     for (const node of pipeline) {
       node.update();
+    }
+
+    // Maybe move this to another file
+    // Move node when dragged
+    if (selector.selectedNode) {
+      let canvasNode = selector.selectedNode;
+
+      if (!userState.isEditing && !selector.rect && canvasNode.selected && canvasClick.pressed &&
+        (
+          // If not exactly on the shape of the vector or if the cursor goes outside of the bounding box
+          canvasNode.boundingBox.containPoint(cursorPosition.offsetPos) ||
+          userState.isDragging
+        )
+      ) {
+        if (!userState.isDragging) {
+          selector.disable();
+          userState.isDragging = true;
+          canvasClick.setClickPoint(cursorPosition.clientPos);
+        }
+
+        // move delta between last post and current pos
+        console.log(cursorPosition.x, canvasClick.clickPoint.x);
+        let deltaX = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
+        let deltaY = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
+        canvasClick.setClickPoint(cursorPosition.clientPos);
+        canvasNode.move({x: deltaX, y: deltaY});
+      }
+
+      // Reactivate selector rectangle
+      if (userState.isDragging && !canvasClick.pressed) {
+        userState.isDragging = false;
+        selector.enable();
+      }
     }
   }
 

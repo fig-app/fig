@@ -35,6 +35,7 @@
   import {roundFloat} from "@fig/functions/math";
   import {Geometries} from "$lib/canvas/components/vector/Geometries.svelte.js";
   import type {TransformCorner} from "$lib/canvas/components/TransformCorner.svelte.js";
+  import type {Vector} from "@fig/types/dist/properties/Vector";
 
   let {node}: { node: Node } = $props();
 
@@ -81,6 +82,7 @@
   let canvasNode: CanvasNode = $state({
     draw,
     update,
+    move: moveVector,
     node: node,
     selected: false,
     boundingBox: Rect.new(),
@@ -350,37 +352,6 @@
       }
     }
 
-    // Move when dragged
-    if (!userState.isEditing && !selector.rect && canvasNode.selected && canvasClick.pressed &&
-      (
-        // If not exactly on the shape of the vector or if the cursor goes outside of the bounding box
-        canvasNode.boundingBox.containPoint(cursorPosition.offsetPos) ||
-        userState.isDragging
-      )
-    ) {
-      if (!userState.isDragging) {
-        selector.disable();
-        userState.isDragging = true;
-        canvasClick.setClickPoint(cursorPosition.clientPos);
-      }
-
-      // When it is dragged, let's say it's always hovered
-      hovered = true;
-
-      // move delta between last post and current pos
-      console.log(cursorPosition.x, canvasClick.clickPoint.x);
-      let deltaX = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
-      let deltaY = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
-      canvasClick.setClickPoint(cursorPosition.clientPos);
-      moveVector(deltaX, deltaY);
-    }
-
-    // Reactivate selector rectangle
-    if (userState.isDragging && !canvasClick.pressed) {
-      userState.isDragging = false;
-      selector.enable();
-    }
-
     // Toggle vector EDIT MODE when double click
     if (dblclick && !editMode && editTimer.finished()) {
       editMode = true;
@@ -428,12 +399,15 @@
     }
   }
 
-  function moveVector(xDelta: number, yDelta: number) {
+  function moveVector(delta: Vector) {
+    // When it is dragged, let's say it's always hovered
+    hovered = true;
+
     for (const geometry of strokeGeometries.geometries) {
       for (const command of geometry.commands) {
         if (commandHasEndPoint(command)) {
-          command.endPoint.x += xDelta;
-          command.endPoint.y += yDelta;
+          command.endPoint.x += delta.x;
+          command.endPoint.y += delta.y;
         }
       }
     }

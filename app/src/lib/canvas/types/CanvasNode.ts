@@ -6,6 +6,7 @@ import type { Vector } from "@fig/types/properties/Vector";
 export type CanvasNode = {
   draw: CanvasDrawFunction;
   update: () => void;
+  move: (delta: Vector) => void;
   node: Node;
   selected: boolean;
   boundingBox: Rect;
