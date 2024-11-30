@@ -33,8 +33,8 @@
   import {parsePathString} from "@fig/functions/path/index";
   import {userState} from "$lib/canvas/stores/userState.svelte";
   import {roundFloat} from "@fig/functions/math";
-  import {Geometries} from "$lib/canvas/Geometries.svelte";
-  import type {TransformCorner} from "$lib/canvas/components/vector/TransformCorner.svelte";
+  import {Geometries} from "$lib/canvas/components/vector/Geometries.svelte.js";
+  import type {TransformCorner} from "$lib/canvas/components/TransformCorner.svelte.js";
 
   let {node}: { node: Node } = $props();
 
@@ -270,24 +270,6 @@
         color: canvasColors.blue,
         strokeWidth: 2,
       });
-
-      // Draw 4 drag squares to corners of the bounding rect
-      for (const corner of canvasNode.boundingBox.corners) {
-        rect({
-          ctx,
-          x: corner.x,
-          y: corner.y,
-          width: 10,
-          height: 10,
-          colors: {
-            stroke: canvasColors.blue,
-            background: canvasColors.white,
-          },
-          radius: 0,
-          rotation: 0,
-          strokeWeight: 2,
-        });
-      }
     }
 
     // Update string paths commands of node
@@ -345,7 +327,7 @@
     if (selector.rect && !selector.partsMode) {
       if (selector.rect.collide(canvasNode.boundingBox)) {
         selector.selectNode(canvasNode);
-      } else {
+      } else if (selector.enabled) {
         selector.unselectNode(canvasNode);
       }
     } else {
@@ -356,7 +338,14 @@
         } else {
           selector.selectSingleNode(canvasNode);
         }
-      } else if (!keys.shiftPressed() && canvasClick.single && canvasNode.selected && !editMode && !canvasNode.boundingBox.containPoint(cursorPosition.offsetPos)) {
+      } else if (
+        selector.enabled &&
+        !keys.shiftPressed() &&
+        canvasClick.single &&
+        canvasNode.selected &&
+        !editMode &&
+        !canvasNode.boundingBox.containPoint(cursorPosition.offsetPos)
+      ) {
         selector.unselectNode(canvasNode);
       }
     }
@@ -374,6 +363,7 @@
         userState.isDragging = true;
         canvasClick.setClickPoint(cursorPosition.clientPos);
       }
+
       // When it is dragged, let's say it's always hovered
       hovered = true;
 
@@ -384,6 +374,7 @@
       canvasClick.setClickPoint(cursorPosition.clientPos);
       moveVector(deltaX, deltaY);
     }
+
     // Reactivate selector rectangle
     if (userState.isDragging && !canvasClick.pressed) {
       userState.isDragging = false;

@@ -1,11 +1,11 @@
-import type {VectorPart} from "$lib/canvas/types/VectorPart";
-import type {CanvasNode} from "$lib/canvas/types/CanvasNode";
-import {Rect} from "$lib/canvas/Rect.svelte";
-import {cursorPosition, keys} from "$lib/stores";
-import {canvasClick} from "$lib/canvas/stores/canvasClick.svelte";
-import {canvasColors} from "$lib/canvas/stores/canvasColors";
-import {removeArrayOfTupleDuplicates} from "@fig/functions/array";
-import type {Vector} from "@fig/types/properties/Vector";
+import type { VectorPart } from "$lib/canvas/types/VectorPart";
+import type { CanvasNode } from "$lib/canvas/types/CanvasNode";
+import { Rect } from "$lib/canvas/Rect.svelte";
+import { cursorPosition, keys } from "$lib/stores";
+import { canvasClick } from "$lib/canvas/stores/canvasClick.svelte";
+import { canvasColors } from "$lib/canvas/stores/canvasColors";
+import { removeArrayOfTupleDuplicates } from "@fig/functions/array";
+import type { Vector } from "@fig/types/properties/Vector";
 
 class Selector {
   mode: "node" | "vector" = $state("node");
@@ -20,8 +20,7 @@ class Selector {
   rect: Rect | null = $state(null);
   origin: Vector | null = $state(null);
 
-  constructor() {
-  }
+  constructor() {}
 
   draw(ctx: CanvasRenderingContext2D) {
     if (this.disabled) return;
@@ -29,7 +28,7 @@ class Selector {
     if (this.rect) {
       this.rect.drawTopLeft({
         ctx,
-        colors: {stroke: canvasColors.blue},
+        colors: { stroke: canvasColors.blue },
         strokeWeight: 2,
       });
     }
@@ -91,6 +90,10 @@ class Selector {
 
   enable() {
     this.disabled = false;
+  }
+
+  get enabled() {
+    return !this.disabled;
   }
 
   // Nodes

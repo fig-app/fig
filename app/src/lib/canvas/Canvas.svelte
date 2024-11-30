@@ -19,7 +19,11 @@
   import {canvasRenderingContext} from "$lib/canvas/stores/canvasRenderingContext.svelte";
   import {line} from "$lib/canvas/primitive/line";
   import Vector from "$lib/canvas/components/vector/Vector.svelte";
-  import type {TransformCorner} from "$lib/canvas/components/vector/TransformCorner.svelte";
+  import {
+    initializeTransformCorners,
+    TransformCorner
+  } from "$lib/canvas/components/TransformCorner.svelte.js";
+  import {canvasTransform} from "$lib/canvas/stores/canvasTransform.svelte";
 
   type Props = {
     width?: number;
@@ -57,9 +61,6 @@
     y: 0,
   }
 
-  // Corners which is grafted onto the selected node or nodes
-  let transformCorners: TransformCorner[] = $state([]);
-
   updateCanvas(() => [
     canvasSettings.backgroundColor,
     navigation.scale,
@@ -74,6 +75,10 @@
     availableWidth,
     availableHeight
   ]);
+
+  for (let corner of canvasTransform.transformCorners) {
+    updateCanvas(() => [corner.rect.hovered, corner.dragged]);
+  }
 
   // Set canvas context
   setCanvasContext({
@@ -108,7 +113,7 @@
   });
 
   // Mount nodes from the creation pipeline data
-  // View `CanvasPipeline` store for more information on how to add nodes to the pipeline
+  // View creation pipeline in `CanvasPipeline` store for more information on how to add nodes to the pipeline
   $effect(() => {
     if (canvasPipeline.creationPipeline.length > 0) {
       for (let node of canvasPipeline.creationPipeline) {
@@ -164,16 +169,10 @@
     canvasTime.updateTimers();
 
     selector.update();
+    canvasTransform.update();
 
     for (const node of pipeline) {
       node.update();
-    }
-
-    // Update transform corners
-    if (selector.selectedNode) {
-      for (let corner of transformCorners) {
-        corner.update();
-      }
     }
   }
 
@@ -196,12 +195,7 @@
       drawLineIndicators(ctx);
       drawRulers();
 
-      // Draw transform corners
-      if (selector.selectedNode) {
-        for (let corner of transformCorners) {
-          corner.draw(ctx);
-        }
-      }
+      canvasTransform.draw(ctx);
     }
   }
 

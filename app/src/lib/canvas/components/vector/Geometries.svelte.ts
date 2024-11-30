@@ -1,4 +1,4 @@
-import { Geometry } from "$lib/canvas/Geometry.svelte.js";
+import { Geometry } from "$lib/canvas/components/vector/Geometry.svelte.js";
 import { getGeometryBbox } from "@fig/functions/path/bBox";
 
 /**

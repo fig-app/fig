@@ -28,7 +28,7 @@
       y: randomInt(0, window.innerHeight - 200),
       width: 100,
       height: 100
-    }, randomColor())
+    }, randomColor(), randomInt(1, 5));
   }
 
 </script>

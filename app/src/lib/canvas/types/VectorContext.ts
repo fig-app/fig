@@ -1,5 +1,5 @@
 import type { VectorPart } from "$lib/canvas/types/VectorPart";
-import type { Geometries } from "$lib/canvas/Geometries.svelte";
+import type { Geometries } from "$lib/canvas/components/vector/Geometries.svelte.js";
 
 export type VectorContext = {
   register: (part: VectorPart) => void;

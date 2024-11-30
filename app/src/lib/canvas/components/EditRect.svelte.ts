@@ -28,11 +28,11 @@ export class EditRect {
   }
 
   hovered() {
-    return this.rect.hovered();
+    return this.rect.hovered;
   }
 
   clicked() {
-    return this.rect.clicked();
+    return this.rect.clicked;
   }
 
   update() {}

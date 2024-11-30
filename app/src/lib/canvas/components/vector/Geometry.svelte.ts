@@ -1,5 +1,5 @@
 import type { PathCommand } from "@fig/functions/path/PathCommand";
-import { navigation } from "$lib/canvas/stores/navigation.svelte";
+import { navigation } from "$lib/canvas/stores/navigation.svelte.js";
 import { serializeCommands } from "@fig/functions/path/serialize";
 import { parsePathString } from "@fig/functions/path/index";
 import { normalize } from "@fig/functions/path/normalize";
