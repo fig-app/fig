@@ -325,30 +325,32 @@
     clicked = hovered && canvasClick.pressed;
     dblclick = hovered && canvasClick.double;
 
-    // Check for selection with SELECTOR RECTANGLE
-    if (selector.rect && !selector.partsMode) {
-      if (selector.rect.collide(canvasNode.boundingBox)) {
-        selector.selectNode(canvasNode);
-      } else if (selector.enabled) {
-        selector.unselectNode(canvasNode);
-      }
-    } else {
-      // Check for selection with CLICK
-      if (clicked) {
-        if (keys.shiftPressed()) {
-          selector.selectNode(canvasNode)
-        } else {
-          selector.selectSingleNode(canvasNode);
+    if (!userState.isResizingNode && !userState.isDragging) {
+      // Check for selection with SELECTOR RECTANGLE
+      if (selector.rect && !selector.partsMode) {
+        if (selector.rect.collide(canvasNode.boundingBox)) {
+          selector.selectNode(canvasNode);
+        } else if (selector.enabled) {
+          selector.unselectNode(canvasNode);
         }
-      } else if (
-        selector.enabled &&
-        !keys.shiftPressed() &&
-        canvasClick.single &&
-        canvasNode.selected &&
-        !editMode &&
-        !canvasNode.boundingBox.containPoint(cursorPosition.offsetPos)
-      ) {
-        selector.unselectNode(canvasNode);
+      } else {
+        // Check for selection with CLICK
+        if (clicked) {
+          if (keys.shiftPressed()) {
+            selector.selectNode(canvasNode)
+          } else {
+            selector.selectSingleNode(canvasNode);
+          }
+        } else if (
+          selector.enabled &&
+          !keys.shiftPressed() &&
+          canvasClick.single &&
+          canvasNode.selected &&
+          !editMode &&
+          !canvasNode.boundingBox.containPoint(cursorPosition.offsetPos)
+        ) {
+          selector.unselectNode(canvasNode);
+        }
       }
     }
 

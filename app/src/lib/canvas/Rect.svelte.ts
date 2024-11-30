@@ -28,6 +28,7 @@ export class Rect {
   topLeft: Vector = $state({ x: 0, y: 0 });
   width = $state(0);
   height = $state(0);
+  hoverDistance = $state(0);
 
   constructor({ x = 0, y = 0, width = 0, height = 0 }: RectConstructorArgs) {
     this.topLeft.x = x;
@@ -104,7 +105,13 @@ export class Rect {
 
   // Functions
   get hovered(): boolean {
-    return hoverRect(cursorPosition.offsetPos, this.topLeft, this.width, this.height);
+    return hoverRect(
+      cursorPosition.offsetPos,
+      this.topLeft,
+      this.width,
+      this.height,
+      this.hoverDistance,
+    );
   }
 
   get clicked(): boolean {

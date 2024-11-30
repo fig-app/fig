@@ -19,10 +19,6 @@
   import {canvasRenderingContext} from "$lib/canvas/stores/canvasRenderingContext.svelte";
   import {line} from "$lib/canvas/primitive/line";
   import Vector from "$lib/canvas/components/vector/Vector.svelte";
-  import {
-    initializeTransformCorners,
-    TransformCorner
-  } from "$lib/canvas/components/TransformCorner.svelte.js";
   import {canvasTransform} from "$lib/canvas/stores/canvasTransform.svelte";
   import {userState} from "$lib/canvas/stores/userState.svelte";
 
@@ -80,6 +76,8 @@
   for (let corner of canvasTransform.transformCorners) {
     updateCanvas(() => [corner.rect.hovered, corner.dragged]);
   }
+
+  $inspect(selector.disabled)
 
   // Set canvas context
   setCanvasContext({
@@ -176,12 +174,16 @@
       node.update();
     }
 
-    // Maybe move this to another file
-    // Move node when dragged
     if (selector.selectedNode) {
       let canvasNode = selector.selectedNode;
 
-      if (!userState.isEditing && !selector.rect && canvasNode.selected && canvasClick.pressed &&
+      // Move node when dragged
+      if (
+        !userState.isResizingNode &&
+        !userState.isEditing &&
+        !selector.rect &&
+        canvasNode.selected &&
+        canvasClick.pressed &&
         (
           // If not exactly on the shape of the vector or if the cursor goes outside of the bounding box
           canvasNode.boundingBox.containPoint(cursorPosition.offsetPos) ||
@@ -194,11 +196,12 @@
           canvasClick.setClickPoint(cursorPosition.clientPos);
         }
 
-        // move delta between last post and current pos
-        console.log(cursorPosition.x, canvasClick.clickPoint.x);
+        // Move delta between last post and current pos
+        // console.log(cursorPosition.x, canvasClick.clickPoint.x);
         let deltaX = (cursorPosition.x - canvasClick.clickPoint.x) / navigation.scale;
         let deltaY = (cursorPosition.y - canvasClick.clickPoint.y) / navigation.scale;
         canvasClick.setClickPoint(cursorPosition.clientPos);
+
         canvasNode.move({x: deltaX, y: deltaY});
       }
 

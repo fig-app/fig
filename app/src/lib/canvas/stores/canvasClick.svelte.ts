@@ -1,9 +1,10 @@
-import type {Vector} from "@fig/types/properties/Vector";
+import type { Vector } from "@fig/types/properties/Vector";
 
 type CanvasClickStates = {
   single: boolean;
   double: boolean;
   pressed: boolean;
+  released: boolean;
   clickPoint: Vector | null;
 };
 
@@ -12,11 +13,11 @@ class CanvasClickSvelte {
     single: false,
     double: false,
     pressed: false,
+    released: false,
     clickPoint: null,
   });
 
-  constructor() {
-  }
+  constructor() {}
 
   get single() {
     return this.states.single;
@@ -30,9 +31,13 @@ class CanvasClickSvelte {
     return this.states.pressed;
   }
 
+  get released() {
+    return this.states.released;
+  }
+
   get clickPoint() {
     let point = this.states.clickPoint;
-    return point ? point : {x: 0, y: 0};
+    return point ? point : { x: 0, y: 0 };
   }
 
   public setClickPoint(point: Vector) {
@@ -62,6 +67,11 @@ class CanvasClickSvelte {
     this.states.double = false;
     this.states.pressed = false;
     this.states.clickPoint = null;
+    
+    this.states.released = true;
+    setTimeout(() => {
+      this.states.released = false;
+    }, 100);
   }
 }
 

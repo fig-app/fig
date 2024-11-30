@@ -6,6 +6,8 @@ import { selector } from "$lib/canvas/components/Selector.svelte.js";
 import { canvasClick } from "$lib/canvas/stores/canvasClick.svelte";
 import { cursorPosition } from "$lib/stores";
 import type { Horizontal, Vertical } from "$lib/canvas/types/Axis";
+import { userState } from "$lib/canvas/stores/userState.svelte";
+import { canvasTransform } from "$lib/canvas/stores/canvasTransform.svelte";
 
 const SIZE: number = 8;
 
@@ -24,6 +26,7 @@ export class TransformCorner {
     this.horizontal = horizontal;
     this.rect.width = SIZE;
     this.rect.height = SIZE;
+    this.rect.hoverDistance = 2;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -48,11 +51,15 @@ export class TransformCorner {
     }
   }
 
-  update(position: Vector) {
-    this.position = position;
-    this.rect.center = this.position;
+  update(position: Vector | null = null) {
+    // If no corner is selected, update the position of the corner
+    // based on the position of the selected node (passed as an argument)
+    if (!canvasTransform.hasSelectedCorner() && position) {
+      this.position = position;
+    }
 
     // Adjust the size of the corner when zooming
+    // This is a temporary solution
     if (navigation.percentScale < 100) {
       this.rect.width = SIZE * navigation.scale;
       this.rect.height = SIZE * navigation.scale;
@@ -62,28 +69,36 @@ export class TransformCorner {
     }
 
     // Check for dragging
-    if (this.rect.clicked) {
+    if (this.rect.clicked && !canvasTransform.hasSelectedCorner()) {
       this.dragged = true;
-    } else if (this.dragged && !canvasClick.pressed) {
+      canvasTransform.setSelectedCorner(this);
+      userState.isResizingNode = true;
+    }
+    // And not dragging
+    else if (this.dragged && !canvasClick.pressed) {
       this.dragged = false;
+      canvasTransform.unselectCorner();
+      userState.isResizingNode = false;
     }
 
-    if (this.dragged) {
+    // if (this.rect.hovered) {
+    //   selector.disable();
+    // } else {
+    //   selector.enable();
+    // }
+
+    if (this.dragged && selector.selectedNode) {
       // Update the position of the corner
       this.position.x = cursorPosition.offsetX;
       this.position.y = cursorPosition.offsetY;
 
+      // selector.selectedNode.resize.fromCorner(this.vertical, this.horizontal, this.position);
+
       // Disable selector
       selector.disable();
     }
-  }
-}
 
-export function initializeTransformCorners(): TransformCorner[] {
-  return [
-    new TransformCorner("top", "left"),
-    new TransformCorner("top", "right"),
-    new TransformCorner("bottom", "right"),
-    new TransformCorner("bottom", "left"),
-  ];
+    // console.log("dragged", this.dragged, canvasTransform.selectedCorner, selector.disabled);
+    this.rect.center = this.position;
+  }
 }
